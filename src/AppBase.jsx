@@ -23,6 +23,15 @@ export const MAX_SESSIONS = (isMobile && !isPad) ? 30 : 100;
 // /clear 后乐观水位：把上下文血条压到这个百分比，下一次 context_window SSE 推送会自动覆盖回真实值
 export const OPTIMISTIC_CLEAR_PERCENT = 5;
 
+function getInitialProviderState() {
+  if (typeof window === 'undefined') return { provider: 'claude', codexSessionId: '' };
+  const params = new URLSearchParams(window.location.search);
+  return {
+    provider: params.get('provider') === 'codex' ? 'codex' : 'claude',
+    codexSessionId: params.get('session') || '',
+  };
+}
+
 /**
  * 共享基类：包含 PC 和 Mobile 通用的状态管理、SSE 通信、数据处理、偏好设置等逻辑。
  * 子类 App (PC) 和 Mobile 各自实现 render() 方法。
@@ -36,6 +45,7 @@ class AppBase extends React.Component {
 
   constructor(props) {
     super(props);
+    const initialProvider = getInitialProviderState();
     // 从 localStorage 恢复缓存倒计时
     const savedExpireAt = parseInt(localStorage.getItem('ccv_cacheExpireAt'), 10) || null;
     const savedCacheType = localStorage.getItem('ccv_cacheType') || null;
@@ -50,6 +60,12 @@ class AppBase extends React.Component {
       cacheExpireAt,
       cacheType,
       mainAgentSessions: [], // [{ messages, response }]
+      provider: initialProvider.provider,
+      codexSessions: [],
+      codexSessionsLoading: false,
+      codexSessionsError: '',
+      codexHome: '',
+      selectedCodexSessionId: initialProvider.codexSessionId,
       importModalVisible: false,
       localLogs: {},       // { projectName: [{file, timestamp, size}] }
       localLogsLoading: false,
@@ -132,6 +148,7 @@ class AppBase extends React.Component {
     // 增量维护的 KV-Cache 缓存内容（稳定引用，不受 inProgress 闪烁影响）
     this._lastKvCacheContent = null;
     this._sseSlimmer = null; this._sseReconstructor = null;
+    this._codexSessionsSeq = 0;
   }
 
   /** 批量剪枝 entries：清空旧 MainAgent 的 body.messages，保留最后一条完整 */
@@ -165,6 +182,48 @@ class AppBase extends React.Component {
       preferences: ctx.preferences,
       onUpdatePreferences: ctx.updatePreferences,
       onUpdateClaudeSettings: ctx.updateClaudeSettings,
+    };
+  }
+
+  _isCodexProvider() {
+    return this.state.provider === 'codex';
+  }
+
+  _setProviderUrl(provider, sessionId) {
+    if (typeof window === 'undefined' || !window.history?.replaceState) return;
+    const nextUrl = new URL(window.location.href);
+    if (provider === 'codex') {
+      nextUrl.searchParams.set('provider', 'codex');
+      nextUrl.searchParams.delete('logfile');
+      if (sessionId) nextUrl.searchParams.set('session', sessionId);
+      else nextUrl.searchParams.delete('session');
+    } else {
+      nextUrl.searchParams.delete('provider');
+      nextUrl.searchParams.delete('session');
+    }
+    window.history.replaceState(null, '', `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
+  }
+
+  _resetViewerEntries(extra = {}) {
+    this._teardownTransientLiveState();
+    this._rebuildRequestIndex([]);
+    this._currentSessionId = null;
+    this._oldestTs = null;
+    return {
+      requests: [],
+      mainAgentSessions: [],
+      selectedIndex: null,
+      streamingLatest: null,
+      serverCachedContent: null,
+      contextWindow: null,
+      contextBarOptimistic: false,
+      hasMoreHistory: false,
+      loadingMore: false,
+      sessionIndex: [],
+      loadingSessionId: null,
+      fileLoading: false,
+      fileLoadingCount: 0,
+      ...extra,
     };
   }
 
@@ -379,6 +438,7 @@ class AppBase extends React.Component {
     // 获取当前监控的项目名称
     const params = new URLSearchParams(window.location.search);
     const logfile = params.get('logfile');
+    const isCodexInitial = this._isCodexProvider();
     fetch(apiUrl('/api/project-name'))
       .then(res => res.json())
       .then(data => {
@@ -386,7 +446,7 @@ class AppBase extends React.Component {
         this.setState({ projectName });
         if (projectName) document.title = projectName;
         // 移动端：从缓存恢复数据，在 SSE 数据到达前立即渲染
-        if (isMobile && projectName && !logfile && this.state.requests.length === 0) {
+        if (!isCodexInitial && isMobile && projectName && !logfile && this.state.requests.length === 0) {
           loadEntries(projectName).then(cached => {
             if (cached && this.state.requests.length === 0) {
               this._batchSlim(cached);
@@ -437,6 +497,7 @@ class AppBase extends React.Component {
     fetch(apiUrl('/api/cli-mode'))
       .then(res => res.json())
       .then(data => {
+        if (this._isCodexProvider()) return;
         if (data.workspaceMode) {
           this.setState({ cliMode: true, workspaceMode: true, isWorkspaceServer: true });
         } else if (data.cliMode) {
@@ -446,7 +507,9 @@ class AppBase extends React.Component {
       .catch(() => { });
 
     // 检查是否是通过 ?logfile= 打开的历史日志
-    if (logfile) {
+    if (isCodexInitial) {
+      this.loadCodexSessions(this.state.selectedCodexSessionId);
+    } else if (logfile) {
       this.loadLocalLogFile(logfile);
     } else {
       this.initSSE();
@@ -521,7 +584,7 @@ class AppBase extends React.Component {
     if (this.eventSource) { this.eventSource.close(); this.eventSource = null; }
 
     // 必须在 _teardownTransientLiveState() 之前，否则 _chunkedEntries 会被清零。
-    if (this._chunkedEntries && this._chunkedEntries.length > 0 && isMobile) {
+    if (this._chunkedEntries && this._chunkedEntries.length > 0 && isMobile && !this._isCodexProvider()) {
       try {
         const partial = reconstructEntries([...this._chunkedEntries]);
         if (Array.isArray(partial) && partial.length > 0) {
@@ -637,12 +700,108 @@ class AppBase extends React.Component {
     this._loadingMore = false;
   }
 
+  loadCodexSessions = async (preferredSessionId = this.state.selectedCodexSessionId, options = {}) => {
+    const seq = ++this._codexSessionsSeq;
+    this.setState({ codexSessionsLoading: true, codexSessionsError: '' });
+    try {
+      const res = await fetch(apiUrl('/api/codex/sessions'));
+      const data = await res.json();
+      if (seq !== this._codexSessionsSeq) return;
+      if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+
+      const sessions = Array.isArray(data.sessions) ? data.sessions : [];
+      const selected = sessions.some(s => s.id === preferredSessionId)
+        ? preferredSessionId
+        : (sessions[0]?.id || '');
+      const error = sessions.length === 0 ? t('ui.codexNoSessions') : '';
+
+      this.setState({
+        codexHome: data.codexHome || '',
+        codexSessions: sessions,
+        codexSessionsLoading: false,
+        codexSessionsError: error,
+        selectedCodexSessionId: selected,
+        ...(selected ? {} : this._resetViewerEntries()),
+      }, () => {
+        if (!this._isCodexProvider()) return;
+        this._setProviderUrl('codex', selected);
+        if (!selected && this.eventSource) { this.eventSource.close(); this.eventSource = null; }
+        if (selected && (options.force || !this.eventSource)) this.initSSE();
+      });
+    } catch (err) {
+      if (seq !== this._codexSessionsSeq) return;
+      this.setState({
+        codexSessionsLoading: false,
+        codexSessionsError: err.message || t('ui.codexLoadFailed'),
+        ...this._resetViewerEntries(),
+      });
+    }
+  };
+
+  handleProviderChange = (provider) => {
+    const nextProvider = provider === 'codex' ? 'codex' : 'claude';
+    if (nextProvider === this.state.provider) return;
+
+    if (this.eventSource) { this.eventSource.close(); this.eventSource = null; }
+    if (this._localLogES) { this._localLogES.close(); this._localLogES = null; }
+    this._isLocalLog = false;
+    this._localLogFile = null;
+
+    if (nextProvider === 'codex') {
+      this.setState({
+        provider: 'codex',
+        workspaceMode: false,
+        cliMode: false,
+        sdkMode: false,
+        ...this._resetViewerEntries({ fileLoading: true }),
+      }, () => {
+        this._setProviderUrl('codex', this.state.selectedCodexSessionId);
+        this.loadCodexSessions(this.state.selectedCodexSessionId, { force: true });
+      });
+      return;
+    }
+
+    this.setState({
+      provider: 'claude',
+      codexSessionsError: '',
+      ...this._resetViewerEntries({ fileLoading: true }),
+    }, () => {
+      this._setProviderUrl('claude');
+      this.initSSE();
+    });
+  };
+
+  handleCodexSessionChange = (sessionId) => {
+    if (!sessionId || sessionId === this.state.selectedCodexSessionId) return;
+    if (this.eventSource) { this.eventSource.close(); this.eventSource = null; }
+    this.setState({
+      selectedCodexSessionId: sessionId,
+      ...this._resetViewerEntries({ fileLoading: true }),
+    }, () => {
+      this._setProviderUrl('codex', sessionId);
+      this.initSSE();
+    });
+  };
+
+  handleCodexSessionsRefresh = () => {
+    this.loadCodexSessions(this.state.selectedCodexSessionId, { force: true });
+  };
+
   initSSE() {
     try {
       // 尝试使用缓存元数据进行增量加载
       let url = '/events';
       let hasCache = false;
-      if (isMobile) {
+      const isCodex = this._isCodexProvider();
+      if (this.eventSource) { this.eventSource.close(); this.eventSource = null; }
+      if (isCodex) {
+        const sessionId = this.state.selectedCodexSessionId;
+        if (!sessionId) {
+          this.setState({ fileLoading: false, fileLoadingCount: 0 });
+          return;
+        }
+        url = `/events?provider=codex&session=${encodeURIComponent(sessionId)}`;
+      } else if (isMobile) {
         const meta = getCacheMeta();
         if (meta && meta.lastTs && meta.count > 0) {
           url = `/events?since=${encodeURIComponent(meta.lastTs)}&cc=${meta.count}&project=${encodeURIComponent(meta.projectName || '')}`;
@@ -650,7 +809,7 @@ class AppBase extends React.Component {
         }
       }
       // 移动端无缓存时只加载最近 200 条，剩余按需分页
-      if (!hasCache && isMobile) {
+      if (!isCodex && !hasCache && isMobile) {
         url = '/events?limit=200';
       }
       // 只有在无缓存时才显示 loading 遮罩
@@ -796,7 +955,7 @@ class AppBase extends React.Component {
           const { mainAgentSessions, filtered } = this._processEntries(entries);
 
           // P1: 移动端 hot/cold 分层
-          if (isMobile && mainAgentSessions.length > HOT_SESSION_COUNT) {
+          if (isMobile && !this._isCodexProvider() && mainAgentSessions.length > HOT_SESSION_COUNT) {
             const sessionIndex = buildSessionIndex(entries, mainAgentSessions);
             const fullIndex = isIncremental
               ? mergeSessionIndices(this.state.sessionIndex, sessionIndex)
@@ -840,7 +999,7 @@ class AppBase extends React.Component {
             };
             if (!isIncremental) newState.hasMoreHistory = !!this._hasMoreHistory && !!this._oldestTs;
             this.setState(newState);
-            if (isMobile && this.state.projectName) {
+            if (isMobile && !this._isCodexProvider() && this.state.projectName) {
               saveEntries(this.state.projectName, entries);
             }
           }
@@ -865,7 +1024,7 @@ class AppBase extends React.Component {
                   fileLoadingCount: 0,
                   serverCachedContent: null,
                 });
-                if (isMobile && this.state.projectName) {
+                if (isMobile && !this._isCodexProvider() && this.state.projectName) {
                   saveEntries(this.state.projectName, entries);
                 }
               });
@@ -878,7 +1037,7 @@ class AppBase extends React.Component {
                 fileLoadingCount: 0,
                 serverCachedContent: null,
               });
-              if (isMobile) clearEntries();
+              if (isMobile && !this._isCodexProvider()) clearEntries();
             }
           } else {
             this.setState({ fileLoading: false, fileLoadingCount: 0 });
@@ -991,9 +1150,11 @@ class AppBase extends React.Component {
   loadLocalLogFile(file) {
     // 独立 SSE 链路加载历史日志：/api/local-log 返回 event-stream，
     // 与 /events (CLI 模式) 完全隔离，不会触发 terminal/workspace 等 CLI 行为
+    if (this.eventSource) { this.eventSource.close(); this.eventSource = null; }
     this._isLocalLog = true;
     this._localLogFile = file;
-    this.setState({ fileLoading: true, fileLoadingCount: 0, serverCachedContent: null });
+    this.setState({ provider: 'claude', fileLoading: true, fileLoadingCount: 0, serverCachedContent: null });
+    this._setProviderUrl('claude');
 
     // 关闭上一次的加载连接（防止快速切换时资源泄漏）
     if (this._localLogES) { this._localLogES.close(); this._localLogES = null; }
@@ -1343,7 +1504,9 @@ class AppBase extends React.Component {
   handleWorkspaceLaunch = ({ projectName }) => {
     this._isLocalLog = false;
     this._localLogFile = null;
+    this._setProviderUrl('claude');
     this.setState({
+      provider: 'claude',
       workspaceMode: false,
       projectName,
       viewMode: 'chat',

@@ -1,7 +1,7 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { request } from 'node:http';
-import { mkdtempSync, rmSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, existsSync, cpSync, appendFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -20,9 +20,14 @@ writeFileSync(fakeLogFile, JSON.stringify({
   status: 200,
 }) + '\n---\n');
 
+const fakeCodexHome = join(tmpDir, 'codex');
+cpSync(join(process.cwd(), 'test/fixtures/codex-session'), fakeCodexHome, { recursive: true });
+const fakeCodexSessionId = '11111111-2222-3333-4444-555555555555';
+
 // 设置环境变量，阻止自动启动和副作用
 process.env.CCV_WORKSPACE_MODE = '1';
 process.env.CCV_CLI_MODE = '0';
+process.env.CODEX_HOME = fakeCodexHome;
 
 /** 用 node:http 发请求（避免被 interceptor patch 的 fetch 干扰） */
 function httpRequest(port, path, { method = 'GET', body = null } = {}) {
@@ -47,6 +52,75 @@ function httpRequest(port, path, { method = 'GET', body = null } = {}) {
     });
     req.on('error', reject);
     if (body) req.write(typeof body === 'string' ? body : JSON.stringify(body));
+    req.end();
+  });
+}
+
+function readSseUntil(port, path, marker) {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const finish = (value) => {
+      if (settled) return;
+      settled = true;
+      resolve(value);
+    };
+    const req = request({
+      hostname: '127.0.0.1',
+      port,
+      path,
+      method: 'GET',
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => {
+        data += chunk;
+        if (data.includes(marker)) {
+          req.destroy();
+          finish({ status: res.statusCode, headers: res.headers, body: data });
+        }
+      });
+      res.on('end', () => finish({ status: res.statusCode, headers: res.headers, body: data }));
+    });
+    req.on('error', err => {
+      if (settled) return;
+      reject(err);
+    });
+    req.end();
+  });
+}
+
+function readSseUntilAfterLoad(port, path, marker, afterLoad) {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let afterLoadCalled = false;
+    const finish = (value) => {
+      if (settled) return;
+      settled = true;
+      resolve(value);
+    };
+    const req = request({
+      hostname: '127.0.0.1',
+      port,
+      path,
+      method: 'GET',
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => {
+        data += chunk;
+        if (!afterLoadCalled && data.includes('event: load_end')) {
+          afterLoadCalled = true;
+          afterLoad();
+        }
+        if (data.includes(marker)) {
+          req.destroy();
+          finish({ status: res.statusCode, headers: res.headers, body: data });
+        }
+      });
+      res.on('end', () => finish({ status: res.statusCode, headers: res.headers, body: data }));
+    });
+    req.on('error', err => {
+      if (settled) return;
+      reject(err);
+    });
     req.end();
   });
 }
@@ -137,6 +211,59 @@ describe('server API endpoints', { concurrency: false }, () => {
     assert.equal(data.cliMode, false);
     // workspaceMode: isWorkspaceMode && !_workspaceLaunched → true && !false = true
     assert.equal(data.workspaceMode, true);
+  });
+
+  // --- Codex provider API ---
+  it('GET /api/codex/sessions lists trusted Codex sessions', async () => {
+    const res = await httpRequest(port, '/api/codex/sessions');
+    assert.equal(res.status, 200);
+    const data = res.json();
+    assert.equal(data.codexHome, fakeCodexHome);
+    assert.equal(data.sessions.length, 1);
+    assert.equal(data.sessions[0].id, fakeCodexSessionId);
+  });
+
+  it('GET /api/requests?provider=codex returns adapted entries', async () => {
+    const res = await httpRequest(port, `/api/requests?provider=codex&session=${fakeCodexSessionId}`);
+    assert.equal(res.status, 200);
+    const data = res.json();
+    assert.ok(Array.isArray(data));
+    assert.equal(data[0].provider, 'codex');
+    assert.ok(data.some(entry => entry.codexKind === 'Command'));
+    assert.equal(data.at(-1).response.body.usage.total_tokens, 1250);
+  });
+
+  it('GET /api/requests?provider=codex rejects unknown sessions', async () => {
+    const res = await httpRequest(port, '/api/requests?provider=codex&session=../../etc/passwd');
+    assert.equal(res.status, 404);
+    assert.match(res.json().error, /not found/i);
+  });
+
+  it('GET /events?provider=codex streams load events', async () => {
+    const res = await readSseUntil(port, `/events?provider=codex&session=${fakeCodexSessionId}`, 'event: load_end');
+    assert.equal(res.status, 200);
+    assert.equal(res.headers['content-type'], 'text/event-stream');
+    assert.match(res.body, /event: load_start/);
+    assert.match(res.body, /event: load_chunk/);
+    assert.match(res.body, /event: load_end/);
+    assert.match(res.body, /"provider":"codex"/);
+  });
+
+  it('GET /events?provider=codex streams appended JSONL lines', async () => {
+    const sessionPath = join(fakeCodexHome, 'sessions/2026/05/05/rollout-2026-05-05T10-00-00-11111111-2222-3333-4444-555555555555.jsonl');
+    const liveEvent = {
+      timestamp: '2026-05-05T10:00:20.000Z',
+      type: 'event_msg',
+      payload: { type: 'user_message', message: 'Live tail message' },
+    };
+    const res = await readSseUntilAfterLoad(
+      port,
+      `/events?provider=codex&session=${fakeCodexSessionId}`,
+      'Live tail message',
+      () => setTimeout(() => appendFileSync(sessionPath, JSON.stringify(liveEvent) + '\n'), 50)
+    );
+    assert.equal(res.status, 200);
+    assert.match(res.body, /Live tail message/);
   });
 
   // --- GET /api/user-profile ---

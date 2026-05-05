@@ -137,6 +137,14 @@ ccv -h
 * 每个请求内联显示 Token 用量统计（输入/输出 Token、缓存创建/读取、命中率）
 * 兼容 Claude Code Router（CCR）及其他代理场景 — 通过 API 路径模式兜底匹配请求
 
+### Codex Viewer（只读）
+
+在顶部栏的数据源选择器中从 Claude 切换到 Codex。CC-Viewer 会扫描 `CODEX_HOME` 或 `~/.codex` 下的 `sessions/**/*.jsonl`，列出可信会话，并把选中的 Codex session 渲染到 Raw 和对话模式中。
+
+* 只读：不会启动 Codex、不会包装 Codex TUI、不会拦截上游 API，也不会解密加密 reasoning 内容
+* 直达 URL：打开 viewer 时使用 `?provider=codex`，也可以追加 `&session=<session-id>`
+* 实时更新：选中的 Codex JSONL 文件追加完整新行后，会通过现有 SSE 路径增量显示
+
 ### 对话模式
 
 点击右上角「对话模式」按钮，将 Main Agent 的完整对话历史解析为聊天界面：

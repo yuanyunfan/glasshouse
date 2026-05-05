@@ -181,6 +181,14 @@ class AppHeader extends React.Component {
     return reason;
   }
 
+  formatCodexSessionLabel(session) {
+    if (!session) return '';
+    const title = session.threadName || session.filename || session.id;
+    const cwdName = session.cwd ? session.cwd.split(/[\\/]/).filter(Boolean).pop() : '';
+    const updated = session.updatedAt ? new Date(session.updatedAt).toLocaleString() : '';
+    return [title, cwdName, updated].filter(Boolean).join(' · ');
+  }
+
   // 白名单式 SCU：render() 里读到的每个 props 字段都必须在此列出，否则父组件 setState
   // 不会触发 AppHeader 重渲染（症状：受控控件的 checked/value 卡住不更新）。
   // 新增传给 AppHeader 的 prop 时，记得同步加进这里。
@@ -191,6 +199,11 @@ class AppHeader extends React.Component {
       nextProps.viewMode !== this.props.viewMode ||
       nextProps.cacheExpireAt !== this.props.cacheExpireAt ||
       nextProps.cacheType !== this.props.cacheType ||
+      nextProps.provider !== this.props.provider ||
+      nextProps.codexSessions !== this.props.codexSessions ||
+      nextProps.codexSessionsLoading !== this.props.codexSessionsLoading ||
+      nextProps.codexSessionsError !== this.props.codexSessionsError ||
+      nextProps.selectedCodexSessionId !== this.props.selectedCodexSessionId ||
       nextProps.isLocalLog !== this.props.isLocalLog ||
       nextProps.localLogFile !== this.props.localLogFile ||
       nextProps.projectName !== this.props.projectName ||
@@ -1167,7 +1180,7 @@ class AppHeader extends React.Component {
   }
 
   render() {
-    const { requestCount, requests = [], viewMode, cacheType, onToggleViewMode, onImportLocalLogs, onLangChange, isLocalLog, localLogFile, projectName, collapseToolResults, onCollapseToolResultsChange, expandThinking, onExpandThinkingChange, showFullToolContent, onShowFullToolContentChange, expandDiff, onExpandDiffChange, filterIrrelevant, onFilterIrrelevantChange, logDir, onLogDirChange, updateInfo, onDismissUpdate, cliMode, terminalVisible, onToggleTerminal, onReturnToWorkspaces, contextWindow, contextBarOptimistic, serverCachedContent, resumeAutoChoice, onResumeAutoChoiceToggle, onResumeAutoChoiceChange, themeColor, onThemeColorChange, autoApproveSeconds, onAutoApproveChange } = this.props;
+    const { requestCount, requests = [], viewMode, cacheType, provider = 'claude', onProviderChange, codexSessions = [], codexSessionsLoading, codexSessionsError, selectedCodexSessionId, onCodexSessionChange, onCodexSessionsRefresh, onToggleViewMode, onImportLocalLogs, onLangChange, isLocalLog, localLogFile, projectName, collapseToolResults, onCollapseToolResultsChange, expandThinking, onExpandThinkingChange, showFullToolContent, onShowFullToolContentChange, expandDiff, onExpandDiffChange, filterIrrelevant, onFilterIrrelevantChange, logDir, onLogDirChange, updateInfo, onDismissUpdate, cliMode, terminalVisible, onToggleTerminal, onReturnToWorkspaces, contextWindow, contextBarOptimistic, serverCachedContent, resumeAutoChoice, onResumeAutoChoiceToggle, onResumeAutoChoiceChange, themeColor, onThemeColorChange, autoApproveSeconds, onAutoApproveChange } = this.props;
     const { countdownText } = this.state;
 
     const menuItems = [
@@ -1334,6 +1347,54 @@ class AppHeader extends React.Component {
               />
             );
           })()}
+          {onProviderChange && (
+            <Space size={6} className={styles.providerControls}>
+              <Select
+                size="small"
+                value={provider}
+                className={styles.providerSelect}
+                aria-label={t('ui.provider')}
+                onChange={onProviderChange}
+                options={[
+                  { value: 'claude', label: t('ui.providerClaude') },
+                  { value: 'codex', label: t('ui.providerCodex') },
+                ]}
+              />
+              {provider === 'codex' && (
+                <>
+                  <Select
+                    size="small"
+                    showSearch
+                    allowClear={false}
+                    loading={!!codexSessionsLoading}
+                    value={selectedCodexSessionId || undefined}
+                    className={styles.codexSessionSelect}
+                    aria-label={t('ui.codexSession')}
+                    placeholder={codexSessionsLoading ? t('ui.codexSessionLoading') : t('ui.codexSessionPlaceholder')}
+                    optionFilterProp="label"
+                    optionLabelProp="label"
+                    notFoundContent={codexSessionsLoading ? <Spin size="small" /> : (codexSessionsError || t('ui.codexNoSessions'))}
+                    onChange={onCodexSessionChange}
+                    options={codexSessions.map(session => ({
+                      value: session.id,
+                      label: this.formatCodexSessionLabel(session),
+                      title: session.cwd || session.id,
+                    }))}
+                  />
+                  <Tooltip title={t('ui.codexRefreshSessions')}>
+                    <Button
+                      size="small"
+                      className={styles.codexRefreshBtn}
+                      icon={<ReloadOutlined />}
+                      onClick={onCodexSessionsRefresh}
+                      loading={!!codexSessionsLoading}
+                      aria-label={t('ui.codexRefreshSessions')}
+                    />
+                  </Tooltip>
+                </>
+              )}
+            </Space>
+          )}
           {updateInfo && (
             <Tag
               color="orange"

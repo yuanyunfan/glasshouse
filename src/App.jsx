@@ -304,7 +304,8 @@ class App extends AppBase {
     // (历史:合并前 ChatView 的 _inputWs 始终连;v1.6.226 一度绑到 cliMode || terminalVisible,
     // 在 mobile 隐藏终端 / web-only 浏览等场景下 hook bridge / PTY 提交全失败,触发"请求未送达"toast。
     // 回退到与合并前 _inputWs 始终连等价的语义。SDK 模式 ws 缺失是 latent issue,本次不处理。)
-    const wsOpen = !this._isLocalLog && !this.state.sdkMode;
+    const isCodexProvider = this.state.provider === 'codex';
+    const wsOpen = !this._isLocalLog && !isCodexProvider && !this.state.sdkMode;
 
     return (
       <ConfigProvider theme={this.themeConfig}>
@@ -340,6 +341,14 @@ class App extends AppBase {
               viewMode={viewMode}
               cacheExpireAt={this.state.cacheExpireAt}
               cacheType={this.state.cacheType}
+              provider={this.state.provider}
+              onProviderChange={this.handleProviderChange}
+              codexSessions={this.state.codexSessions}
+              codexSessionsLoading={this.state.codexSessionsLoading}
+              codexSessionsError={this.state.codexSessionsError}
+              selectedCodexSessionId={this.state.selectedCodexSessionId}
+              onCodexSessionChange={this.handleCodexSessionChange}
+              onCodexSessionsRefresh={this.handleCodexSessionsRefresh}
               onToggleViewMode={this.handleToggleViewMode}
               onLangChange={this.handleLangChange}
               onImportLocalLogs={this.handleImportLocalLogs}
@@ -360,11 +369,11 @@ class App extends AppBase {
               onLogDirChange={this.handleLogDirChange}
               updateInfo={this.state.updateInfo}
               onDismissUpdate={() => this.setState({ updateInfo: null })}
-              cliMode={this.state.cliMode}
+              cliMode={isCodexProvider ? false : this.state.cliMode}
               sdkMode={this.state.sdkMode}
-              terminalVisible={this.state.sdkMode ? false : this.state.terminalVisible}
+              terminalVisible={isCodexProvider || this.state.sdkMode ? false : this.state.terminalVisible}
               onToggleTerminal={() => this.setState(prev => ({ terminalVisible: !prev.terminalVisible }))}
-              onReturnToWorkspaces={this.state.cliMode ? this.handleReturnToWorkspaces : null}
+              onReturnToWorkspaces={this.state.cliMode && !isCodexProvider ? this.handleReturnToWorkspaces : null}
               contextWindow={this.state.contextWindow}
               contextBarOptimistic={this.state.contextBarOptimistic}
               onNavigateCacheMsg={this.handleNavigateCacheMsg}
@@ -388,7 +397,7 @@ class App extends AppBase {
               onProxyProfileChange={this.handleProxyProfileChange}
             />
           </Layout.Header>
-          {this.state.claudeMissing && (
+          {!isCodexProvider && this.state.claudeMissing && (
             <Alert
               type="warning"
               showIcon
@@ -400,6 +409,23 @@ class App extends AppBase {
           <Layout.Content className={styles.content}>
             {viewMode === 'raw' && (
               filteredRequests.length === 0 ? (
+                isCodexProvider ? (
+                <div className={styles.guideContainer}>
+                  <div className={styles.guideContent}>
+                    <h2 className={styles.guideTitle}>{t('ui.codexMode')}</h2>
+                    <div className={styles.guideStep}>
+                      <div className={styles.guideStepNum}>1</div>
+                      <div className={styles.guideStepBody}>
+                        <p className={styles.guideText}>
+                          {this.state.codexSessionsLoading
+                            ? t('ui.codexSessionLoading')
+                            : (this.state.codexSessionsError || t('ui.codexNoSessionSelected'))}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                ) : (
                 <div className={styles.guideContainer}>
                   <div className={styles.guideContent}>
                     <h2 className={styles.guideTitle}>{t('ui.guide.title')}</h2>
@@ -429,6 +455,7 @@ class App extends AppBase {
                     </div>
                   </div>
                 </div>
+                )
               ) : (
               <div
                 ref={this.mainContainerRef}
@@ -471,7 +498,7 @@ class App extends AppBase {
               )
             )}
             <div className={styles.chatViewWrapper} style={{ display: viewMode === 'chat' ? 'flex' : 'none' }}>
-              <ChatView {...this._settingsProps()} getTokenStatsContent={this._getTokenStatsContent} requests={filteredRequests} mainAgentSessions={mainAgentSessions} streamingLatest={this.state.streamingLatest} userProfile={this.state.userProfile} collapseToolResults={this.state.collapseToolResults} expandThinking={this.state.expandThinking} showFullToolContent={this.state.showFullToolContent} showThinkingSummaries={this.state.showThinkingSummaries} onViewRequest={this.handleViewRequest} scrollToTimestamp={this.state.chatScrollToTs} onScrollTsDone={this.handleScrollTsDone} cliMode={this._isLocalLog ? false : this.state.cliMode} sdkMode={this._isLocalLog ? false : this.state.sdkMode} terminalVisible={this._isLocalLog ? false : (this.state.sdkMode ? false : this.state.terminalVisible)} onToggleTerminal={() => this.setState(prev => ({ terminalVisible: !prev.terminalVisible }))} pendingUploadPaths={this.state.pendingUploadPaths} onUploadPathsConsumed={this.handleUploadPathsConsumed} fileLoading={this.state.fileLoading} isStreaming={this.state.isStreaming} hasMoreHistory={this.state.hasMoreHistory} loadingMore={this.state.loadingMore} onLoadMoreHistory={() => this.loadMoreHistory()} loadingSessionId={this.state.loadingSessionId} onLoadSession={(sid) => this.loadSession(sid)} lang={this.state.lang} autoApproveSeconds={this.state.autoApproveSeconds} onAutoApproveChange={this.handleAutoApproveChange} onClearContextOptimistic={this.handleClearContextOptimistic} onPendingAsk={this.handleApprovalAsk} onPendingPtyPlan={this.handleApprovalPtyPlan} ownTabId={this.state.ownTabId} projectName={this.state.projectName} />
+              <ChatView {...this._settingsProps()} getTokenStatsContent={this._getTokenStatsContent} requests={filteredRequests} mainAgentSessions={mainAgentSessions} streamingLatest={this.state.streamingLatest} userProfile={this.state.userProfile} collapseToolResults={this.state.collapseToolResults} expandThinking={this.state.expandThinking} showFullToolContent={this.state.showFullToolContent} showThinkingSummaries={this.state.showThinkingSummaries} onViewRequest={this.handleViewRequest} scrollToTimestamp={this.state.chatScrollToTs} onScrollTsDone={this.handleScrollTsDone} cliMode={this._isLocalLog || isCodexProvider ? false : this.state.cliMode} sdkMode={this._isLocalLog || isCodexProvider ? false : this.state.sdkMode} terminalVisible={this._isLocalLog || isCodexProvider ? false : (this.state.sdkMode ? false : this.state.terminalVisible)} onToggleTerminal={() => this.setState(prev => ({ terminalVisible: !prev.terminalVisible }))} pendingUploadPaths={this.state.pendingUploadPaths} onUploadPathsConsumed={this.handleUploadPathsConsumed} fileLoading={this.state.fileLoading} isStreaming={this.state.isStreaming} hasMoreHistory={this.state.hasMoreHistory} loadingMore={this.state.loadingMore} onLoadMoreHistory={() => this.loadMoreHistory()} loadingSessionId={this.state.loadingSessionId} onLoadSession={(sid) => this.loadSession(sid)} lang={this.state.lang} autoApproveSeconds={this.state.autoApproveSeconds} onAutoApproveChange={this.handleAutoApproveChange} onClearContextOptimistic={this.handleClearContextOptimistic} onPendingAsk={this.handleApprovalAsk} onPendingPtyPlan={this.handleApprovalPtyPlan} ownTabId={this.state.ownTabId} projectName={this.state.projectName} />
             </div>
           </Layout.Content>
           <div className={styles.footer}>

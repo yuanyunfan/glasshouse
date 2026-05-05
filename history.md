@@ -2,6 +2,7 @@
 
 ## 1.6.236 (2026-05-05)
 
+- feat(codex): add read-only Codex session JSONL viewer with trusted session APIs, SSE live tail, provider/session UI switch, and raw/chat rendering
 - perf(chatview): viewReqProps 9 处 spread → 显式 prop（消除 messages.map 内对象创建热点）
 - refactor(contexts): SettingsProvider class → 函数组件 + useMemo value（消除 contextType 订阅链路虚假重渲）
 - refactor(appheader): 抽离 LiveTagPopover + inline style 提常量 + CSS 变量化（hover 血条 popover 性能修复）
@@ -1071,4 +1072,3 @@ Windows 用户启动 Electron client 报 `ERR_UNSUPPORTED_ESM_URL_SCHEME "Receiv
 ### 0.0.1 (2026-02-17) — 初始版本
 
 - 拦截并记录 Claude API 请求/响应
-

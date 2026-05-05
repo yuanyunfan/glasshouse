@@ -207,6 +207,43 @@ class DetailPanel extends React.Component {
     );
   }
 
+  renderCodexSummary(request) {
+    if (request?.provider !== 'codex') return null;
+    const session = request._codexSession || {};
+    const rawEvents = Array.isArray(request._codexRawEvents) ? request._codexRawEvents : [];
+    const rawTypes = rawEvents
+      .map(event => event?.payload?.type || event?.type)
+      .filter(Boolean)
+      .join(', ');
+    return (
+      <div className={styles.codexSummary}>
+        <div className={styles.codexSummaryHeader}>
+          <Tag color="blue">{t('ui.providerCodex')}</Tag>
+          <Tag>{request.codexKind || t('ui.codexKind')}</Tag>
+          {session.id && <Text code className={styles.codexSessionId}>{session.id}</Text>}
+        </div>
+        <div className={styles.codexSummaryGrid}>
+          <div>
+            <Text type="secondary">{t('ui.codexSession')}</Text>
+            <div className={styles.codexSummaryValue}>{session.threadName || session.filename || session.id || '-'}</div>
+          </div>
+          <div>
+            <Text type="secondary">cwd</Text>
+            <div className={styles.codexSummaryValue}>{session.cwd || request.body?.metadata?.cwd || '-'}</div>
+          </div>
+          <div>
+            <Text type="secondary">model</Text>
+            <div className={styles.codexSummaryValue}>{request.body?.model || request.response?.body?.model || '-'}</div>
+          </div>
+          <div>
+            <Text type="secondary">{t('ui.codexRawEvents')}</Text>
+            <div className={styles.codexSummaryValue}>{rawTypes || rawEvents.length}</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   getRequestExpandNode(data, type) {
     if (type !== 'request' || !data || typeof data !== 'object') return undefined;
     const { request, requests, selectedIndex } = this.props;
@@ -754,6 +791,18 @@ class DetailPanel extends React.Component {
       },
     ];
 
+    if (request.provider === 'codex') {
+      tabItems.unshift({
+        key: 'codex-raw',
+        label: t('ui.codexRawEvents'),
+        children: (
+          <div className={styles.tabContent}>
+            <JsonViewer data={request._codexRawEvents || []} defaultExpand="all" />
+          </div>
+        ),
+      });
+    }
+
     const usage = request.response?.body?.usage;
     const tokenStats = usage ? (() => {
       const input = usage.input_tokens || 0;
@@ -807,6 +856,8 @@ class DetailPanel extends React.Component {
             </div>
           )}
         </div>
+
+        {this.renderCodexSummary(request)}
 
         <Tabs
           activeKey={currentTab}

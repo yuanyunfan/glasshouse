@@ -51,6 +51,8 @@ import { countLogEntries, streamRawEntriesAsync, readPagedEntries } from './lib/
 import { awaitDrainOrClose } from './lib/sse-backpressure.js';
 import { enrichRawIfNeeded } from './lib/enrich-plan-input.js';
 import { buildTeamStatusResponse } from './lib/team-runtime.js';
+import { listCodexSessions, readCodexSession, createCodexSessionTail } from './lib/codex-session-reader.js';
+import { buildCodexContextWindow } from './lib/codex-entry-adapter.js';
 
 
 // 动态获取 getPrefsFile()（LOG_DIR 可能在运行时被 setLogDir 修改）
@@ -264,6 +266,21 @@ function _logWatcherOpts(logFile) {
   };
 }
 
+function _sendJson(res, status, data) {
+  res.writeHead(status, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(data));
+}
+
+function _latestCodexContextWindow(entries) {
+  if (!Array.isArray(entries)) return null;
+  for (let i = entries.length - 1; i >= 0; i--) {
+    const usage = entries[i]?.response?.body?.usage;
+    const cw = buildCodexContextWindow(usage);
+    if (cw) return cw;
+  }
+  return null;
+}
+
 function getLocalIp() {
   const nets = networkInterfaces();
   for (const name of Object.keys(nets)) {
@@ -358,6 +375,19 @@ async function handleRequest(req, res) {
     if (!res.headersSent) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Plugin error' }));
+    }
+    return;
+  }
+
+  if (url === '/api/codex/sessions' && method === 'GET') {
+    try {
+      const result = listCodexSessions();
+      _sendJson(res, 200, {
+        codexHome: result.codexHome,
+        sessions: result.sessions,
+      });
+    } catch (err) {
+      _sendJson(res, 500, { error: err.message || 'Failed to list Codex sessions' });
     }
     return;
   }
@@ -941,6 +971,74 @@ async function handleRequest(req, res) {
     return;
   }
 
+  // SSE endpoint — Codex provider reads trusted session JSONL files by id.
+  if (url === '/events' && method === 'GET' && parsedUrl.searchParams.get('provider') === 'codex') {
+    const sessionId = parsedUrl.searchParams.get('session');
+    if (!sessionId) {
+      _sendJson(res, 400, { error: 'missing "session" parameter' });
+      return;
+    }
+
+    let loaded;
+    try {
+      loaded = readCodexSession(sessionId);
+    } catch (err) {
+      const status = err.code === 'CODEX_SESSION_NOT_FOUND' ? 404 : 500;
+      _sendJson(res, status, { error: err.message || 'Failed to read Codex session' });
+      return;
+    }
+
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+    });
+
+    const pingTimer = setInterval(() => {
+      try { res.write('event: ping\ndata: {}\n\n'); } catch {}
+    }, 30000);
+
+    let cleanupTail = null;
+    const removeCodexClient = () => {
+      clearInterval(pingTimer);
+      if (cleanupTail) {
+        try { cleanupTail(); } catch {}
+        cleanupTail = null;
+      }
+    };
+    req.on('close', removeCodexClient);
+    res.on('close', removeCodexClient);
+    res.on('error', removeCodexClient);
+
+    try {
+      const entries = loaded.entries || [];
+      res.write(`event: load_start\ndata: ${JSON.stringify({ total: entries.length, incremental: false })}\n\n`);
+      for (const entry of entries) {
+        if (res.destroyed || !res.writable) break;
+        const payload = `event: load_chunk\ndata: [${JSON.stringify(entry)}]\n\n`;
+        const drained = res.write(payload);
+        if (!drained) await awaitDrainOrClose(res, SSE_BACKPRESSURE_TIMEOUT_MS);
+      }
+      res.write('event: load_end\ndata: {}\n\n');
+      const cw = _latestCodexContextWindow(entries);
+      if (cw) res.write(`event: context_window\ndata: ${JSON.stringify(cw)}\n\n`);
+
+      cleanupTail = createCodexSessionTail(sessionId, (entry) => {
+        if (res.destroyed || !res.writable) return;
+        try {
+          res.write(`data: ${JSON.stringify(entry)}\n\n`);
+          const liveCw = buildCodexContextWindow(entry?.response?.body?.usage);
+          if (liveCw) res.write(`event: context_window\ndata: ${JSON.stringify(liveCw)}\n\n`);
+        } catch {}
+      });
+    } catch (err) {
+      try { res.write(`event: error\ndata: ${JSON.stringify({ error: err.message })}\n\n`); } catch {}
+      removeCodexClient();
+      try { res.end(); } catch {}
+    }
+    return;
+  }
+
   // SSE endpoint
   if (url === '/events' && method === 'GET') {
     res.writeHead(200, {
@@ -1098,6 +1196,22 @@ async function handleRequest(req, res) {
 
   // API endpoint
   if (url === '/api/requests' && method === 'GET') {
+    if (parsedUrl.searchParams.get('provider') === 'codex') {
+      const sessionId = parsedUrl.searchParams.get('session');
+      if (!sessionId) {
+        _sendJson(res, 400, { error: 'missing "session" parameter' });
+        return;
+      }
+      try {
+        const result = readCodexSession(sessionId);
+        _sendJson(res, 200, result.entries);
+      } catch (err) {
+        const status = err.code === 'CODEX_SESSION_NOT_FOUND' ? 404 : 500;
+        _sendJson(res, status, { error: err.message || 'Failed to read Codex session' });
+      }
+      return;
+    }
+
     // 异步流式 JSON 数组输出，不做 reconstruct，发原始条目
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.write('[');

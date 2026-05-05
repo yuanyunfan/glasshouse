@@ -440,6 +440,7 @@ class Mobile extends AppBase {
     }
 
     const mobileIsLocalLog = !!this._isLocalLog;
+    const mobileIsCodex = this.state.provider === 'codex';
     let mobileModelName = null;
     for (let i = filteredRequests.length - 1; i >= 0; i--) {
       const effective = getEffectiveModel(filteredRequests[i]);
@@ -472,7 +473,7 @@ class Mobile extends AppBase {
 
     // 单条 /ws/terminal 的开启条件:与 App 同款,回退到「非本地日志 + 非 SDK 模式都连」,
     // 修 mobile 隐藏终端时 ChatView 的 hook bridge / PTY 提交失败回归(参看 App.jsx:305 注释)。
-    const wsOpen = !mobileIsLocalLog && !this.state.sdkMode;
+    const wsOpen = !mobileIsLocalLog && !mobileIsCodex && !this.state.sdkMode;
 
     return (
       <TerminalWsProvider open={wsOpen}>
@@ -507,7 +508,11 @@ class Mobile extends AppBase {
                 <line x1="3" y1="18" x2="21" y2="18" />
               </svg>
             </button>
-            {!mobileIsLocalLog ? (() => {
+            {mobileIsCodex ? (
+              <span className={styles.mobileCLIStatusLabel}>
+                {t('ui.providerCodex')}{this.state.selectedCodexSessionId ? `: ${this.state.selectedCodexSessionId.slice(0, 8)}` : ''}
+              </span>
+            ) : !mobileIsLocalLog ? (() => {
               // 移动端（含 iPad）：渲染与 PC 一致的上下文血条。contextPercent 已在 render 顶部计算。
               const contextPercent = mobileContextPercent;
               const ctxColor = contextPercent >= 80 ? 'var(--color-error-light)' : contextPercent >= 60 ? 'var(--color-warning-light)' : 'var(--color-success)';
@@ -592,7 +597,7 @@ class Mobile extends AppBase {
               >
                 {t('ui.mobileGoBack')}
               </Button>
-            ) : this.state.hasGit ? (
+            ) : !mobileIsCodex && this.state.hasGit ? (
               <Button
                 type="text"
                 size="small"
@@ -603,7 +608,7 @@ class Mobile extends AppBase {
                 {this.state.mobileGitDiffVisible ? t('ui.mobileGitDiffExit') : t('ui.mobileGitDiffBrowse')}
               </Button>
             ) : null}
-            {!mobileIsLocalLog && (
+            {!mobileIsLocalLog && !mobileIsCodex && (
               <Button
                 type="text"
                 size="small"
@@ -705,9 +710,9 @@ class Mobile extends AppBase {
                     onViewRequest={null}
                     scrollToTimestamp={null}
                     onScrollTsDone={() => {}}
-                    cliMode={this.state.cliMode}
-                    sdkMode={this.state.sdkMode}
-                    terminalVisible={this.state.mobileTerminalVisible}
+                    cliMode={mobileIsCodex ? false : this.state.cliMode}
+                    sdkMode={mobileIsCodex ? false : this.state.sdkMode}
+                    terminalVisible={mobileIsCodex ? false : this.state.mobileTerminalVisible}
                     mobileChatVisible={true}
                     fileLoading={this.state.fileLoading}
                     isStreaming={this.state.isStreaming}
@@ -732,7 +737,7 @@ class Mobile extends AppBase {
               </ConfigProvider>
             </>
           )}
-          {!mobileIsLocalLog && (
+          {!mobileIsLocalLog && !mobileIsCodex && (
             <div className={`${styles.mobileChatOverlay} ${this.state.mobileTerminalVisible ? styles.mobileChatOverlayVisible : ''}`}>
               <TerminalPanel
                 {...this._settingsProps()}

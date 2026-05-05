@@ -143,6 +143,14 @@ Fulfill your imagination of mobile programming. There's also a plugin mechanism 
 - Each request displays inline Token usage statistics (input/output tokens, cache creation/read, hit rate)
 - Compatible with Claude Code Router (CCR) and other proxy scenarios — falls back to API path pattern matching
 
+### Codex Viewer (Read-only)
+
+Use the provider selector in the top bar to switch from Claude to Codex. CC-Viewer scans `CODEX_HOME` or `~/.codex` for `sessions/**/*.jsonl`, lists trusted sessions, and renders the selected session in both Raw and Conversation modes.
+
+- Read-only: it does not launch Codex, wrap the Codex TUI, intercept upstream API calls, or decrypt encrypted reasoning content
+- Direct URL: open the viewer with `?provider=codex`, optionally adding `&session=<session-id>`
+- Live updates: when the selected Codex JSONL file gets new complete lines, the viewer streams them through the existing SSE path
+
 ### Conversation Mode
 
 Click the "Conversation Mode" button in the top-right corner to parse the Main Agent's complete conversation history into a chat interface:

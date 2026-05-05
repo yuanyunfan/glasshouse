@@ -1,0 +1,12 @@
+{"timestamp":"2026-05-05T10:00:00.000Z","type":"session_meta","payload":{"id":"11111111-2222-3333-4444-555555555555","timestamp":"2026-05-05T10:00:00.000Z","cwd":"/tmp/codex-fixture","originator":"codex-tui","cli_version":"0.128.0","source":"cli","model_provider":"gpt-5.4"}}
+{"timestamp":"2026-05-05T10:00:01.000Z","type":"event_msg","payload":{"type":"task_started","turn_id":"turn-fixture","started_at":1777975201,"model_context_window":258400}}
+{"timestamp":"2026-05-05T10:00:02.000Z","type":"event_msg","payload":{"type":"user_message","message":"List files","images":[],"local_images":[],"text_elements":[]}}
+{"timestamp":"2026-05-05T10:00:03.000Z","type":"response_item","payload":{"type":"reasoning","summary":[],"content":null,"encrypted_content":"encrypted-fixture"}}
+{"timestamp":"2026-05-05T10:00:04.000Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","arguments":"{\"cmd\":\"ls\",\"workdir\":\"/tmp/codex-fixture\"}","call_id":"call_fixture_exec"}}
+{"timestamp":"2026-05-05T10:00:05.000Z","type":"event_msg","payload":{"type":"exec_command_end","call_id":"call_fixture_exec","process_id":"123","turn_id":"turn-fixture","command":["/bin/zsh","-lc","ls"],"cwd":"/tmp/codex-fixture","stdout":"","stderr":"","aggregated_output":"README.md\nsrc\n","exit_code":0,"status":"completed"}}
+{"timestamp":"2026-05-05T10:00:06.000Z","type":"response_item","payload":{"type":"function_call_output","call_id":"call_fixture_exec","output":"README.md\nsrc\n"}}
+{"timestamp":"2026-05-05T10:00:07.000Z","type":"event_msg","payload":{"type":"agent_message","message":"Found `README.md` and `src`.","phase":"commentary","memory_citation":null}}
+{"timestamp":"2026-05-05T10:00:07.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"Found `README.md` and `src`."}],"phase":"commentary"}}
+{"timestamp":"2026-05-05T10:00:08.000Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":1200,"cached_input_tokens":200,"output_tokens":50,"reasoning_output_tokens":10,"total_tokens":1250},"last_token_usage":{"input_tokens":1200,"cached_input_tokens":200,"output_tokens":50,"reasoning_output_tokens":10,"total_tokens":1250},"model_context_window":258400},"rate_limits":{"limit_id":"codex"}}}
+{"timestamp":"2026-05-05T10:00:09.000Z","type":"event_msg","payload":{"type":"task_complete","turn_id":"turn-fixture","last_agent_message":"Found `README.md` and `src`."}}
+{"timestamp":"2026-05-05T10:00:10.000Z","type":"event_msg","payload":

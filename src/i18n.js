@@ -8101,6 +8101,71 @@ const i18nData = {
     "th": "ปิดรายละเอียดโครงการ",
     "tr": "Proje ayrıntılarını kapat",
     "uk": "Закрити деталі проєкту"
+  },
+  "ui.provider": {
+    "zh": "数据源",
+    "en": "Provider",
+    "zh-TW": "資料源"
+  },
+  "ui.providerClaude": {
+    "zh": "Claude",
+    "en": "Claude",
+    "zh-TW": "Claude"
+  },
+  "ui.providerCodex": {
+    "zh": "Codex",
+    "en": "Codex",
+    "zh-TW": "Codex"
+  },
+  "ui.codexMode": {
+    "zh": "Codex Viewer",
+    "en": "Codex Viewer",
+    "zh-TW": "Codex Viewer"
+  },
+  "ui.codexSession": {
+    "zh": "Codex 会话",
+    "en": "Codex session",
+    "zh-TW": "Codex 會話"
+  },
+  "ui.codexSessionPlaceholder": {
+    "zh": "选择 Codex 会话",
+    "en": "Select a Codex session",
+    "zh-TW": "選擇 Codex 會話"
+  },
+  "ui.codexSessionLoading": {
+    "zh": "正在加载 Codex 会话...",
+    "en": "Loading Codex sessions...",
+    "zh-TW": "正在載入 Codex 會話..."
+  },
+  "ui.codexNoSessions": {
+    "zh": "没有找到 Codex session JSONL",
+    "en": "No Codex session JSONL files found",
+    "zh-TW": "沒有找到 Codex session JSONL"
+  },
+  "ui.codexLoadFailed": {
+    "zh": "加载 Codex 会话失败",
+    "en": "Failed to load Codex sessions",
+    "zh-TW": "載入 Codex 會話失敗"
+  },
+  "ui.codexNoSessionSelected": {
+    "zh": "请选择一个 Codex 会话。",
+    "en": "Select a Codex session.",
+    "zh-TW": "請選擇一個 Codex 會話。"
+  },
+  "ui.codexRefreshSessions": {
+    "zh": "刷新 Codex 会话",
+    "en": "Refresh Codex sessions",
+    "zh-TW": "重新整理 Codex 會話"
+  },
+  "ui.codexRawEvents": {
+    "zh": "Codex 原始事件",
+    "en": "Codex raw events",
+    "zh-TW": "Codex 原始事件"
+  },
+  "ui.codexKind": {
+    "zh": "类型",
+    "en": "Kind",
+    "zh-TW": "類型"
   }
 };
 
