@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { adaptCodexEvents, buildCodexContextWindow, CODEX_KINDS } from '../lib/codex-entry-adapter.js';
+import { adaptCodexEvents, buildCodexContextWindow, CODEX_KINDS, slimCodexEntries } from '../lib/codex-entry-adapter.js';
 
 describe('codex-entry-adapter', () => {
   it('normalizes Codex events into viewer pseudo entries', () => {
@@ -48,5 +48,22 @@ describe('codex-entry-adapter', () => {
     });
     assert.equal(context.used_percentage, 15);
     assert.equal(context.remaining_percentage, 85);
+  });
+
+  it('slims cumulative Codex entries while preserving restore metadata', () => {
+    const entries = adaptCodexEvents([
+      { timestamp: '2026-05-05T10:00:00.000Z', type: 'session_meta', payload: { id: 's1', cwd: '/repo' } },
+      { timestamp: '2026-05-05T10:00:01.000Z', type: 'event_msg', payload: { type: 'user_message', message: 'Hello' } },
+      { timestamp: '2026-05-05T10:00:02.000Z', type: 'event_msg', payload: { type: 'agent_message', message: 'Hi' } },
+    ], { session: { id: 's1', cwd: '/repo' } });
+
+    slimCodexEntries(entries);
+
+    assert.equal(entries[1]._slimmed, true);
+    assert.equal(entries[1]._messageCount, 1);
+    assert.equal(entries[1]._fullEntryIndex, 2);
+    assert.deepEqual(entries[1].body.messages, []);
+    assert.equal(entries[2]._slimmed, undefined);
+    assert.equal(entries[2].body.messages.length, 2);
   });
 });

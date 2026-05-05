@@ -981,7 +981,7 @@ async function handleRequest(req, res) {
 
     let loaded;
     try {
-      loaded = readCodexSession(sessionId);
+      loaded = readCodexSession(sessionId, { slim: true });
     } catch (err) {
       const status = err.code === 'CODEX_SESSION_NOT_FOUND' ? 404 : 500;
       _sendJson(res, status, { error: err.message || 'Failed to read Codex session' });
@@ -1203,7 +1203,7 @@ async function handleRequest(req, res) {
         return;
       }
       try {
-        const result = readCodexSession(sessionId);
+        const result = readCodexSession(sessionId, { slim: true });
         _sendJson(res, 200, result.entries);
       } catch (err) {
         const status = err.code === 'CODEX_SESSION_NOT_FOUND' ? 404 : 500;
