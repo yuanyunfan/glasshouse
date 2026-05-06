@@ -2,6 +2,7 @@
 
 ## 1.6.236 (2026-05-05)
 
+- rename: rebrand public package metadata, CLI/UI/Electron text, docs, and Homebrew references from CC Viewer / cc-viewer to Glasshouse while keeping the `ccv` command and legacy runtime compatibility names stable
 - feat(codex): add read-only Codex session JSONL viewer with trusted session APIs, SSE live tail, provider/session UI switch, and raw/chat rendering
 - feat(codex-http): add `ccv run -- codex` Raven-facing Responses API interceptor with `provider=codex` viewer mode
 - feat(codex-http): extend the shell hook so direct `codex` agent launches print Glasshouse URLs and route through the Codex HTTP interceptor

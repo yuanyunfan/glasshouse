@@ -1,8 +1,8 @@
-# CC-Viewer Plugin System
+# Glasshouse Plugin System
 
 [中文版](./plugins.zh.md)
 
-CC-Viewer provides a lightweight plugin mechanism that allows injecting custom logic at specific lifecycle points. This is particularly useful for enterprise deployments — for example, replacing the QR code's LAN URL with a corporate proxy URL.
+Glasshouse provides a lightweight plugin mechanism that allows injecting custom logic at specific lifecycle points. This is particularly useful for enterprise deployments — for example, replacing the QR code's LAN URL with a corporate proxy URL.
 
 ## Quick Start
 
@@ -27,7 +27,7 @@ export default {
 };
 ```
 
-1. Restart cc-viewer. The plugin loads automatically — no `npm install` needed.
+1. Restart Glasshouse. The plugin loads automatically — no `npm install` needed.
 
 ## Plugin Directory
 
@@ -37,7 +37,7 @@ All plugins live in:
 ~/.claude/cc-viewer/plugins/
 ```
 
-This is `LOG_DIR/plugins/` — the same base directory cc-viewer uses for logs and preferences. Enterprise IT teams can pre-populate this directory for all users.
+This is `LOG_DIR/plugins/` — the same base directory Glasshouse uses for logs and preferences. Enterprise IT teams can pre-populate this directory for all users.
 
 The loader scans for all `*.js` and `*.mjs` files in this directory. Each file is one plugin.
 
@@ -69,7 +69,7 @@ Triggered on every HTTP request, after token authentication but before route dis
 | -------------- | ------------------------------------------------------------------------- |
 | **Type**       | Waterfall (serial pipeline)                                               |
 | **Parameters** | `{ req, res, url, method, parsedUrl, handled }`                           |
-| **Returns**    | `{ handled: true }` to short-circuit the request (skip cc-viewer routing) |
+| **Returns**    | `{ handled: true }` to short-circuit the request (skip Glasshouse routing) |
 | **Timing**     | After token auth, before route dispatch                                   |
 
 * `req` / `res` — Node.js `IncomingMessage` / `ServerResponse` objects
@@ -241,7 +241,7 @@ hooks: {
 
 ### Waterfall
 
-Plugins execute **sequentially** in filename sort order. Each plugin receives the return value of the previous one. The final value is used by cc-viewer.
+Plugins execute **sequentially** in filename sort order. Each plugin receives the return value of the previous one. The final value is used by Glasshouse.
 
 ```
 initial value → plugin-A → plugin-B → plugin-C → final value
@@ -257,7 +257,7 @@ All plugins execute **concurrently**. Return values are ignored. Used for notifi
 
 Every hook call is wrapped in `try/catch`. If a plugin throws an error:
 
-* The error is logged to stderr: `[CC Viewer] Plugin "name" hook "hookName" error: message`
+* The error is logged to stderr: `[Glasshouse] Plugin "name" hook "hookName" error: message`
 * Other plugins and the host application are **not** affected
 * For waterfall hooks, the value passes through to the next plugin unchanged
 
@@ -290,7 +290,7 @@ export default {
       fetch('https://monitor.company.com/api/notify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ service: 'cc-viewer', port, host }),
+        body: JSON.stringify({ service: 'glasshouse', port, host }),
       }).catch(() => {});
     },
 

@@ -11,15 +11,45 @@ import { ensureHooks } from './lib/ensure-hooks.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
-const INJECT_START = '// >>> Start CC Viewer Web Service >>>';
-const INJECT_END = '// <<< Start CC Viewer Web Service <<<';
+const INJECT_START = '// >>> Start Glasshouse Web Service >>>';
+const INJECT_END = '// <<< Start Glasshouse Web Service <<<';
+const LEGACY_INJECT_START = '// >>> Start CC Viewer Web Service >>>';
+const LEGACY_INJECT_END = '// <<< Start CC Viewer Web Service <<<';
 const INJECT_BLOCK = `${INJECT_START}\n${INJECT_IMPORT}\n${INJECT_END}`;
 
 
-const SHELL_HOOK_START = '# >>> CC-Viewer Auto-Inject >>>';
-const SHELL_HOOK_END = '# <<< CC-Viewer Auto-Inject <<<';
+const SHELL_HOOK_START = '# >>> Glasshouse Auto-Inject >>>';
+const SHELL_HOOK_END = '# <<< Glasshouse Auto-Inject <<<';
+const LEGACY_SHELL_HOOK_START = '# >>> CC-Viewer Auto-Inject >>>';
+const LEGACY_SHELL_HOOK_END = '# <<< CC-Viewer Auto-Inject <<<';
+
+const SHELL_HOOK_MARKERS = [
+  [SHELL_HOOK_START, SHELL_HOOK_END],
+  [LEGACY_SHELL_HOOK_START, LEGACY_SHELL_HOOK_END],
+];
+const CLI_INJECT_MARKERS = [
+  [INJECT_START, INJECT_END],
+  [LEGACY_INJECT_START, LEGACY_INJECT_END],
+];
 
 const cliPath = resolveCliPath();
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function hasMarkedBlock(content, markerPairs) {
+  return markerPairs.some(([start]) => content.includes(start));
+}
+
+function removeMarkedBlocks(content, markerPairs) {
+  let out = content;
+  for (const [start, end] of markerPairs) {
+    const regex = new RegExp(`\\n?${escapeRegExp(start)}[\\s\\S]*?${escapeRegExp(end)}\\n?`, 'g');
+    out = out.replace(regex, '\n');
+  }
+  return out;
+}
 
 // 统一的"claude 找不到"错误提示：区分"Claude Code 2.x wrapper 装了但原生二进制
 // 没 ready（--ignore-scripts / --omit=optional / 某些 pnpm 配置）"和"claude 根本
@@ -182,7 +212,7 @@ claude() {
     ccv run -- claude --ccv-internal "$@"
     return $?
   fi
-  if ! grep -q "CC Viewer" "$cli_js" 2>/dev/null; then
+  if ! grep -Eq "Glasshouse|CC Viewer" "$cli_js" 2>/dev/null; then
     ccv -logger 2>/dev/null
   fi
   command claude "$@"
@@ -216,12 +246,12 @@ function installShellHook(isNative) {
   try {
     let content = existsSync(configPath) ? readFileSync(configPath, 'utf-8') : '';
 
-    if (content.includes(SHELL_HOOK_START)) {
+    if (hasMarkedBlock(content, SHELL_HOOK_MARKERS)) {
       const hook = buildShellHook(isNative);
       // Extract existing hook content
-      const regex = new RegExp(`${SHELL_HOOK_START}[\\s\\S]*?${SHELL_HOOK_END}`);
+      const regex = new RegExp(`${escapeRegExp(SHELL_HOOK_START)}[\\s\\S]*?${escapeRegExp(SHELL_HOOK_END)}`);
       const existingMatch = content.match(regex);
-      if (existingMatch && existingMatch[0] === hook) {
+      if (existingMatch && existingMatch[0] === hook && !content.includes(LEGACY_SHELL_HOOK_START)) {
         return { path: configPath, status: 'exists' };
       }
       // Hook content differs: remove old and reinstall
@@ -251,9 +281,8 @@ function removeShellHook() {
     try {
       if (!existsSync(p)) continue;
       const content = readFileSync(p, 'utf-8');
-      if (!content.includes(SHELL_HOOK_START)) continue;
-      const regex = new RegExp(`\\n?${SHELL_HOOK_START}[\\s\\S]*?${SHELL_HOOK_END}\\n?`, 'g');
-      const newContent = content.replace(regex, '\n');
+      if (!hasMarkedBlock(content, SHELL_HOOK_MARKERS)) continue;
+      const newContent = removeMarkedBlocks(content, SHELL_HOOK_MARKERS);
       writeFileSync(p, newContent);
       lastResult = { path: p, status: 'removed' };
     } catch (err) {
@@ -264,9 +293,12 @@ function removeShellHook() {
 }
 
 function injectCliJs() {
-  const content = readFileSync(cliPath, 'utf-8');
-  if (content.includes(INJECT_START)) {
+  let content = readFileSync(cliPath, 'utf-8');
+  if (content.includes(INJECT_BLOCK)) {
     return 'exists';
+  }
+  if (hasMarkedBlock(content, CLI_INJECT_MARKERS)) {
+    content = removeMarkedBlocks(content, CLI_INJECT_MARKERS);
   }
   const lines = content.split('\n');
   lines.splice(2, 0, INJECT_BLOCK);
@@ -278,9 +310,8 @@ function removeCliJsInjection() {
   try {
     if (!existsSync(cliPath)) return 'not_found';
     const content = readFileSync(cliPath, 'utf-8');
-    if (!content.includes(INJECT_START)) return 'clean';
-    const regex = new RegExp(`${INJECT_START}\\n${INJECT_IMPORT}\\n${INJECT_END}\\n?`, 'g');
-    writeFileSync(cliPath, content.replace(regex, ''));
+    if (!hasMarkedBlock(content, CLI_INJECT_MARKERS)) return 'clean';
+    writeFileSync(cliPath, removeMarkedBlocks(content, CLI_INJECT_MARKERS));
     return 'removed';
   } catch {
     return 'error';
@@ -340,7 +371,7 @@ async function runCodexProxyCommand(cmd, cmdArgs, noOpen = false) {
       throw new Error(`Codex provider "${codexConfig.provider}" does not define model_providers.${codexConfig.provider}.base_url`);
     }
     if (codexConfig.wireApi && codexConfig.wireApi !== 'responses') {
-      console.error(`[CC Viewer] Codex provider "${codexConfig.provider}" uses wire_api="${codexConfig.wireApi}"; Codex HTTP interceptor currently captures /v1/responses first.`);
+      console.error(`[Glasshouse] Codex provider "${codexConfig.provider}" uses wire_api="${codexConfig.wireApi}"; Codex HTTP interceptor currently captures /v1/responses first.`);
     }
 
     serverMod = await import('./server.js');
@@ -363,7 +394,7 @@ async function runCodexProxyCommand(cmd, cmdArgs, noOpen = false) {
     env.CCV_CODEX_PROXY_MODE = '1';
 
     const viewerUrl = `${protocol}://127.0.0.1:${port}?provider=codex`;
-    console.log('CC Viewer (Codex):');
+    console.log('Glasshouse (Codex):');
     console.log(`  ➜ Local:   ${viewerUrl}`);
     const _lanIps = serverMod.getAllLocalIps();
     const _token = serverMod.getAccessToken();
@@ -437,7 +468,7 @@ async function runProxyCommand(args, noOpen = false) {
     }
     env.ANTHROPIC_BASE_URL = `http://127.0.0.1:${proxyPort}`;
     env.CCV_PROXY_MODE = '1'; // 告诉 interceptor.js 不要再启动 server
-    // 剥离 cc-viewer 的内部短路开关，避免泄漏给 claude 子进程
+    // 剥离 Glasshouse 的内部短路开关，避免泄漏给 claude 子进程
     delete env.CCV_SKIP_THINKING_DISPLAY;
 
     const settingsJson = JSON.stringify({
@@ -539,7 +570,7 @@ async function runCliMode(extraClaudeArgs = [], cwd, noOpen = false) {
   try {
     await spawnClaude(proxyPort, workingDir, extraClaudeArgs, claudePath, isNpmVersion, port, serverProtocol);
   } catch (err) {
-    console.error('[CC Viewer] Failed to spawn Claude:', err.message);
+    console.error('[Glasshouse] Failed to spawn Claude:', err.message);
     await serverMod.stopViewer();
     process.exit(1);
   }
@@ -555,7 +586,7 @@ async function runCliMode(extraClaudeArgs = [], cwd, noOpen = false) {
     } catch {}
   }
 
-  console.log(`CC Viewer:`);
+  console.log(`Glasshouse:`);
   console.log(`  ➜ Local:   ${url}`);
   const _lanIps = serverMod.getAllLocalIps();
   const _token = serverMod.getAccessToken();
@@ -579,7 +610,7 @@ async function runSdkMode(extraClaudeArgs = [], cwd, noOpen = false) {
     sdkManager = await import('./lib/sdk-manager.js');
     if (!sdkManager.isSdkAvailable()) throw new Error('query not available');
   } catch {
-    console.warn('[CC Viewer] Agent SDK not available, falling back to PTY mode (-C)');
+    console.warn('[Glasshouse] Agent SDK not available, falling back to PTY mode (-C)');
     return runCliMode(extraClaudeArgs, cwd, noOpen);
   }
 
@@ -645,7 +676,7 @@ async function runSdkMode(extraClaudeArgs = [], cwd, noOpen = false) {
     } catch {}
   }
 
-  console.log(`CC Viewer (SDK mode):`);
+  console.log(`Glasshouse (SDK mode):`);
   console.log(`  ➜ Local:   ${url}`);
   const _lanIps = serverMod.getAllLocalIps();
   const _token = serverMod.getAccessToken();
@@ -709,7 +740,7 @@ async function runCliModeWorkspaceSelector(extraClaudeArgs = [], noOpen = false)
     } catch {}
   }
 
-  console.log(`CC Viewer (Workspace):`);
+  console.log(`Glasshouse (Workspace):`);
   console.log(`  ➜ Local:   ${url}`);
   const _lanIps = serverMod.getAllLocalIps();
   const _token = serverMod.getAccessToken();
@@ -805,7 +836,7 @@ if (isHelp) {
 if (isVersion) {
   try {
     const pkg = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8'));
-    console.log(`cc-viewer v${pkg.version}`);
+    console.log(`glasshouse v${pkg.version}`);
   } catch (e) {
     console.error('Failed to read version:', e.message);
   }

@@ -1,4 +1,4 @@
-/* MdxEditorPanel — 把 MDXEditor 的 Radix 主题变量映射到 cc-viewer 现有
+/* MdxEditorPanel — 把 MDXEditor 的 Radix 主题变量映射到 Glasshouse 现有
    --bg-* / --text-* / --border-* / --color-primary 体系，做到 dark/light
    切换全自动。container 既加 .dark/.light（panel 自管），也加 dark-theme（MDXEditor
    官方 dark 入口），双保险。
@@ -8,13 +8,13 @@
    按 CSS Cascading & Inheritance Level 5 规范，**unlayered 永远胜过任何 layered**，
    因此本文件无需 !important、也无需抬 specificity 即可干净覆盖 MDXEditor 默认样式。
 
-   全局污染对冲：cc-viewer/src/global.css 有两条 unlayered 规则会泄漏进编辑区——
+   全局污染对冲：Glasshouse/src/global.css 有两条 unlayered 规则会泄漏进编辑区——
      1. `*:focus { outline: none !important }`  → 编辑区任何元素失去 focus 视觉
      2. `* { scrollbar-* }`                       → MDXEditor 滚动条被全局接管
-   规则 1 我们用 :focus-visible 的 box-shadow 自给视觉；规则 2 接受现状（与 cc-viewer
+   规则 1 我们用 :focus-visible 的 box-shadow 自给视觉；规则 2 接受现状（与 Glasshouse
    全站滚动条统一是 feature 不是 bug）。此外官方 demo 的 prose 排版（h1-h6 字号阶梯、
    p / list / blockquote 间距）MDXEditor 自身不出样式，必须在 .contentEditable 内
-   显式补齐，否则会被 cc-viewer 全局 reset 压成裸文本。
+   显式补齐，否则会被 Glasshouse 全局 reset 压成裸文本。
 
    ⚠️ 已知技术债：本文件用了大量 :global([class*='_xxx']) 通配符匹配 MDXEditor
    内部 CSS module hash class（_toolbarRoot / _selectContent / _dialogContent /
@@ -163,7 +163,7 @@
 
 /* =====================================================================
    Contenteditable 内的 prose 排版（关键修复）
-   MDXEditor 自身完全不给 h/p/list/blockquote 等元素出样式，且 cc-viewer 全局
+   MDXEditor 自身完全不给 h/p/list/blockquote 等元素出样式，且 Glasshouse 全局
    会做隐式 reset，所以必须在这里补齐字号阶梯和默认间距，不然就是一坨裸文本。
    ===================================================================== */
 .contentEditable {
@@ -629,7 +629,7 @@
 
 /* =====================================================================
    以下规则匹配 Radix portal 渲染到 document.body 的浮层，必须用全局选择器
-   z-index 选 1500：高于 cc-viewer 所有 chrome (max ~1100) 与 AntD Popover (1030) /
+   z-index 选 1500：高于 Glasshouse 所有 chrome (max ~1100) 与 AntD Popover (1030) /
    Tooltip (1070)；低于 AntD message/notification (2010) 保 toast 永远在最上。
    1499 给 dialog 遮罩，让 dialog 内容（1500）正好压在自己的遮罩之上。
 

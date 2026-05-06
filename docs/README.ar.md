@@ -1,4 +1,4 @@
-# CC-Viewer
+# Glasshouse
 
 مجموعة أدوات Vibe Coding مستخلصة من خبرة تطوير عملية ومبنية فوق Claude Code:
 
@@ -23,15 +23,15 @@
 #### التثبيت عبر npm
 
 ```bash
-npm install -g cc-viewer --registry=https://registry.npmjs.org
+npm install -g @yuanyunfan/glasshouse --registry=https://registry.npmjs.org
 ```
 
 #### التثبيت عبر Homebrew (موصى به لـ macOS / Linux)
 
 ```bash
-brew tap weiesky/cc-viewer
-brew install cc-viewer
-brew upgrade cc-viewer   # للتحديثات — لا تستخدم npm install -g مع تثبيتات brew
+brew tap yuanyunfan/glasshouse
+brew install glasshouse
+brew upgrade glasshouse   # للتحديثات — لا تستخدم npm install -g مع تثبيتات brew
 ```
 
 ### التشغيل
@@ -50,7 +50,7 @@ ccv -c --d             # == claude --continue --dangerously-skip-permissions
 
 بعد التشغيل في وضع البرمجة، ستُفتح صفحة ويب تلقائيًا.
 
-يتوفر CC-Viewer أيضًا كتطبيق سطح مكتب أصلي: [صفحة التنزيل](https://github.com/weiesky/cc-viewer/releases)
+يتوفر Glasshouse أيضًا كتطبيق سطح مكتب أصلي: [صفحة التنزيل](https://github.com/yuanyunfan/glasshouse/releases)
 
 
 ### وضع المُسجّل (Logger)
@@ -73,19 +73,19 @@ ccv --uninstall
 
 ### استكشاف الأخطاء وإصلاحها
 
-إذا واجهت مشكلات عند بدء تشغيل cc-viewer، إليك النهج النهائي لاستكشاف الأخطاء وإصلاحها:
+إذا واجهت مشكلات عند بدء تشغيل Glasshouse، إليك النهج النهائي لاستكشاف الأخطاء وإصلاحها:
 
 الخطوة 1: افتح Claude Code في أي مجلد.
 
 الخطوة 2: أعطِ Claude Code التعليمات التالية:
 
 ```
-I have installed the cc-viewer npm package, but after running ccv it still doesn't work properly. Please check cc-viewer's cli.js and findcc.js, and adapt them to the local Claude Code deployment based on the specific environment. Keep the scope of changes as constrained as possible within findcc.js.
+I have installed the Glasshouse npm package, but after running ccv it still doesn't work properly. Please check Glasshouse's cli.js and findcc.js, and adapt them to the local Claude Code deployment based on the specific environment. Keep the scope of changes as constrained as possible within findcc.js.
 ```
 
 السماح لـ Claude Code بتشخيص المشكلة بنفسه أكثر فاعلية من سؤال أي شخص أو قراءة أي وثائق!
 
-بعد اكتمال التعليمات أعلاه، سيتم تحديث `findcc.js`. إذا كان مشروعك يتطلب النشر المحلي بشكل متكرر، أو إذا كان الكود المنسوخ (المتفرّع) يحتاج غالبًا إلى حل مشكلات التثبيت، فإن الاحتفاظ بهذا الملف يسمح لك ببساطة بنسخه في المرة القادمة. في هذه المرحلة، العديد من المشاريع والشركات التي تستخدم Claude Code لا تنشر على Mac بل على بيئات مستضافة من جانب الخادم، لذا قام المؤلف بفصل `findcc.js` ليسهل تتبع تحديثات الكود المصدري لـ cc-viewer في المستقبل.
+بعد اكتمال التعليمات أعلاه، سيتم تحديث `findcc.js`. إذا كان مشروعك يتطلب النشر المحلي بشكل متكرر، أو إذا كان الكود المنسوخ (المتفرّع) يحتاج غالبًا إلى حل مشكلات التثبيت، فإن الاحتفاظ بهذا الملف يسمح لك ببساطة بنسخه في المرة القادمة. في هذه المرحلة، العديد من المشاريع والشركات التي تستخدم Claude Code لا تنشر على Mac بل على بيئات مستضافة من جانب الخادم، لذا قام المؤلف بفصل `findcc.js` ليسهل تتبع تحديثات الكود المصدري لـ Glasshouse في المستقبل.
 
 
 ### أوامر أخرى
@@ -156,7 +156,7 @@ ccv -h
 
 ### إدارة السجلات
 
-من خلال قائمة CC-Viewer المنسدلة في الزاوية العلوية اليسرى:
+من خلال قائمة Glasshouse المنسدلة في الزاوية العلوية اليسرى:
 
 <img width="1500" height="760" alt="image" src="https://github.com/user-attachments/assets/33295e2b-f2e0-4968-a6f1-6f3d1404454e" />
 
@@ -185,7 +185,7 @@ ccv -h
 
 <img width="600" height="370" alt="image" src="https://github.com/user-attachments/assets/87d332ea-3e34-4957-b442-f9d070211fbf" />
 
-يمكنك تخصيص الإضافات وإدارة جميع عمليات CC-Viewer، ويدعم CC-Viewer التبديل السريع إلى واجهات API لأطراف ثالثة (نعم، يمكنك استخدام GLM، Kimi، MiniMax، Qwen، DeepSeek — على الرغم من أن المؤلف يعتبرها جميعًا ضعيفة جدًا في هذه المرحلة).
+يمكنك تخصيص الإضافات وإدارة جميع عمليات Glasshouse، ويدعم Glasshouse التبديل السريع إلى واجهات API لأطراف ثالثة (نعم، يمكنك استخدام GLM، Kimi، MiniMax، Qwen، DeepSeek — على الرغم من أن المؤلف يعتبرها جميعًا ضعيفة جدًا في هذه المرحلة).
 
 ---
 

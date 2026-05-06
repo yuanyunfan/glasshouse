@@ -2,7 +2,7 @@
 
 ## Kontekst
 
-CC-Viewer zawiera wbudowaną funkcję tłumaczenia (`POST /api/translate`) opartą na Anthropic Messages API. We wczesnej implementacji żądania tłumaczenia ponownie wykorzystywały buforowane dane uwierzytelniające z sesji Claude Code — w tym zarówno nagłówki `x-api-key`, jak i `authorization`. Powodowało to subtelny, ale poważny problem: wyniki tłumaczeń często zwracały nieistotną treść.
+Glasshouse zawiera wbudowaną funkcję tłumaczenia (`POST /api/translate`) opartą na Anthropic Messages API. We wczesnej implementacji żądania tłumaczenia ponownie wykorzystywały buforowane dane uwierzytelniające z sesji Claude Code — w tym zarówno nagłówki `x-api-key`, jak i `authorization`. Powodowało to subtelny, ale poważny problem: wyniki tłumaczeń często zwracały nieistotną treść.
 
 ## Przyczyna źródłowa
 
@@ -24,7 +24,7 @@ Gdy Claude Code używa logowania subskrypcyjnego OAuth, przepływ uwierzytelnian
 ```
 Główna rozmowa Claude Code ──(authorization: Bearer sessionToken)──→ Anthropic API
                                                                         ↑
-Żądanie tłumaczenia CC-Viewer ──(authorization: Bearer sessionToken)──→ Anthropic API
+Żądanie tłumaczenia Glasshouse ──(authorization: Bearer sessionToken)──→ Anthropic API
 ```
 
 Ponieważ żądania tłumaczenia ponownie wykorzystywały ten sam token sesji, serwer Anthropic może powiązać żądania tłumaczenia z kontekstem głównej rozmowy Claude Code. Powoduje to:

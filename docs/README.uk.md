@@ -1,4 +1,4 @@
-# CC-Viewer
+# Glasshouse
 
 Набір інструментів Vibe Coding, виокремлений з практичного досвіду розробки, побудований на основі Claude Code:
 
@@ -23,15 +23,15 @@
 #### Встановлення через npm
 
 ```bash
-npm install -g cc-viewer --registry=https://registry.npmjs.org
+npm install -g @yuanyunfan/glasshouse --registry=https://registry.npmjs.org
 ```
 
 #### Встановлення через Homebrew (рекомендовано для macOS / Linux)
 
 ```bash
-brew tap weiesky/cc-viewer
-brew install cc-viewer
-brew upgrade cc-viewer   # для оновлень — НЕ використовуйте npm install -g для brew-встановлень
+brew tap yuanyunfan/glasshouse
+brew install glasshouse
+brew upgrade glasshouse   # для оновлень — НЕ використовуйте npm install -g для brew-встановлень
 ```
 
 ### Запуск
@@ -50,7 +50,7 @@ ccv -c --d             # == claude --continue --dangerously-skip-permissions
 
 Після запуску в режимі програмування веб-сторінка відкриється автоматично.
 
-CC-Viewer також постачається як нативний десктопний застосунок: [Сторінка завантаження](https://github.com/weiesky/cc-viewer/releases)
+Glasshouse також постачається як нативний десктопний застосунок: [Сторінка завантаження](https://github.com/yuanyunfan/glasshouse/releases)
 
 
 ### Режим Logger
@@ -73,19 +73,19 @@ ccv --uninstall
 
 ### Усунення несправностей
 
-Якщо ви стикаєтеся з проблемами при запуску cc-viewer, ось остаточний підхід до усунення несправностей:
+Якщо ви стикаєтеся з проблемами при запуску Glasshouse, ось остаточний підхід до усунення несправностей:
 
 Крок 1: Відкрийте Claude Code у будь-якому каталозі.
 
 Крок 2: Дайте Claude Code наступну інструкцію:
 
 ```
-I have installed the cc-viewer npm package, but after running ccv it still doesn't work properly. Please check cc-viewer's cli.js and findcc.js, and adapt them to the local Claude Code deployment based on the specific environment. Keep the scope of changes as constrained as possible within findcc.js.
+I have installed the Glasshouse npm package, but after running ccv it still doesn't work properly. Please check Glasshouse's cli.js and findcc.js, and adapt them to the local Claude Code deployment based on the specific environment. Keep the scope of changes as constrained as possible within findcc.js.
 ```
 
 Дозволити Claude Code самому діагностувати проблему ефективніше, ніж запитувати когось або читати будь-яку документацію!
 
-Після виконання наведеної вище інструкції `findcc.js` буде оновлено. Якщо ваш проект часто потребує локального розгортання, або якщо форкнутий код часто потребує вирішення проблем встановлення, збереження цього файлу дозволить вам просто скопіювати його наступного разу. На цьому етапі багато проектів та компаній, що використовують Claude Code, розгортаються не на Mac, а в хостованих серверних середовищах, тому автор виділив `findcc.js`, щоб у майбутньому було легше відстежувати оновлення вихідного коду cc-viewer.
+Після виконання наведеної вище інструкції `findcc.js` буде оновлено. Якщо ваш проект часто потребує локального розгортання, або якщо форкнутий код часто потребує вирішення проблем встановлення, збереження цього файлу дозволить вам просто скопіювати його наступного разу. На цьому етапі багато проектів та компаній, що використовують Claude Code, розгортаються не на Mac, а в хостованих серверних середовищах, тому автор виділив `findcc.js`, щоб у майбутньому було легше відстежувати оновлення вихідного коду Glasshouse.
 
 
 ### Інші команди
@@ -156,7 +156,7 @@ ccv -h
 
 ### Керування логами
 
-Через випадаюче меню CC-Viewer у верхньому лівому куті:
+Через випадаюче меню Glasshouse у верхньому лівому куті:
 
 <img width="1500" height="760" alt="image" src="https://github.com/user-attachments/assets/33295e2b-f2e0-4968-a6f1-6f3d1404454e" />
 
@@ -185,7 +185,7 @@ ccv -h
 
 <img width="600" height="370" alt="image" src="https://github.com/user-attachments/assets/87d332ea-3e34-4957-b442-f9d070211fbf" />
 
-Ви можете налаштовувати плагіни, керувати всіма процесами CC-Viewer, а CC-Viewer підтримує гаряче перемикання на сторонні API (так, ви можете використовувати GLM, Kimi, MiniMax, Qwen, DeepSeek — хоча автор вважає їх усіх досить слабкими на даний момент).
+Ви можете налаштовувати плагіни, керувати всіма процесами Glasshouse, а Glasshouse підтримує гаряче перемикання на сторонні API (так, ви можете використовувати GLM, Kimi, MiniMax, Qwen, DeepSeek — хоча автор вважає їх усіх досить слабкими на даний момент).
 
 ---
 

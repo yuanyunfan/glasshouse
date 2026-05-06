@@ -3,7 +3,7 @@
 ## İki giriş alanı ne işe yarar
 
 - **Uzman adı**: UltraPlan varyant satırındaki rol düğmesinde gösterilen etiket (maks. 30 karakter). Yalnızca bir görüntü adıdır ve **asla** Claude Code'a gönderilmez.
-- **Prompt gövdesi**: rol talimatınız. Gönderim sırasında cc-viewer **otomatik olarak** bunu `[SCOPED INSTRUCTION]` kapsam başlığıyla birlikte `<system-reminder>...</system-reminder>` etiketleriyle sarmalar. Bu yüzden **yalnızca gövdeyi yazın** — `<system-reminder>` etiketlerini kendiniz eklemeyin.
+- **Prompt gövdesi**: rol talimatınız. Gönderim sırasında Glasshouse **otomatik olarak** bunu `[SCOPED INSTRUCTION]` kapsam başlığıyla birlikte `<system-reminder>...</system-reminder>` etiketleriyle sarmalar. Bu yüzden **yalnızca gövdeyi yazın** — `<system-reminder>` etiketlerini kendiniz eklemeyin.
 
 ---
 
@@ -82,7 +82,7 @@ Your final plan must include the following elements:
 
 Bu, Claude Code'a şunu söyler: **bu talimatlar yalnızca sonraki 1–3 turda etkindir**, sonra silinir. "Uzman kişiliğinin" sonradan ilgisiz konuşmalara sızmasını önler.
 
-**Bu satır cc-viewer tarafından otomatik üretilir. Sizin yazmanıza gerek yok.**
+**Bu satır Glasshouse tarafından otomatik üretilir. Sizin yazmanıza gerek yok.**
 
 ### 2. Açılış görev tanımı (**yeniden yazmanız gereken kısım budur**)
 > Leverage a multi-agent exploration mechanism to formulate an exceptionally detailed implementation plan.
@@ -125,7 +125,7 @@ Orijinal şablon "uygulama planının" 6 öğesini listeler. Teslimatınız tama
 
 ## Yazım ipuçları (TL;DR)
 
-1. **Sarmalayıcıyı koruyun**: `<system-reminder>` + `[SCOPED INSTRUCTION]` satırı cc-viewer tarafından eklenir — tekrarlamayın.
+1. **Sarmalayıcıyı koruyun**: `<system-reminder>` + `[SCOPED INSTRUCTION]` satırı Glasshouse tarafından eklenir — tekrarlamayın.
 2. **Açılış cümlesini yeniden yazın**: rol, hedef ve çıktı formatını tek satırda belirtin.
 3. **İş akışını esnetin**: hafif görevler için 1–2 adım, tam 5 adımlı döngü yalnızca karmaşık olanlar için.
 4. **Adım 1 alt rollerini yeniden yazın**: varsayılanlar (akademik makaleler / rakipler / demo) muhtemelen istediğiniz şey değildir.

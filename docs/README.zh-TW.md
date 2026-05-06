@@ -1,4 +1,4 @@
-# CC-Viewer
+# Glasshouse
 
 基於 Claude Code、提煉自身開發經驗、沉澱而成的 Vibe Coding 工具：
 
@@ -23,15 +23,15 @@
 #### 透過 npm 安裝
 
 ```bash
-npm install -g cc-viewer --registry=https://registry.npmjs.org
+npm install -g @yuanyunfan/glasshouse --registry=https://registry.npmjs.org
 ```
 
 #### 透過 Homebrew 安裝（macOS / Linux 推薦）
 
 ```bash
-brew tap weiesky/cc-viewer
-brew install cc-viewer
-brew upgrade cc-viewer   # 升級用這個，brew 安裝的 ccv 不要用 npm install -g 升級
+brew tap yuanyunfan/glasshouse
+brew install glasshouse
+brew upgrade glasshouse   # 升級用這個，brew 安裝的 ccv 不要用 npm install -g 升級
 ```
 
 ### 啟動方式
@@ -50,7 +50,7 @@ ccv -c --d             # == claude --continue --dangerously-skip-permissions
 
 以程式設計模式啟動後，網頁將會自動開啟。
 
-CC-Viewer 也提供原生桌面應用程式：[下載頁面](https://github.com/weiesky/cc-viewer/releases)
+Glasshouse 也提供原生桌面應用程式：[下載頁面](https://github.com/yuanyunfan/glasshouse/releases)
 
 
 ### 記錄器模式
@@ -73,19 +73,19 @@ ccv --uninstall
 
 ### 疑難排解
 
-如果你在啟動 cc-viewer 時遇到問題，以下是終極疑難排解方法：
+如果你在啟動 Glasshouse 時遇到問題，以下是終極疑難排解方法：
 
 步驟 1：在任何目錄中開啟 Claude Code。
 
 步驟 2：向 Claude Code 下達以下指示：
 
 ```
-I have installed the cc-viewer npm package, but after running ccv it still doesn't work properly. Please check cc-viewer's cli.js and findcc.js, and adapt them to the local Claude Code deployment based on the specific environment. Keep the scope of changes as constrained as possible within findcc.js.
+I have installed the Glasshouse npm package, but after running ccv it still doesn't work properly. Please check Glasshouse's cli.js and findcc.js, and adapt them to the local Claude Code deployment based on the specific environment. Keep the scope of changes as constrained as possible within findcc.js.
 ```
 
 讓 Claude Code 自行診斷問題，比詢問任何人或閱讀任何文件都更有效！
 
-完成上述指令後，`findcc.js` 會被更新。如果你的專案經常需要本地部署，或分叉的程式碼常常需要解決安裝問題，保留此檔案可讓你下次直接複製使用。目前許多使用 Claude Code 的專案與公司並非部署在 Mac，而是部署在伺服器端託管環境中，因此作者將 `findcc.js` 獨立出來，方便未來追蹤 cc-viewer 原始碼更新。
+完成上述指令後，`findcc.js` 會被更新。如果你的專案經常需要本地部署，或分叉的程式碼常常需要解決安裝問題，保留此檔案可讓你下次直接複製使用。目前許多使用 Claude Code 的專案與公司並非部署在 Mac，而是部署在伺服器端託管環境中，因此作者將 `findcc.js` 獨立出來，方便未來追蹤 Glasshouse 原始碼更新。
 
 
 ### 其他指令
@@ -156,7 +156,7 @@ ccv -h
 
 ### 日誌管理
 
-透過左上角的 CC-Viewer 下拉選單：
+透過左上角的 Glasshouse 下拉選單：
 
 <img width="1500" height="760" alt="image" src="https://github.com/user-attachments/assets/33295e2b-f2e0-4968-a6f1-6f3d1404454e" />
 
@@ -185,7 +185,7 @@ ccv -h
 
 <img width="600" height="370" alt="image" src="https://github.com/user-attachments/assets/87d332ea-3e34-4957-b442-f9d070211fbf" />
 
-你可以自訂外掛、管理所有 CC-Viewer 程序，CC-Viewer 也支援熱切換第三方 API（沒錯，你可以使用 GLM、Kimi、MiniMax、Qwen、DeepSeek —— 儘管作者認為它們目前都還相當薄弱）。
+你可以自訂外掛、管理所有 Glasshouse 程序，Glasshouse 也支援熱切換第三方 API（沒錯，你可以使用 GLM、Kimi、MiniMax、Qwen、DeepSeek —— 儘管作者認為它們目前都還相當薄弱）。
 
 ---
 

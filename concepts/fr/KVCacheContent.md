@@ -4,7 +4,7 @@
 
 Lorsque tu communiques avec Claude, chaque requete API envoie le contexte complet de la conversation (prompt systeme + definitions d'outils + messages historiques). Le mecanisme de prompt caching d'Anthropic met en cache le contenu du prefixe deja calcule cote serveur. Si le prefixe d'une requete ulterieure correspond, le resultat en cache est reutilise directement, evitant les calculs redondants et reduisant considerablement la latence et les couts.
 
-Dans cc-viewer, ce mecanisme est appele "KV-Cache", correspondant au prompt caching au niveau de l'API d'Anthropic, et non au cache key-value au sein des couches d'attention du transformer du LLM lui-meme.
+Dans Glasshouse, ce mecanisme est appele "KV-Cache", correspondant au prompt caching au niveau de l'API d'Anthropic, et non au cache key-value au sein des couches d'attention du transformer du LLM lui-meme.
 
 ## Comment fonctionne le cache
 
@@ -22,7 +22,7 @@ Tant que ce prefixe correspond exactement a n'importe quelle requete dans la fen
 
 ## Qu'est-ce que le "contenu actuel du cache KV" ?
 
-Le "contenu actuel du cache KV" affiche dans cc-viewer est extrait de la derniere requete MainAgent, specifiquement le contenu avant la limite du cache (cache breakpoint). Il comprend :
+Le "contenu actuel du cache KV" affiche dans Glasshouse est extrait de la derniere requete MainAgent, specifiquement le contenu avant la limite du cache (cache breakpoint). Il comprend :
 
 - **Prompt systeme** : Les instructions systeme de Claude Code, incluant les directives centrales de l'agent, les specifications d'utilisation des outils, les instructions du projet CLAUDE.md, les informations d'environnement, etc.
 - **Outils** : La liste actuelle des definitions d'outils disponibles (comme Read, Write, Bash, Agent, outils MCP, etc.)

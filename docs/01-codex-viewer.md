@@ -7,7 +7,7 @@ The session JSONL reader described here has been removed from the runtime.
 
 ## Background
 
-`cc-viewer` currently understands Claude Code request logs and local uploaded
+`Glasshouse` currently understands Claude Code request logs and local uploaded
 JSONL logs. Codex CLI already writes session JSONL files under
 `CODEX_HOME || ~/.codex`, but those files are not Claude API request logs and
 cannot be loaded by the existing viewer without an adapter.

@@ -41,7 +41,7 @@ Référence des champs du corps de réponse de l'API Claude `/v1/messages`.
 | **ephemeral_5m_input_tokens** | Nombre de tokens de création de cache à court terme avec un TTL de 5 minutes |
 | **ephemeral_1h_input_tokens** | Nombre de tokens de création de cache à long terme avec un TTL de 1 heure |
 
-> **À propos de la facturation du cache** : Le prix unitaire de `cache_read_input_tokens` est bien inférieur à celui de `input_tokens`, tandis que le prix unitaire de `cache_creation_input_tokens` est légèrement supérieur à celui de l'entrée normale. Par conséquent, maintenir un taux de succès de cache élevé dans les conversations continues peut réduire considérablement les coûts. Vous pouvez surveiller visuellement ce ratio grâce à la métrique « Taux de succès » dans cc-viewer.
+> **À propos de la facturation du cache** : Le prix unitaire de `cache_read_input_tokens` est bien inférieur à celui de `input_tokens`, tandis que le prix unitaire de `cache_creation_input_tokens` est légèrement supérieur à celui de l'entrée normale. Par conséquent, maintenir un taux de succès de cache élevé dans les conversations continues peut réduire considérablement les coûts. Vous pouvez surveiller visuellement ce ratio grâce à la métrique « Taux de succès » dans Glasshouse.
 
 ## Signification de stop_reason
 

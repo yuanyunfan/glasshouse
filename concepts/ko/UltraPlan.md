@@ -2,7 +2,7 @@
 
 ## UltraPlan이란
 
-UltraPlan은 Claude Code의 네이티브 `/ultraplan` 명령에 대한 cc-viewer의 **현지화 구현**입니다. Claude의 공식 원격 서비스를 실행할 필요 없이 로컬 환경에서 `/ultraplan`의 전체 기능을 사용할 수 있으며, Claude Code가 **멀티 에이전트 협업**으로 복잡한 계획 및 구현 작업을 수행하도록 안내합니다.
+UltraPlan은 Claude Code의 네이티브 `/ultraplan` 명령에 대한 Glasshouse의 **현지화 구현**입니다. Claude의 공식 원격 서비스를 실행할 필요 없이 로컬 환경에서 `/ultraplan`의 전체 기능을 사용할 수 있으며, Claude Code가 **멀티 에이전트 협업**으로 복잡한 계획 및 구현 작업을 수행하도록 안내합니다.
 
 일반 Plan 모드나 Agent Team과 비교하여 UltraPlan은 다음이 가능합니다:
 - 다양한 작업 유형에 맞는 **코드 전문가**와 **리서치 전문가** 역할 제공

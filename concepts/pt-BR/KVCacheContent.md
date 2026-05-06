@@ -4,7 +4,7 @@
 
 Quando voce conversa com o Claude, cada requisicao da API envia o contexto completo da conversa (system prompt + definicoes de ferramentas + historico de mensagens). O mecanismo de prompt caching da Anthropic armazena no servidor o conteudo do prefixo ja calculado. Se requisicoes subsequentes tiverem o mesmo prefixo, os resultados armazenados sao reutilizados diretamente, pulando calculos redundantes e reduzindo significativamente a latencia e os custos.
 
-No cc-viewer, esse mecanismo e chamado de "KV-Cache" e corresponde ao prompt caching no nivel da API da Anthropic, nao ao key-value cache interno das camadas de atencao do transformer do LLM.
+No Glasshouse, esse mecanismo e chamado de "KV-Cache" e corresponde ao prompt caching no nivel da API da Anthropic, nao ao key-value cache interno das camadas de atencao do transformer do LLM.
 
 ## Como o caching funciona
 
@@ -22,7 +22,7 @@ Desde que esse prefixo corresponda exatamente a uma requisicao anterior dentro d
 
 ## O que e o "conteudo atual do KV-Cache"?
 
-O "conteudo atual do KV-Cache" exibido no cc-viewer e extraido da ultima requisicao do MainAgent e inclui o conteudo anterior ao limite do cache (cache breakpoint). Especificamente, ele compreende:
+O "conteudo atual do KV-Cache" exibido no Glasshouse e extraido da ultima requisicao do MainAgent e inclui o conteudo anterior ao limite do cache (cache breakpoint). Especificamente, ele compreende:
 
 - **System Prompt**: as instrucoes de sistema do Claude Code, incluindo instrucoes principais do agent, especificacoes de uso de ferramentas, instrucoes do projeto CLAUDE.md, informacoes do ambiente, etc.
 - **Tools**: a lista de definicoes de ferramentas atualmente disponiveis (como Read, Write, Bash, Agent, ferramentas MCP, etc.)

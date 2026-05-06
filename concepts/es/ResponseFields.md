@@ -41,7 +41,7 @@ Referencia de campos del cuerpo de respuesta de la API de Claude `/v1/messages`.
 | **ephemeral_5m_input_tokens** | Número de tokens de creación de caché a corto plazo con TTL de 5 minutos |
 | **ephemeral_1h_input_tokens** | Número de tokens de creación de caché a largo plazo con TTL de 1 hora |
 
-> **Sobre la facturación de caché**: El precio unitario de `cache_read_input_tokens` es mucho menor que el de `input_tokens`, mientras que el precio unitario de `cache_creation_input_tokens` es ligeramente superior al de la entrada normal. Por lo tanto, mantener una alta tasa de aciertos de caché en conversaciones continuas puede reducir significativamente los costos. Puede monitorear visualmente esta proporción a través de la métrica "Tasa de aciertos" en cc-viewer.
+> **Sobre la facturación de caché**: El precio unitario de `cache_read_input_tokens` es mucho menor que el de `input_tokens`, mientras que el precio unitario de `cache_creation_input_tokens` es ligeramente superior al de la entrada normal. Por lo tanto, mantener una alta tasa de aciertos de caché en conversaciones continuas puede reducir significativamente los costos. Puede monitorear visualmente esta proporción a través de la métrica "Tasa de aciertos" en Glasshouse.
 
 ## Significado de stop_reason
 

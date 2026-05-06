@@ -145,7 +145,7 @@ export async function spawnClaude(proxyPort, cwd, extraArgs = [], claudePath = n
   env.ANTHROPIC_BASE_URL = `http://127.0.0.1:${proxyPort}`;
   env.CCV_PROXY_MODE = '1'; // 告诉 interceptor.js 不要再启动 server
   env.CCV_LOG_DIR = LOG_DIR; // 让 fork 出的 Claude Code 进程找到同一份 profile.json 等资源
-  // 剥离 cc-viewer 的内部短路开关，避免泄漏给 claude 子进程
+  // 剥离 Glasshouse 的内部短路开关，避免泄漏给 claude 子进程
   delete env.CCV_SKIP_THINKING_DISPLAY;
 
   // Resolve real Node.js path (Electron's process.execPath is the Electron binary)
@@ -238,7 +238,7 @@ export async function spawnClaude(proxyPort, cwd, extraArgs = [], claudePath = n
     // 是透明的。新 pty 正常启动后自己会上报 state/exit。这样避免前端看到一次假的退出事件。
     const hasContinue = extraArgs.includes('-c') || extraArgs.includes('--continue');
     if (hasContinue && exitCode !== 0 && outputBuffer.includes('No conversation found')) {
-      console.error('[CC Viewer] -c failed (no conversation), retrying without -c');
+      console.error('[Glasshouse] -c failed (no conversation), retrying without -c');
       const retryArgs = extraArgs.filter(a => a !== '-c' && a !== '--continue');
       spawnClaude(proxyPort, cwd, retryArgs, claudePath, isNpmVersion, serverPort, serverProtocol);
       return;
@@ -254,7 +254,7 @@ export async function spawnClaude(proxyPort, cwd, extraArgs = [], claudePath = n
     const flagRejected = weInjectedFlag && exitCode !== 0
       && /unknown option ['"]--thinking-display/i.test(outputBuffer);
     if (flagRejected) {
-      console.error('[CC Viewer] claude rejected --thinking-display, marking as unsupported and retrying without flag');
+      console.error('[Glasshouse] claude rejected --thinking-display, marking as unsupported and retrying without flag');
       _thinkingDisplayRejectedPaths.add(claudePath);
       spawnClaude(proxyPort, cwd, extraArgs, claudePath, isNpmVersion, serverPort, serverProtocol);
       return;
@@ -346,8 +346,8 @@ export async function spawnShell() {
   lastExitCode = null;
   currentWorkspacePath = cwd;
 
-  // Clean env: remove cc-viewer specific vars so child shells don't inherit them
-  // (prevents CCVIEWER_PORT/CCVIEWER_PROTOCOL leaking to non-cc-viewer Claude instances;
+  // Clean env: remove Glasshouse specific vars so child shells don't inherit them
+  // (prevents CCVIEWER_PORT/CCVIEWER_PROTOCOL leaking to non-Glasshouse Claude instances;
   // 115c48b 加入 CCVIEWER_PROTOCOL 但只更新 spawnClaude，此处对齐)
   const shellEnv = { ...process.env };
   delete shellEnv.CCVIEWER_PORT;

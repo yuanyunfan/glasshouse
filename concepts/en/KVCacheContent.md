@@ -4,7 +4,7 @@
 
 When you chat with Claude, each API request sends the full conversation context (system prompt + tool definitions + historical messages). Anthropic's prompt caching mechanism caches previously computed prefix content on the server side. If the prefix of a subsequent request matches, the cached result is reused directly, skipping redundant computation and significantly reducing latency and cost.
 
-In cc-viewer, this mechanism is referred to as "KV-Cache", corresponding to Anthropic's API-level prompt caching — not the key-value cache within the transformer attention layers of the LLM itself.
+In Glasshouse, this mechanism is referred to as "KV-Cache", corresponding to Anthropic's API-level prompt caching — not the key-value cache within the transformer attention layers of the LLM itself.
 
 ## How Caching Works
 
@@ -22,7 +22,7 @@ As long as this prefix exactly matches any request within the TTL window, the AP
 
 ## What is "Current KV-Cache Content"?
 
-The "Current KV-Cache Content" displayed in cc-viewer is extracted from the most recent MainAgent request — specifically the content before the cache boundary (cache breakpoint). It includes:
+The "Current KV-Cache Content" displayed in Glasshouse is extracted from the most recent MainAgent request — specifically the content before the cache boundary (cache breakpoint). It includes:
 
 - **System Prompt**: Claude Code's system instructions, including core agent directives, tool usage specifications, CLAUDE.md project instructions, environment information, etc.
 - **Tools**: The current list of available tool definitions (such as Read, Write, Bash, Agent, MCP tools, etc.)

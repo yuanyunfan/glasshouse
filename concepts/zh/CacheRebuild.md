@@ -8,7 +8,7 @@ Anthropic 的 prompt caching 机制会将请求中的 system → tools → messa
 
 ## 缓存重建原因分类
 
-cc-viewer 通过对比前后两个 MainAgent 请求的 body，精确判断缓存重建的原因：
+Glasshouse 通过对比前后两个 MainAgent 请求的 body，精确判断缓存重建的原因：
 
 | reason | 含义 | 判断方式 |
 |--------|------|----------|

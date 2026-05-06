@@ -2,7 +2,7 @@
 
 ## Arka Plan
 
-CC-Viewer, Anthropic Messages API tarafından desteklenen yerleşik bir çeviri özelliği (`POST /api/translate`) içerir. Erken uygulamada, çeviri istekleri Claude Code oturumundan önbelleğe alınmış kimlik doğrulama bilgilerini yeniden kullanıyordu — hem `x-api-key` hem de `authorization` başlıkları dahil. Bu, ince ama ciddi bir soruna neden oldu: çeviri sonuçları sıklıkla alakasız içerik döndürüyordu.
+Glasshouse, Anthropic Messages API tarafından desteklenen yerleşik bir çeviri özelliği (`POST /api/translate`) içerir. Erken uygulamada, çeviri istekleri Claude Code oturumundan önbelleğe alınmış kimlik doğrulama bilgilerini yeniden kullanıyordu — hem `x-api-key` hem de `authorization` başlıkları dahil. Bu, ince ama ciddi bir soruna neden oldu: çeviri sonuçları sıklıkla alakasız içerik döndürüyordu.
 
 ## Temel Neden
 
@@ -24,7 +24,7 @@ Claude Code abonelik OAuth girişi kullandığında, kimlik doğrulama akışı 
 ```
 Claude Code ana konuşma ──(authorization: Bearer sessionToken)──→ Anthropic API
                                                                       ↑
-CC-Viewer çeviri isteği ──(authorization: Bearer sessionToken)──→ Anthropic API
+Glasshouse çeviri isteği ──(authorization: Bearer sessionToken)──→ Anthropic API
 ```
 
 Çeviri istekleri aynı oturum tokenını yeniden kullandığından, Anthropic sunucusu çeviri isteklerini Claude Code'un ana konuşma bağlamıyla ilişkilendirebilir. Bu durum şunlara yol açar:

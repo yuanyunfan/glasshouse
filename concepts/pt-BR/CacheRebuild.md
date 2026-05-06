@@ -8,7 +8,7 @@ A reconstrução de cache implica cobrança adicional de tokens (o preço de cac
 
 ## Classificação das Causas de Reconstrução de Cache
 
-O cc-viewer determina com precisão a causa da reconstrução de cache comparando os bodies de duas requisições MainAgent consecutivas:
+O Glasshouse determina com precisão a causa da reconstrução de cache comparando os bodies de duas requisições MainAgent consecutivas:
 
 | reason | Significado | Método de Determinação |
 |--------|------|----------|

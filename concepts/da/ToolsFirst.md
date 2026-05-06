@@ -1,6 +1,6 @@
 # Hvorfor vises Tools først?
 
-I cc-viewers kontekstpanel vises **Tools før System Prompt og Messages**. Denne rækkefølge afspejler præcist **Anthropic API's KV-Cache-præfikssekvens**.
+I Glasshouses kontekstpanel vises **Tools før System Prompt og Messages**. Denne rækkefølge afspejler præcist **Anthropic API's KV-Cache-præfikssekvens**.
 
 ## KV-Cache-præfikssekvens
 
@@ -74,4 +74,4 @@ MCP-værktøjer (Model Context Protocol) placeres ligesom indbyggede værktøjer
 | Hyppig tilføjelse/fjernelse af MCP-servere | Hver ændring udløser fuld cache-genopbygning; overvej at fastlåse værktøjssættet |
 | Overdimensionerede Tool Schemas | Beskær beskrivelser og enums for at reducere præfiks-tokenforbrug |
 
-I cc-viewers Context-panel vises MCP-værktøjer sammen med indbyggede værktøjer i Tools-området, hvilket giver et klart overblik over hvert værktøjs Schema-størrelse og bidrag til cache-præfikset.
+I Glasshouses Context-panel vises MCP-værktøjer sammen med indbyggede værktøjer i Tools-området, hvilket giver et klart overblik over hvert værktøjs Schema-størrelse og bidrag til cache-præfikset.

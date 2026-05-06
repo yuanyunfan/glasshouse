@@ -2,7 +2,7 @@
 
 # 签名配置检查工具
 
-echo "🔍 CC Viewer 签名配置检查"
+echo "🔍 Glasshouse 签名配置检查"
 echo "================================"
 echo ""
 

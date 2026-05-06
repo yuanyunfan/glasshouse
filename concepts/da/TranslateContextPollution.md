@@ -2,7 +2,7 @@
 
 ## Baggrund
 
-CC-Viewer inkluderer en indbygget oversættelsesfunktion (`POST /api/translate`) drevet af Anthropic Messages API. I den tidlige implementering genbrugte oversættelsesanmodninger cachede autentificeringsoplysninger fra Claude Code-sessionen — herunder både `x-api-key` og `authorization` headers. Dette forårsagede et subtilt men alvorligt problem: oversættelsesresultater returnerede ofte irrelevant indhold.
+Glasshouse inkluderer en indbygget oversættelsesfunktion (`POST /api/translate`) drevet af Anthropic Messages API. I den tidlige implementering genbrugte oversættelsesanmodninger cachede autentificeringsoplysninger fra Claude Code-sessionen — herunder både `x-api-key` og `authorization` headers. Dette forårsagede et subtilt men alvorligt problem: oversættelsesresultater returnerede ofte irrelevant indhold.
 
 ## Grundårsag
 
@@ -24,7 +24,7 @@ Når Claude Code bruger OAuth-abonnementslogin, ser autentificeringsflowet såda
 ```
 Claude Code hovedsamtale ──(authorization: Bearer sessionToken)──→ Anthropic API
                                                                       ↑
-CC-Viewer oversættelsesanmodning ──(authorization: Bearer sessionToken)──→ Anthropic API
+Glasshouse oversættelsesanmodning ──(authorization: Bearer sessionToken)──→ Anthropic API
 ```
 
 Da oversættelsesanmodninger genbrugte det samme sessionstoken, kan Anthropic-serveren tilknytte oversættelsesanmodninger til Claude Codes hovedsamtalekontekst. Dette medfører:

@@ -8,7 +8,7 @@ Anthropic의 prompt caching 메커니즘은 요청 내의 system → tools → m
 
 ## 캐시 재구축 원인 분류
 
-cc-viewer는 전후 두 MainAgent 요청의 body를 비교하여 캐시 재구축의 원인을 정확히 판정합니다:
+Glasshouse는 전후 두 MainAgent 요청의 body를 비교하여 캐시 재구축의 원인을 정확히 판정합니다:
 
 | reason | 의미 | 판정 방법 |
 |--------|------|-----------|

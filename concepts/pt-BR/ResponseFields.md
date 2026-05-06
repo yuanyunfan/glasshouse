@@ -41,7 +41,7 @@ Descrição dos campos do corpo de resposta da API Claude `/v1/messages`.
 | **ephemeral_5m_input_tokens** | Número de tokens para criação de cache de curto prazo com TTL de 5 minutos |
 | **ephemeral_1h_input_tokens** | Número de tokens para criação de cache de longo prazo com TTL de 1 hora |
 
-> **Sobre a tarifação do cache**: O preço unitário de `cache_read_input_tokens` é muito inferior ao de `input_tokens`, enquanto o preço unitário de `cache_creation_input_tokens` é ligeiramente superior ao da entrada normal. Portanto, manter uma alta taxa de acerto de cache em conversas contínuas pode reduzir significativamente os custos. Através da métrica "taxa de acerto" do cc-viewer é possível monitorar visualmente essa proporção.
+> **Sobre a tarifação do cache**: O preço unitário de `cache_read_input_tokens` é muito inferior ao de `input_tokens`, enquanto o preço unitário de `cache_creation_input_tokens` é ligeiramente superior ao da entrada normal. Portanto, manter uma alta taxa de acerto de cache em conversas contínuas pode reduzir significativamente os custos. Através da métrica "taxa de acerto" do Glasshouse é possível monitorar visualmente essa proporção.
 
 ## Significado de stop_reason
 

@@ -3,7 +3,7 @@
 ## Was die beiden Eingabefelder tun
 
 - **Expertenname**: das Label, das auf der Rollenschaltfläche in der UltraPlan-Variantenzeile angezeigt wird (max. 30 Zeichen). Es ist nur ein Anzeigename und wird **niemals** an Claude Code gesendet.
-- **Prompt-Inhalt**: Ihre Rollenanweisung. Beim Senden umschließt cc-viewer ihn **automatisch** mit `<system-reminder>...</system-reminder>`-Tags und einem `[SCOPED INSTRUCTION]`-Scope-Header. Schreiben Sie also **nur den Inhalt** — fügen Sie keine `<system-reminder>`-Tags selbst hinzu.
+- **Prompt-Inhalt**: Ihre Rollenanweisung. Beim Senden umschließt Glasshouse ihn **automatisch** mit `<system-reminder>...</system-reminder>`-Tags und einem `[SCOPED INSTRUCTION]`-Scope-Header. Schreiben Sie also **nur den Inhalt** — fügen Sie keine `<system-reminder>`-Tags selbst hinzu.
 
 ---
 
@@ -82,7 +82,7 @@ Your final plan must include the following elements:
 
 Dies teilt Claude Code mit: **diese Anweisungen sind nur für die nächsten 1–3 Runden aktiv**, danach werden sie ausgeblendet. Verhindert, dass die „Expertenpersona" anschließend in unzusammenhängende Konversationen einsickert.
 
-**Diese Zeile wird automatisch von cc-viewer generiert. Sie müssen sie nicht schreiben.**
+**Diese Zeile wird automatisch von Glasshouse generiert. Sie müssen sie nicht schreiben.**
 
 ### 2. Einführende Aufgabendefinition (**das ist es, was Sie umschreiben sollten**)
 > Leverage a multi-agent exploration mechanism to formulate an exceptionally detailed implementation plan.
@@ -125,7 +125,7 @@ Die ursprüngliche Vorlage listet 6 Elemente eines „Implementierungsplans" auf
 
 ## Tipps zur Erstellung (TL;DR)
 
-1. **Behalten Sie den Wrapper**: `<system-reminder>` + `[SCOPED INSTRUCTION]`-Zeile wird von cc-viewer hinzugefügt — nicht wiederholen.
+1. **Behalten Sie den Wrapper**: `<system-reminder>` + `[SCOPED INSTRUCTION]`-Zeile wird von Glasshouse hinzugefügt — nicht wiederholen.
 2. **Schreiben Sie den Eröffnungssatz um**: nennen Sie Rolle, Ziel und Ausgabeformat in einer Zeile.
 3. **Flexibler Workflow**: 1–2 Schritte für leichte Aufgaben, die volle 5-Schritte-Schleife nur für komplexe.
 4. **Schreiben Sie die Unterrollen aus Schritt 1 um**: die Standardwerte (akademische Arbeiten / Wettbewerber / Demo) sind wahrscheinlich nicht das, was Sie wollen.

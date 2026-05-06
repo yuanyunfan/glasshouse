@@ -41,7 +41,7 @@ Field reference for the Claude API `/v1/messages` response body.
 | **ephemeral_5m_input_tokens** | Number of tokens for short-term cache creation with a 5-minute TTL |
 | **ephemeral_1h_input_tokens** | Number of tokens for long-term cache creation with a 1-hour TTL |
 
-> **About cache billing**: The unit price of `cache_read_input_tokens` is much lower than `input_tokens`, while the unit price of `cache_creation_input_tokens` is slightly higher than normal input. Therefore, maintaining a high cache hit rate in ongoing conversations can significantly reduce costs. You can visually monitor this ratio through the "Hit Rate" metric in cc-viewer.
+> **About cache billing**: The unit price of `cache_read_input_tokens` is much lower than `input_tokens`, while the unit price of `cache_creation_input_tokens` is slightly higher than normal input. Therefore, maintaining a high cache hit rate in ongoing conversations can significantly reduce costs. You can visually monitor this ratio through the "Hit Rate" metric in Glasshouse.
 
 ## stop_reason Meanings
 

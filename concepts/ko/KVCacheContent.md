@@ -4,7 +4,7 @@
 
 Claude와 대화할 때, 매 API 요청마다 완전한 대화 컨텍스트(system prompt + 도구 정의 + 과거 메시지)가 전송됩니다. Anthropic의 prompt caching 메커니즘은 이미 계산된 접두사 내용을 서버 측에 캐시하고, 후속 요청에서 접두사가 일치하면 캐시 결과를 직접 재사용하여 중복 계산을 건너뛰고, 지연 시간과 비용을 대폭 줄입니다.
 
-cc-viewer에서는 이 메커니즘을 "KV-Cache"라고 부르지만, 이는 Anthropic API 수준의 prompt caching에 해당하는 것이며, LLM 내부 transformer 어텐션 레이어의 key-value cache가 아닙니다.
+Glasshouse에서는 이 메커니즘을 "KV-Cache"라고 부르지만, 이는 Anthropic API 수준의 prompt caching에 해당하는 것이며, LLM 내부 transformer 어텐션 레이어의 key-value cache가 아닙니다.
 
 ## 캐시의 작동 원리
 
@@ -22,7 +22,7 @@ Tools → System Prompt → Messages(캐시 브레이크포인트까지)
 
 ## "현재 KV-Cache 캐시 내용"이란?
 
-cc-viewer에 표시되는 "현재 KV-Cache 캐시 내용"은 최근 MainAgent 요청에서 추출된, 캐시 경계(cache breakpoint) 이전의 내용입니다. 구체적으로 다음을 포함합니다:
+Glasshouse에 표시되는 "현재 KV-Cache 캐시 내용"은 최근 MainAgent 요청에서 추출된, 캐시 경계(cache breakpoint) 이전의 내용입니다. 구체적으로 다음을 포함합니다:
 
 - **System Prompt**: Claude Code의 시스템 지시사항으로, 핵심 agent 지시, 도구 사용 규범, CLAUDE.md 프로젝트 지시, 환경 정보 등을 포함
 - **Tools**: 현재 사용 가능한 도구 정의 목록(Read, Write, Bash, Agent, MCP 도구 등)

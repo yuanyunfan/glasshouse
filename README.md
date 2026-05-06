@@ -1,7 +1,7 @@
-<img width="1500" height="200" alt="CC-Viewer" src="https://github.com/user-attachments/assets/abec0513-1d56-4244-b7ed-9382b6c09049" />
+<img width="1500" height="200" alt="Glasshouse" src="https://github.com/user-attachments/assets/abec0513-1d56-4244-b7ed-9382b6c09049" />
 
 
-# CC-Viewer
+# Glasshouse
 
 A Vibe Coding toolkit distilled from hands-on development experience, built on top of Claude Code:
 
@@ -26,15 +26,15 @@ English | [简体中文](./docs/README.zh.md) | [繁體中文](./docs/README.zh-
 #### Install via npm
 
 ```bash
-npm install -g cc-viewer --registry=https://registry.npmjs.org
+npm install -g @yuanyunfan/glasshouse --registry=https://registry.npmjs.org
 ```
 
 #### Install via Homebrew (recommended for macOS / Linux)
 
 ```bash
-brew tap weiesky/cc-viewer
-brew install cc-viewer
-brew upgrade cc-viewer   # for updates — do NOT use npm install -g for brew installs
+brew tap yuanyunfan/glasshouse
+brew install glasshouse
+brew upgrade glasshouse   # for updates — do NOT use npm install -g for brew installs
 ```
 
 ### Launch
@@ -53,14 +53,14 @@ ccv -c --d             # == claude --continue --dangerously-skip-permissions
 
 After launching in programming mode, a web page will open automatically.
 
-CC-Viewer also ships as a native desktop app: [Download page](https://github.com/weiesky/cc-viewer/releases)
+Glasshouse also ships as a native desktop app: [Download page](https://github.com/yuanyunfan/glasshouse/releases)
 
 
 ### Logger Mode
 
 If you still prefer the native claude tool or the VS Code extension, use this mode.
 
-In this mode, launching `claude` will automatically start a logging process that records request logs to ~/.claude/cc-viewer/*yourproject*/date.jsonl
+In this mode, launching `claude` will automatically start a logging process that records request logs to the legacy-compatible data directory `~/.claude/cc-viewer/*yourproject*/date.jsonl`.
 
 Enable logger mode:
 ```bash
@@ -76,19 +76,19 @@ ccv --uninstall
 
 ### Troubleshooting
 
-If you encounter issues starting cc-viewer, here is the ultimate troubleshooting approach:
+If you encounter issues starting Glasshouse, here is the ultimate troubleshooting approach:
 
 Step 1: Open Claude Code in any directory.
 
 Step 2: Give Claude Code the following instruction:
 
 ```
-I have installed the cc-viewer npm package, but after running ccv it still doesn't work properly. Please check cc-viewer's cli.js and findcc.js, and adapt them to the local Claude Code deployment based on the specific environment. Keep the scope of changes as constrained as possible within findcc.js.
+I have installed the Glasshouse npm package, but after running ccv it still doesn't work properly. Please check Glasshouse's cli.js and findcc.js, and adapt them to the local Claude Code deployment based on the specific environment. Keep the scope of changes as constrained as possible within findcc.js.
 ```
 
 Letting Claude Code diagnose the issue itself is more effective than asking anyone or reading any documentation!
 
-After the above instruction is completed, `findcc.js` will be updated. If your project frequently requires local deployment, or if forked code often needs to resolve installation issues, keeping this file lets you simply copy it next time. At this stage, many projects and companies using Claude Code are not deploying on Mac but rather on server-side hosted environments, so the author has separated `findcc.js` to make it easier to track cc-viewer source code updates going forward.
+After the above instruction is completed, `findcc.js` will be updated. If your project frequently requires local deployment, or if forked code often needs to resolve installation issues, keeping this file lets you simply copy it next time. At this stage, many projects and companies using Claude Code are not deploying on Mac but rather on server-side hosted environments, so the author has separated `findcc.js` to make it easier to track Glasshouse source code updates going forward.
 
 
 ### Other Commands
@@ -145,7 +145,7 @@ Fulfill your imagination of mobile programming. There's also a plugin mechanism 
 
 ### Codex HTTP Capture (Raven)
 
-If Codex is configured to use a Raven OpenAI-compatible provider, run it through CC-Viewer:
+If Codex is configured to use a Raven OpenAI-compatible provider, run it through Glasshouse:
 
 ```bash
 ccv run -- codex
@@ -153,7 +153,7 @@ ccv run -- codex
 
 After installing or updating the shell hook with `ccv -logger`, running `codex` directly also starts the Codex HTTP interceptor for agent commands and prints the matching Local/Network/Proxy/Upstream Glasshouse URLs. Codex mode prints the viewer URLs but does not open a browser automatically; set `CCV_CODEX_OPEN_BROWSER=1` to opt into the old auto-open behavior. Codex management commands such as `login`, `logout`, `mcp`, `plugin`, `update`, and `--help` pass through unchanged.
 
-CC-Viewer starts a local Codex HTTP proxy, temporarily overrides the spawned Codex process with `-c model_providers.<provider>.base_url=http://127.0.0.1:<port>/v1`, and forwards traffic to the original Raven base URL, usually `http://localhost:7024/v1`. This mode does not edit `~/.codex/config.toml`.
+Glasshouse starts a local Codex HTTP proxy, temporarily overrides the spawned Codex process with `-c model_providers.<provider>.base_url=http://127.0.0.1:<port>/v1`, and forwards traffic to the original Raven base URL, usually `http://localhost:7024/v1`. This mode does not edit `~/.codex/config.toml`.
 
 - Viewer URL: open with `?provider=codex`, or select `Codex` in the provider selector
 - Captures OpenAI Responses API `/v1/responses` requests and JSON/SSE responses
@@ -176,7 +176,7 @@ Click the "Conversation Mode" button in the top-right corner to parse the Main A
 
 ### Log Management
 
-Via the CC-Viewer dropdown menu in the top-left corner:
+Via the Glasshouse dropdown menu in the top-left corner:
 
 <img width="1500" height="760" alt="image" src="https://github.com/user-attachments/assets/33295e2b-f2e0-4968-a6f1-6f3d1404454e" />
 
@@ -205,7 +205,7 @@ You can upload images and describe your needs — Claude's image understanding i
 
 <img width="600" height="370" alt="image" src="https://github.com/user-attachments/assets/87d332ea-3e34-4957-b442-f9d070211fbf" />
 
-You can customize plugins, manage all CC-Viewer processes, and CC-Viewer supports hot-switching to third-party APIs (yes, you can use GLM, Kimi, MiniMax, Qwen, DeepSeek — although the author considers them all quite weak at this point).
+You can customize plugins, manage all Glasshouse processes, and Glasshouse supports hot-switching to third-party APIs (yes, you can use GLM, Kimi, MiniMax, Qwen, DeepSeek — although the author considers them all quite weak at this point).
 
 ---
 

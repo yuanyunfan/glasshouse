@@ -2,7 +2,7 @@
 
 ## Background
 
-CC-Viewer includes a built-in translation feature (`POST /api/translate`) powered by the Anthropic Messages API. In the early implementation, translation requests reused cached authentication credentials from the Claude Code session — including both `x-api-key` and `authorization` headers. This caused a subtle but serious issue: translation results frequently returned irrelevant content.
+Glasshouse includes a built-in translation feature (`POST /api/translate`) powered by the Anthropic Messages API. In the early implementation, translation requests reused cached authentication credentials from the Claude Code session — including both `x-api-key` and `authorization` headers. This caused a subtle but serious issue: translation results frequently returned irrelevant content.
 
 ## Root Cause
 
@@ -24,7 +24,7 @@ When Claude Code uses subscription OAuth login, the authentication flow looks li
 ```
 Claude Code main conversation ──(authorization: Bearer sessionToken)──→ Anthropic API
                                                                           ↑
-CC-Viewer translate request ──(authorization: Bearer sessionToken)──→ Anthropic API
+Glasshouse translate request ──(authorization: Bearer sessionToken)──→ Anthropic API
 ```
 
 Since translation requests reused the same session token, the Anthropic server may associate translation requests with Claude Code's main conversation context. This causes:

@@ -97,7 +97,7 @@ function ChatInputBar({ inputRef, inputEmpty, inputSuggestion, terminalVisible, 
 
     let rec;
     try { rec = new SpeechRec(); } catch (err) {
-      console.error('[CC Viewer] SpeechRecognition init failed:', err);
+      console.error('[Glasshouse] SpeechRecognition init failed:', err);
       return;
     }
     rec.continuous = true;
@@ -131,7 +131,7 @@ function ChatInputBar({ inputRef, inputEmpty, inputSuggestion, terminalVisible, 
       if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
         try { alert(t('ui.chatInput.voicePermissionDenied')); } catch {}
       } else if (event.error !== 'no-speech' && event.error !== 'aborted') {
-        console.error('[CC Viewer] SpeechRecognition error:', event.error);
+        console.error('[Glasshouse] SpeechRecognition error:', event.error);
       }
     };
     rec.onend = () => {
@@ -145,7 +145,7 @@ function ChatInputBar({ inputRef, inputEmpty, inputSuggestion, terminalVisible, 
       recRef.current = rec;
       setRecording(true);
     } catch (err) {
-      console.error('[CC Viewer] SpeechRecognition start failed:', err);
+      console.error('[Glasshouse] SpeechRecognition start failed:', err);
     }
   };
 
@@ -176,7 +176,7 @@ function ChatInputBar({ inputRef, inputEmpty, inputSuggestion, terminalVisible, 
           const path = await uploadFileAndGetPath(file);
           onUploadPath?.(path);
         } catch (err) {
-          console.error('[CC Viewer] Paste image upload failed:', err);
+          console.error('[Glasshouse] Paste image upload failed:', err);
         }
         return;
       }
@@ -321,7 +321,7 @@ function ChatInputBar({ inputRef, inputEmpty, inputSuggestion, terminalVisible, 
                       const path = await uploadFileAndGetPath(file);
                       onUploadPath(path);
                     } catch (err) {
-                      console.error('[CC Viewer] Upload failed:', err);
+                      console.error('[Glasshouse] Upload failed:', err);
                     }
                   };
                   input.click();

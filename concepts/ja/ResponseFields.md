@@ -41,7 +41,7 @@ Claude API `/v1/messages` レスポンスボディのフィールド説明。
 | **ephemeral_5m_input_tokens** | TTL 5分の短期キャッシュ作成トークン数 |
 | **ephemeral_1h_input_tokens** | TTL 1時間の長期キャッシュ作成トークン数 |
 
-> **キャッシュ課金について**: `cache_read_input_tokens` の単価は `input_tokens` よりはるかに低く、`cache_creation_input_tokens` の単価は通常入力よりやや高くなっています。そのため、継続的な会話で高いキャッシュヒット率を維持することで、費用を大幅に削減できます。cc-viewer の「ヒット率」指標でこの比率を直感的に監視できます。
+> **キャッシュ課金について**: `cache_read_input_tokens` の単価は `input_tokens` よりはるかに低く、`cache_creation_input_tokens` の単価は通常入力よりやや高くなっています。そのため、継続的な会話で高いキャッシュヒット率を維持することで、費用を大幅に削減できます。Glasshouse の「ヒット率」指標でこの比率を直感的に監視できます。
 
 ## stop_reason の意味
 

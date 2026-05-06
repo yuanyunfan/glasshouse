@@ -29,4 +29,4 @@ Diff'te `system`, `tools`, `model` gibi alanların değişikliklerini görüyors
 - Body Diff JSON, MainAgent isteğinin detay panelinde gösterilir
 - Başlığa tıklayarak genişletip/daraltabilirsiniz
 - JSON ve Text olmak üzere iki görüntüleme modu ile tek tıkla kopyalama desteklenir
-- Sol üst köşedeki **CC-Viewer → Genel Ayarlar** bölümünden "Body Diff JSON'u varsayılan olarak genişlet" seçeneği ayarlanabilir
+- Sol üst köşedeki **Glasshouse → Genel Ayarlar** bölümünden "Body Diff JSON'u varsayılan olarak genişlet" seçeneği ayarlanabilir

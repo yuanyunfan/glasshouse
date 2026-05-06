@@ -228,7 +228,7 @@ function resolveResumeChoice(choice) {
       LOG_FILE = newPath;
     }
   } catch (err) {
-    console.error('[CC Viewer] resolveResumeChoice error:', err);
+    console.error('[Glasshouse] resolveResumeChoice error:', err);
   }
   const result = { logFile: LOG_FILE };
   _resumeState = null;
@@ -395,7 +395,7 @@ const CUSTOM_API_HOST = getBaseUrlHost();
 let viewerModule = null;
 
 /**
- * Fire-and-forget POST a streaming chunk to cc-viewer server.
+ * Fire-and-forget POST a streaming chunk to the Glasshouse server.
  * Non-blocking: returns immediately, errors silently ignored.
  * Only active when _livePort has been set (via setLivePort, by server.js).
  * @param {function(boolean)} [onDone] - optional callback: true=success, false=413 (payload too large)
@@ -480,7 +480,7 @@ export function setupInterceptor() {
   const _originalFetch = globalThis.fetch;
 
   globalThis.fetch = async function (url, options) {
-    // cc-viewer 内部请求（翻译等）直接透传，不拦截
+    // Glasshouse 内部请求（翻译等）直接透传，不拦截
     const internalHeader = options?.headers?.['x-cc-viewer-internal']
       || (options?.headers instanceof Headers && options.headers.get('x-cc-viewer-internal'));
     if (internalHeader) {
@@ -978,6 +978,6 @@ if (!_ccvSkip && (!process.env.CCV_PROXY_MODE || _isTeammate)) setupInterceptor(
 // Teammate 子进程也跳过，避免端口冲突（leader 已启动 viewer）
 if (!_ccvSkip && !process.env.CCV_PROXY_MODE && !_isTeammate) {
   _initPromise.then(() => import('./server.js')).catch((err) => {
-    console.error('[CC-Viewer] Failed to start viewer server:', err);
+    console.error('[Glasshouse] Failed to start viewer server:', err);
   });
 }

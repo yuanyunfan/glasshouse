@@ -3,7 +3,7 @@
 ## Hva de to inndatafeltene gjør
 
 - **Ekspertnavn**: etiketten som vises på rolleknappen i UltraPlan-variantraden (maks 30 tegn). Det er bare et visningsnavn og sendes **aldri** til Claude Code.
-- **Promptinnhold**: din rolleinstruksjon. Ved sending pakker cc-viewer det **automatisk** inn i `<system-reminder>...</system-reminder>`-tagger med en `[SCOPED INSTRUCTION]`-scope-header. Så **skriv kun selve innholdet** — ikke legg til `<system-reminder>`-tagger selv.
+- **Promptinnhold**: din rolleinstruksjon. Ved sending pakker Glasshouse det **automatisk** inn i `<system-reminder>...</system-reminder>`-tagger med en `[SCOPED INSTRUCTION]`-scope-header. Så **skriv kun selve innholdet** — ikke legg til `<system-reminder>`-tagger selv.
 
 ---
 
@@ -82,7 +82,7 @@ Your final plan must include the following elements:
 
 Dette forteller Claude Code: **disse instruksjonene er kun aktive de neste 1–3 turene**, deretter avtar de. Hindrer at "ekspertpersonaen" lekker inn i urelaterte samtaler etterpå.
 
-**Denne linjen genereres av cc-viewer automatisk. Du trenger ikke å skrive den.**
+**Denne linjen genereres av Glasshouse automatisk. Du trenger ikke å skrive den.**
 
 ### 2. Innledende oppgavedefinisjon (**dette er det du skal skrive om**)
 > Leverage a multi-agent exploration mechanism to formulate an exceptionally detailed implementation plan.
@@ -125,7 +125,7 @@ Den opprinnelige malen lister 6 elementer i en "implementeringsplan". Din levera
 
 ## Forfattertips (TL;DR)
 
-1. **Behold wrapperen**: `<system-reminder>` + `[SCOPED INSTRUCTION]`-linjen legges til av cc-viewer — ikke gjenta.
+1. **Behold wrapperen**: `<system-reminder>` + `[SCOPED INSTRUCTION]`-linjen legges til av Glasshouse — ikke gjenta.
 2. **Skriv om åpningssetningen**: oppgi rolle, mål og utdataformat på én linje.
 3. **Flex arbeidsflyten**: 1–2 trinn for lette oppgaver, den fulle 5-trinns sløyfen kun for komplekse.
 4. **Skriv om Trinn 1s underroller**: standardene (akademiske artikler / konkurrenter / demo) er sannsynligvis ikke det du vil ha.

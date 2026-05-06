@@ -3,7 +3,7 @@
 ## Qué hacen los dos campos de entrada
 
 - **Nombre del experto**: la etiqueta mostrada en el botón de rol en la fila de variantes UltraPlan (máx. 30 caracteres). Es solo un nombre de visualización y **nunca** se envía a Claude Code.
-- **Cuerpo del prompt**: tu instrucción de rol. En el momento del envío, cc-viewer lo envuelve **automáticamente** en etiquetas `<system-reminder>...</system-reminder>` con un encabezado de alcance `[SCOPED INSTRUCTION]`. Por lo tanto, **escribe solo el cuerpo** — no añadas tú mismo las etiquetas `<system-reminder>`.
+- **Cuerpo del prompt**: tu instrucción de rol. En el momento del envío, Glasshouse lo envuelve **automáticamente** en etiquetas `<system-reminder>...</system-reminder>` con un encabezado de alcance `[SCOPED INSTRUCTION]`. Por lo tanto, **escribe solo el cuerpo** — no añadas tú mismo las etiquetas `<system-reminder>`.
 
 ---
 
@@ -82,7 +82,7 @@ Your final plan must include the following elements:
 
 Esto le dice a Claude Code: **estas instrucciones solo están activas durante los próximos 1–3 turnos**, luego se desvanecen. Evita que la «persona experta» se filtre posteriormente a una conversación no relacionada.
 
-**Esta línea es generada automáticamente por cc-viewer. No necesitas escribirla.**
+**Esta línea es generada automáticamente por Glasshouse. No necesitas escribirla.**
 
 ### 2. Definición de tarea inicial (**esto es lo que deberías reescribir**)
 > Leverage a multi-agent exploration mechanism to formulate an exceptionally detailed implementation plan.
@@ -125,7 +125,7 @@ La plantilla original enumera 6 elementos de un «plan de implementación». Tu 
 
 ## Consejos de creación (TL;DR)
 
-1. **Mantén el envoltorio**: la línea `<system-reminder>` + `[SCOPED INSTRUCTION]` la añade cc-viewer — no la repitas.
+1. **Mantén el envoltorio**: la línea `<system-reminder>` + `[SCOPED INSTRUCTION]` la añade Glasshouse — no la repitas.
 2. **Reescribe la oración inicial**: indica el rol, el objetivo y el formato de salida en una sola línea.
 3. **Flexibiliza el flujo de trabajo**: 1–2 pasos para tareas ligeras, el ciclo completo de 5 pasos solo para las complejas.
 4. **Reescribe los subroles del Paso 1**: los valores predeterminados (artículos académicos / competidores / demo) probablemente no son lo que quieres.

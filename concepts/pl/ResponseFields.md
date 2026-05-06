@@ -41,7 +41,7 @@ Opis pol odpowiedzi API Claude `/v1/messages`.
 | **ephemeral_5m_input_tokens** | Liczba tokenow krotkoterminowego cache z TTL 5 minut |
 | **ephemeral_1h_input_tokens** | Liczba tokenow dlugoterminowego cache z TTL 1 godzina |
 
-> **O rozliczaniu cache**: Cena jednostkowa `cache_read_input_tokens` jest znacznie nizsza niz `input_tokens`, natomiast cena jednostkowa `cache_creation_input_tokens` jest nieco wyzsza niz zwykle wejscie. Dlatego utrzymanie wysokiego wskaznika trafien w cache podczas ciaglych rozmow moze znaczaco obnizic koszty. Za pomoca metryki "wskaznik trafien" w cc-viewer mozna latwo monitorowac te proporcje.
+> **O rozliczaniu cache**: Cena jednostkowa `cache_read_input_tokens` jest znacznie nizsza niz `input_tokens`, natomiast cena jednostkowa `cache_creation_input_tokens` jest nieco wyzsza niz zwykle wejscie. Dlatego utrzymanie wysokiego wskaznika trafien w cache podczas ciaglych rozmow moze znaczaco obnizic koszty. Za pomoca metryki "wskaznik trafien" w Glasshouse mozna latwo monitorowac te proporcje.
 
 ## Znaczenie stop_reason
 

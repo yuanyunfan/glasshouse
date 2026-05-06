@@ -4,7 +4,7 @@
 
 Når du samtaler med Claude, sender hver API-anmodning den komplette samtalekontekst (system prompt + værktøjsdefinitioner + beskedhistorik). Anthropics prompt caching-mekanisme cacher allerede beregnet præfiksindhold på serversiden, og hvis præfikset er det samme ved efterfølgende anmodninger, genbruges cacheresultatet direkte, hvilket springer gentagne beregninger over og reducerer latens og omkostninger betydeligt.
 
-I cc-viewer omtales denne mekanisme som "KV-Cache", der svarer til prompt caching på Anthropic API-niveau — ikke key-value cachen i transformerens opmærksomhedslag internt i LLM'en.
+I Glasshouse omtales denne mekanisme som "KV-Cache", der svarer til prompt caching på Anthropic API-niveau — ikke key-value cachen i transformerens opmærksomhedslag internt i LLM'en.
 
 ## Hvordan caching fungerer
 
@@ -22,7 +22,7 @@ Så længe dette præfiks er helt identisk med en hvilken som helst anmodning in
 
 ## Hvad er "aktuelt KV-Cache cacheindhold"?
 
-Det "aktuelle KV-Cache cacheindhold" vist i cc-viewer er indhold udtrukket fra den seneste MainAgent-anmodning, som befinder sig før cachegrænsen (cache breakpoint). Det omfatter specifikt:
+Det "aktuelle KV-Cache cacheindhold" vist i Glasshouse er indhold udtrukket fra den seneste MainAgent-anmodning, som befinder sig før cachegrænsen (cache breakpoint). Det omfatter specifikt:
 
 - **System Prompt**: Claude Codes systeminstruktioner, herunder kerne-agent-instruktioner, retningslinjer for værktøjsbrug, CLAUDE.md-projektinstruktioner, miljøinformation osv.
 - **Tools**: Listen over aktuelt tilgængelige værktøjsdefinitioner (såsom Read, Write, Bash, Agent, MCP-værktøjer osv.)

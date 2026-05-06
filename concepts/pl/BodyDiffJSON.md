@@ -29,4 +29,4 @@ Jeśli w diff pojawiają się zmiany pól `system`, `tools`, `model` itp., oznac
 - Body Diff JSON jest wyświetlany w panelu szczegółów żądania MainAgent
 - Kliknięcie nagłówka rozwija/zwija zawartość
 - Obsługuje tryby podglądu JSON i Text oraz kopiowanie jednym kliknięciem
-- W lewym górnym rogu **CC-Viewer → Ustawienia globalne** można ustawić „Domyślnie rozwiń Body Diff JSON"
+- W lewym górnym rogu **Glasshouse → Ustawienia globalne** można ustawić „Domyślnie rozwiń Body Diff JSON"

@@ -8,7 +8,7 @@ Anthropic 的 prompt caching 機制會將請求中的 system → tools → messa
 
 ## 快取重建原因分類
 
-cc-viewer 透過對比前後兩個 MainAgent 請求的 body，精確判斷快取重建的原因：
+Glasshouse 透過對比前後兩個 MainAgent 請求的 body，精確判斷快取重建的原因：
 
 | reason | 含義 | 判斷方式 |
 |--------|------|----------|

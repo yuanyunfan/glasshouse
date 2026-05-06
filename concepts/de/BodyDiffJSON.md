@@ -29,4 +29,4 @@ Wenn im Diff Änderungen an Feldern wie `system`, `tools`, `model` usw. erschein
 - Body Diff JSON wird im Detailbereich der MainAgent-Anfrage angezeigt
 - Klicken Sie auf den Titel zum Auf-/Zuklappen
 - Unterstützt JSON- und Text-Ansichtsmodi sowie Ein-Klick-Kopieren
-- Unter **CC-Viewer → Globale Einstellungen** (oben links) können Sie „Body Diff JSON standardmäßig aufklappen" einstellen
+- Unter **Glasshouse → Globale Einstellungen** (oben links) können Sie „Body Diff JSON standardmäßig aufklappen" einstellen

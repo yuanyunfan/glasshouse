@@ -3,7 +3,7 @@
 ## O que fazem os dois campos de entrada
 
 - **Nome do especialista**: o rótulo exibido no botão de função na linha de variantes do UltraPlan (máx. 30 caracteres). É apenas um nome de exibição e **nunca** é enviado ao Claude Code.
-- **Corpo do prompt**: sua instrução de função. No momento do envio, o cc-viewer **automaticamente** o envolve em tags `<system-reminder>...</system-reminder>` com um cabeçalho de escopo `[SCOPED INSTRUCTION]`. Portanto, **escreva apenas o corpo** — não adicione tags `<system-reminder>` por conta própria.
+- **Corpo do prompt**: sua instrução de função. No momento do envio, o Glasshouse **automaticamente** o envolve em tags `<system-reminder>...</system-reminder>` com um cabeçalho de escopo `[SCOPED INSTRUCTION]`. Portanto, **escreva apenas o corpo** — não adicione tags `<system-reminder>` por conta própria.
 
 ---
 
@@ -82,7 +82,7 @@ Your final plan must include the following elements:
 
 Isso diz ao Claude Code: **estas instruções estão ativas apenas para as próximas 1–3 rodadas**, depois se dissipam. Impede que a "persona do especialista" vaze para conversas não relacionadas posteriormente.
 
-**Esta linha é gerada automaticamente pelo cc-viewer. Você não precisa escrevê-la.**
+**Esta linha é gerada automaticamente pelo Glasshouse. Você não precisa escrevê-la.**
 
 ### 2. Definição da tarefa inicial (**isto é o que você deve reescrever**)
 > Leverage a multi-agent exploration mechanism to formulate an exceptionally detailed implementation plan.
@@ -125,7 +125,7 @@ O modelo original lista 6 elementos de um "plano de implementação". Seu entreg
 
 ## Dicas de criação (TL;DR)
 
-1. **Mantenha o wrapper**: a linha `<system-reminder>` + `[SCOPED INSTRUCTION]` é adicionada pelo cc-viewer — não repita.
+1. **Mantenha o wrapper**: a linha `<system-reminder>` + `[SCOPED INSTRUCTION]` é adicionada pelo Glasshouse — não repita.
 2. **Reescreva a frase inicial**: declare a função, o objetivo e o formato de saída em uma única linha.
 3. **Flexibilize o fluxo de trabalho**: 1–2 etapas para tarefas leves, o ciclo completo de 5 etapas apenas para as complexas.
 4. **Reescreva as subfunções da Etapa 1**: os padrões (artigos acadêmicos / concorrentes / demo) provavelmente não são o que você quer.

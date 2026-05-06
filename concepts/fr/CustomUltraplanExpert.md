@@ -3,7 +3,7 @@
 ## Ce que font les deux champs de saisie
 
 - **Nom de l'expert** : l'étiquette affichée sur le bouton de rôle dans la rangée des variantes UltraPlan (30 caractères max.). Ce n'est qu'un nom d'affichage et il n'est **jamais** envoyé à Claude Code.
-- **Corps du prompt** : votre instruction de rôle. Au moment de l'envoi, cc-viewer l'enveloppe **automatiquement** dans des balises `<system-reminder>...</system-reminder>` avec un en-tête de portée `[SCOPED INSTRUCTION]`. Donc **n'écrivez que le corps** — n'ajoutez pas vous-même de balises `<system-reminder>`.
+- **Corps du prompt** : votre instruction de rôle. Au moment de l'envoi, Glasshouse l'enveloppe **automatiquement** dans des balises `<system-reminder>...</system-reminder>` avec un en-tête de portée `[SCOPED INSTRUCTION]`. Donc **n'écrivez que le corps** — n'ajoutez pas vous-même de balises `<system-reminder>`.
 
 ---
 
@@ -82,7 +82,7 @@ Your final plan must include the following elements:
 
 Cela indique à Claude Code : **ces instructions ne sont actives que pour les 1 à 3 prochains tours**, puis s'estompent. Empêche la « persona d'expert » de déborder par la suite dans une conversation sans rapport.
 
-**Cette ligne est générée automatiquement par cc-viewer. Vous n'avez pas besoin de l'écrire.**
+**Cette ligne est générée automatiquement par Glasshouse. Vous n'avez pas besoin de l'écrire.**
 
 ### 2. Définition de tâche d'ouverture (**c'est ce que vous devriez réécrire**)
 > Leverage a multi-agent exploration mechanism to formulate an exceptionally detailed implementation plan.
@@ -125,7 +125,7 @@ Le modèle d'origine répertorie 6 éléments d'un « plan d'implémentation ».
 
 ## Conseils de création (TL;DR)
 
-1. **Conservez le wrapper** : la ligne `<system-reminder>` + `[SCOPED INSTRUCTION]` est ajoutée par cc-viewer — ne la répétez pas.
+1. **Conservez le wrapper** : la ligne `<system-reminder>` + `[SCOPED INSTRUCTION]` est ajoutée par Glasshouse — ne la répétez pas.
 2. **Réécrivez la phrase d'ouverture** : énoncez le rôle, l'objectif et le format de sortie en une seule ligne.
 3. **Adaptez le workflow** : 1–2 étapes pour les tâches légères, la boucle complète à 5 étapes uniquement pour les tâches complexes.
 4. **Réécrivez les sous-rôles de l'étape 1** : les valeurs par défaut (articles académiques / concurrents / démo) ne sont probablement pas ce que vous voulez.

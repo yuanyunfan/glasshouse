@@ -3,7 +3,7 @@
 ## Co robią dwa pola wejściowe
 
 - **Nazwa eksperta**: etykieta wyświetlana na przycisku roli w wierszu wariantów UltraPlan (maks. 30 znaków). To tylko nazwa wyświetlana i **nigdy** nie jest wysyłana do Claude Code.
-- **Treść promptu**: twoja instrukcja roli. W momencie wysyłania cc-viewer **automatycznie** opakowuje ją w tagi `<system-reminder>...</system-reminder>` z nagłówkiem zakresu `[SCOPED INSTRUCTION]`. Więc **pisz tylko treść** — nie dodawaj samodzielnie tagów `<system-reminder>`.
+- **Treść promptu**: twoja instrukcja roli. W momencie wysyłania Glasshouse **automatycznie** opakowuje ją w tagi `<system-reminder>...</system-reminder>` z nagłówkiem zakresu `[SCOPED INSTRUCTION]`. Więc **pisz tylko treść** — nie dodawaj samodzielnie tagów `<system-reminder>`.
 
 ---
 
@@ -82,7 +82,7 @@ Your final plan must include the following elements:
 
 Mówi to Claude Code: **te instrukcje są aktywne tylko przez najbliższe 1–3 tury**, a następnie wygasają. Zapobiega temu, by "persona eksperta" przeciekała do niezwiązanej rozmowy później.
 
-**Ta linia jest generowana przez cc-viewer automatycznie. Nie musisz jej pisać.**
+**Ta linia jest generowana przez Glasshouse automatycznie. Nie musisz jej pisać.**
 
 ### 2. Wstępna definicja zadania (**to jest to, co powinieneś przepisać**)
 > Leverage a multi-agent exploration mechanism to formulate an exceptionally detailed implementation plan.
@@ -125,7 +125,7 @@ Oryginalny szablon wymienia 6 elementów "planu wdrożenia". Twój deliverable m
 
 ## Wskazówki dla autorów (TL;DR)
 
-1. **Zachowaj wrapper**: linia `<system-reminder>` + `[SCOPED INSTRUCTION]` jest dodawana przez cc-viewer — nie powtarzaj.
+1. **Zachowaj wrapper**: linia `<system-reminder>` + `[SCOPED INSTRUCTION]` jest dodawana przez Glasshouse — nie powtarzaj.
 2. **Przepisz zdanie otwierające**: określ rolę, cel i format wyjścia w jednej linii.
 3. **Elastycznie kształtuj workflow**: 1–2 kroki dla lekkich zadań, pełna pętla 5-krokowa tylko dla złożonych.
 4. **Przepisz podrole z Kroku 1**: domyślne (artykuły akademickie / konkurenci / demo) prawdopodobnie nie są tym, czego chcesz.

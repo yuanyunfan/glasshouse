@@ -41,7 +41,7 @@ Feltbeskrivelse for responskroppen i Claude API `/v1/messages`.
 | **ephemeral_5m_input_tokens** | Antall tokens for korttids-cacheoppretting med 5 minutters TTL |
 | **ephemeral_1h_input_tokens** | Antall tokens for langtids-cacheoppretting med 1 times TTL |
 
-> **Om cache-fakturering**: Enhetsprisen for `cache_read_input_tokens` er vesentlig lavere enn for `input_tokens`, mens enhetsprisen for `cache_creation_input_tokens` er noe høyere enn vanlig input. Derfor kan en høy cache-treffrate i pågående samtaler redusere kostnadene betydelig. Via "treffrate"-metrikken i cc-viewer kan du enkelt overvåke dette forholdet.
+> **Om cache-fakturering**: Enhetsprisen for `cache_read_input_tokens` er vesentlig lavere enn for `input_tokens`, mens enhetsprisen for `cache_creation_input_tokens` er noe høyere enn vanlig input. Derfor kan en høy cache-treffrate i pågående samtaler redusere kostnadene betydelig. Via "treffrate"-metrikken i Glasshouse kan du enkelt overvåke dette forholdet.
 
 ## Betydningen av stop_reason
 

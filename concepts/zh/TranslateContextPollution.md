@@ -2,7 +2,7 @@
 
 ## 背景
 
-CC-Viewer 内置了翻译功能（`POST /api/translate`），通过调用 Anthropic Messages API 实现文本翻译。在早期实现中，翻译请求会复用 Claude Code 会话中缓存的认证凭据——包括 `x-api-key` 和 `authorization` header。这导致了一个隐蔽但严重的问题：翻译结果频繁"答非所问"。
+Glasshouse 内置了翻译功能（`POST /api/translate`），通过调用 Anthropic Messages API 实现文本翻译。在早期实现中，翻译请求会复用 Claude Code 会话中缓存的认证凭据——包括 `x-api-key` 和 `authorization` header。这导致了一个隐蔽但严重的问题：翻译结果频繁"答非所问"。
 
 ## 问题根因
 
@@ -24,7 +24,7 @@ Anthropic API 支持两种认证方式：
 ```
 Claude Code 主对话 ──(authorization: Bearer sessionToken)──→ Anthropic API
                                                               ↑
-CC-Viewer 翻译请求 ──(authorization: Bearer sessionToken)──→ Anthropic API
+Glasshouse 翻译请求 ──(authorization: Bearer sessionToken)──→ Anthropic API
 ```
 
 由于翻译请求复用了同一个 session token，Anthropic 服务端可能将翻译请求与 Claude Code 的主对话关联到同一上下文。这会导致：

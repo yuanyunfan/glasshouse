@@ -8,7 +8,7 @@ Cache rebuilds mean additional token charges (cache creation is priced higher th
 
 ## Cache Rebuild Reason Categories
 
-cc-viewer compares the bodies of two consecutive MainAgent requests to precisely determine the cause of a cache rebuild:
+Glasshouse compares the bodies of two consecutive MainAgent requests to precisely determine the cause of a cache rebuild:
 
 | reason | Meaning | Detection Method |
 |--------|---------|------------------|

@@ -41,7 +41,7 @@ Claude API `/v1/messages` yanit gövdesinin alan açiklamasi.
 | **ephemeral_5m_input_tokens** | 5 dakika TTL'li kisa süreli önbellek olusturma token sayisi |
 | **ephemeral_1h_input_tokens** | 1 saat TTL'li uzun süreli önbellek olusturma token sayisi |
 
-> **Önbellek ücretlendirmesi hakkinda**: `cache_read_input_tokens` birim fiyati `input_tokens`'dan çok daha düsüktür; `cache_creation_input_tokens` birim fiyati ise normal giristen biraz daha yüksektir. Bu nedenle, sürekli konusmalarda yüksek önbellek isabet oranini korumak maliyetleri önemli ölçüde azaltabilir. Bu orani cc-viewer'daki "isabet orani" göstergesiyle görsel olarak izleyebilirsiniz.
+> **Önbellek ücretlendirmesi hakkinda**: `cache_read_input_tokens` birim fiyati `input_tokens`'dan çok daha düsüktür; `cache_creation_input_tokens` birim fiyati ise normal giristen biraz daha yüksektir. Bu nedenle, sürekli konusmalarda yüksek önbellek isabet oranini korumak maliyetleri önemli ölçüde azaltabilir. Bu orani Glasshouse'daki "isabet orani" göstergesiyle görsel olarak izleyebilirsiniz.
 
 ## stop_reason Anlamlari
 

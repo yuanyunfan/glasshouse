@@ -29,4 +29,4 @@ diff에 `system`, `tools`, `model` 등 필드의 변경이 나타나면, 이번 
 - Body Diff JSON은 MainAgent 요청의 상세 패널에 표시됩니다
 - 제목을 클릭하여 펼치기/접기 가능
 - JSON과 Text 두 가지 보기 모드를 지원하며, 원클릭 복사 가능
-- 좌측 상단 **CC-Viewer → 전역 설정**에서 "Body Diff JSON 기본 펼치기"를 설정할 수 있습니다
+- 좌측 상단 **Glasshouse → 전역 설정**에서 "Body Diff JSON 기본 펼치기"를 설정할 수 있습니다

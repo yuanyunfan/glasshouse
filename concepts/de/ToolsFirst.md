@@ -1,6 +1,6 @@
 # Warum werden Tools zuerst aufgelistet?
 
-Im Context-Panel von cc-viewer **erscheinen Tools vor System Prompt und Messages**. Diese Reihenfolge spiegelt exakt die **KV-Cache-Präfix-Sequenz der Anthropic API** wider.
+Im Context-Panel von Glasshouse **erscheinen Tools vor System Prompt und Messages**. Diese Reihenfolge spiegelt exakt die **KV-Cache-Präfix-Sequenz der Anthropic API** wider.
 
 ## KV-Cache-Präfix-Sequenz
 
@@ -74,4 +74,4 @@ MCP-Tools (Model Context Protocol) werden wie eingebaute Tools ganz vorne im Too
 | Häufiges Hinzufügen/Entfernen von MCP-Servern | Jede Änderung löst vollständigen Cache-Neuaufbau aus; feste Tool-Zusammenstellung erwägen |
 | Überdimensionierte Tool-Schemas | Beschreibungen und Enums kürzen, um Token-Verbrauch im Präfix zu reduzieren |
 
-Im Context-Panel von cc-viewer werden MCP-Tools neben eingebauten Tools im Tools-Bereich angezeigt, sodass Sie die Schema-Größe jedes Tools und seinen Beitrag zum Cache-Präfix direkt sehen können.
+Im Context-Panel von Glasshouse werden MCP-Tools neben eingebauten Tools im Tools-Bereich angezeigt, sodass Sie die Schema-Größe jedes Tools und seinen Beitrag zum Cache-Präfix direkt sehen können.

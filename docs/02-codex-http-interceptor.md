@@ -18,13 +18,13 @@ and Raven:
 
 ```text
 Codex CLI
--> CC-Viewer Codex HTTP proxy: http://127.0.0.1:<port>/v1
+-> Glasshouse Codex HTTP proxy: http://127.0.0.1:<port>/v1
 -> Raven: http://localhost:7024/v1
 -> upstream provider
 ```
 
 Raven remains responsible for model routing, authentication, protocol handling,
-and token/latency accounting. CC-Viewer captures the OpenAI-compatible request
+and token/latency accounting. Glasshouse captures the OpenAI-compatible request
 and response bodies for visualization only.
 
 ## Goals
@@ -47,7 +47,7 @@ and response bodies for visualization only.
 ## Non-goals
 
 - Changing Raven routes, Raven persistence, or Raven retention policy.
-- Saving auth headers or environment secrets into CC-Viewer logs.
+- Saving auth headers or environment secrets into Glasshouse logs.
 - Decrypting Codex `encrypted_content`.
 - Supporting arbitrary upstream paths beyond OpenAI-compatible `/v1/responses`
   and the reserved `/v1/chat/completions` path.
@@ -60,7 +60,7 @@ cli.js
 -> lib/codex-http-proxy.js
 -> Raven upstream
 -> lib/codex-http-adapter.js
--> existing CC-Viewer JSONL log
+-> existing Glasshouse JSONL log
 -> server /events?provider=codex
 -> React provider selector
 ```

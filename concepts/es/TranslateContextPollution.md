@@ -2,7 +2,7 @@
 
 ## Contexto
 
-CC-Viewer incluye una función de traducción integrada (`POST /api/translate`) impulsada por la API de mensajes de Anthropic. En la implementación inicial, las solicitudes de traducción reutilizaban las credenciales de autenticación almacenadas en caché de la sesión de Claude Code, incluyendo tanto los encabezados `x-api-key` como `authorization`. Esto provocó un problema sutil pero grave: los resultados de traducción devolvían con frecuencia contenido irrelevante.
+Glasshouse incluye una función de traducción integrada (`POST /api/translate`) impulsada por la API de mensajes de Anthropic. En la implementación inicial, las solicitudes de traducción reutilizaban las credenciales de autenticación almacenadas en caché de la sesión de Claude Code, incluyendo tanto los encabezados `x-api-key` como `authorization`. Esto provocó un problema sutil pero grave: los resultados de traducción devolvían con frecuencia contenido irrelevante.
 
 ## Causa raíz
 
@@ -24,7 +24,7 @@ Cuando Claude Code utiliza el inicio de sesión OAuth por suscripción, el flujo
 ```
 Conversación principal de Claude Code ──(authorization: Bearer sessionToken)──→ Anthropic API
                                                                                   ↑
-Solicitud de traducción de CC-Viewer ──(authorization: Bearer sessionToken)──→ Anthropic API
+Solicitud de traducción de Glasshouse ──(authorization: Bearer sessionToken)──→ Anthropic API
 ```
 
 Dado que las solicitudes de traducción reutilizaban el mismo token de sesión, el servidor de Anthropic podía asociar las solicitudes de traducción con el contexto de la conversación principal de Claude Code. Esto provoca:

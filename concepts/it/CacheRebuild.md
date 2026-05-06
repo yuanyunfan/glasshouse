@@ -8,7 +8,7 @@ La ricostruzione della cache comporta costi aggiuntivi di token (il prezzo della
 
 ## Classificazione delle cause di ricostruzione della cache
 
-cc-viewer confronta i body di due richieste MainAgent consecutive per determinare con precisione la causa della ricostruzione della cache:
+Glasshouse confronta i body di due richieste MainAgent consecutive per determinare con precisione la causa della ricostruzione della cache:
 
 | reason | Significato | Metodo di determinazione |
 |--------|------|----------|

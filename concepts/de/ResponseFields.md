@@ -41,7 +41,7 @@ Feldbeschreibung des Antwortkörpers der Claude API `/v1/messages`.
 | **ephemeral_5m_input_tokens** | Anzahl der Token für kurzlebige Cache-Erstellung mit 5 Minuten TTL |
 | **ephemeral_1h_input_tokens** | Anzahl der Token für langlebige Cache-Erstellung mit 1 Stunde TTL |
 
-> **Zur Cache-Berechnung**: Der Einzelpreis von `cache_read_input_tokens` liegt deutlich unter dem von `input_tokens`, während der Einzelpreis von `cache_creation_input_tokens` etwas über dem normaler Eingabe liegt. Daher kann eine hohe Cache-Trefferquote in fortlaufenden Gesprächen die Kosten erheblich senken. Mit der Kennzahl "Trefferquote" in cc-viewer lässt sich dieses Verhältnis anschaulich überwachen.
+> **Zur Cache-Berechnung**: Der Einzelpreis von `cache_read_input_tokens` liegt deutlich unter dem von `input_tokens`, während der Einzelpreis von `cache_creation_input_tokens` etwas über dem normaler Eingabe liegt. Daher kann eine hohe Cache-Trefferquote in fortlaufenden Gesprächen die Kosten erheblich senken. Mit der Kennzahl "Trefferquote" in Glasshouse lässt sich dieses Verhältnis anschaulich überwachen.
 
 ## Bedeutung von stop_reason
 

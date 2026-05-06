@@ -1,7 +1,7 @@
 {
-  "name": "cc-viewer",
+  "name": "@yuanyunfan/glasshouse",
   "version": "1.6.236",
-  "description": "Claude Code Logger visualization management tool",
+  "description": "Glasshouse request viewer for Claude Code and Codex",
   "license": "MIT",
   "main": "server.js",
   "type": "module",
@@ -10,7 +10,7 @@
     "./server.js": "./server.js",
     "./interceptor.js": "./interceptor.js"
   },
-  "author": "weiesky",
+  "author": "yuanyunfan",
   "bin": {
     "ccv": "cli.js"
   },
@@ -38,12 +38,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/weiesky/cc-viewer.git"
+    "url": "git+https://github.com/yuanyunfan/glasshouse.git"
   },
   "bugs": {
-    "url": "https://github.com/weiesky/cc-viewer/issues"
+    "url": "https://github.com/yuanyunfan/glasshouse/issues"
   },
-  "homepage": "https://github.com/weiesky/cc-viewer#readme",
+  "homepage": "https://github.com/yuanyunfan/glasshouse#readme",
   "engines": {
     "node": ">=20"
   },

@@ -8,7 +8,7 @@ Ein Cache-Neuaufbau bedeutet zusätzliche Token-Kosten (Cache Creation ist teure
 
 ## Klassifizierung der Cache-Neuaufbau-Ursachen
 
-cc-viewer vergleicht die Bodies zweier aufeinanderfolgender MainAgent-Anfragen und bestimmt präzise die Ursache des Cache-Neuaufbaus:
+Glasshouse vergleicht die Bodies zweier aufeinanderfolgender MainAgent-Anfragen und bestimmt präzise die Ursache des Cache-Neuaufbaus:
 
 | reason | Bedeutung | Erkennungsmethode |
 |--------|-----------|-------------------|

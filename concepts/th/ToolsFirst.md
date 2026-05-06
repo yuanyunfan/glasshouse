@@ -1,6 +1,6 @@
 # ทำไม Tools ถึงแสดงก่อน?
 
-ในแผง Context ของ cc-viewer **Tools จะปรากฏก่อน System Prompt และ Messages** ลำดับนี้สะท้อนให้เห็นถึง **ลำดับ prefix ของ KV-Cache ใน Anthropic API** อย่างแม่นยำ
+ในแผง Context ของ Glasshouse **Tools จะปรากฏก่อน System Prompt และ Messages** ลำดับนี้สะท้อนให้เห็นถึง **ลำดับ prefix ของ KV-Cache ใน Anthropic API** อย่างแม่นยำ
 
 ## ลำดับ prefix ของ KV-Cache
 
@@ -74,4 +74,4 @@
 | เพิ่ม/ลบ MCP server บ่อย | ทุกการเปลี่ยนแปลงทำให้แคชสร้างใหม่ทั้งหมด; พิจารณาตรึงชุดเครื่องมือ |
 | Tool Schema ขนาดใหญ่เกินไป | ลด description และ enum เพื่อลดการใช้ token ของ prefix |
 
-ในแผง Context ของ cc-viewer เครื่องมือ MCP แสดงร่วมกับเครื่องมือในตัวในพื้นที่ Tools ให้มุมมองที่ชัดเจนของขนาด Schema แต่ละเครื่องมือและการมีส่วนร่วมต่อ prefix แคช
+ในแผง Context ของ Glasshouse เครื่องมือ MCP แสดงร่วมกับเครื่องมือในตัวในพื้นที่ Tools ให้มุมมองที่ชัดเจนของขนาด Schema แต่ละเครื่องมือและการมีส่วนร่วมต่อ prefix แคช

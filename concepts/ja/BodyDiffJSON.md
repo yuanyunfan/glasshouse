@@ -29,4 +29,4 @@ diff に `system`、`tools`、`model` などのフィールドの変更が表示
 - Body Diff JSON は MainAgent リクエストの詳細パネルに表示されます
 - タイトルをクリックで展開/折りたたみ
 - JSON と Text の2つの表示モードに対応し、ワンクリックコピーも可能
-- 左上の **CC-Viewer → グローバル設定** で「Body Diff JSON をデフォルトで展開」を設定できます
+- 左上の **Glasshouse → グローバル設定** で「Body Diff JSON をデフォルトで展開」を設定できます

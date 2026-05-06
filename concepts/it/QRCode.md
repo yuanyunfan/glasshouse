@@ -2,7 +2,7 @@
 
 ## Come funziona
 
-CC Viewer avvia un server HTTP e genera un **indirizzo LAN** (es: `http://192.168.1.100:7008`). Scansiona il QR code per accedere a Claude Code dal tuo smartphone tramite la stessa rete WiFi.
+Glasshouse avvia un server HTTP e genera un **indirizzo LAN** (es: `http://192.168.1.100:7008`). Scansiona il QR code per accedere a Claude Code dal tuo smartphone tramite la stessa rete WiFi.
 
 ## Perché non riesco a connettermi?
 
@@ -13,13 +13,13 @@ CC Viewer avvia un server HTTP e genera un **indirizzo LAN** (es: `http://192.16
 
 ## Avviso di sicurezza
 
-> ⚠️ Il servizio LAN di CC Viewer è accessibile a tutti i dispositivi sulla stessa rete.
+> ⚠️ Il servizio LAN di Glasshouse è accessibile a tutti i dispositivi sulla stessa rete.
 
 - Attenzione nelle **reti WiFi pubbliche**
-- CC Viewer utilizza **autenticazione tramite token** per proteggere l'accesso LAN
+- Glasshouse utilizza **autenticazione tramite token** per proteggere l'accesso LAN
 - Si consiglia l'uso su reti affidabili
 
 ## Oltre la LAN
 
 - **Strumenti di tunneling** — frp, ngrok, Tailscale, ecc.
-- **Plugin CC Viewer** — Configura un proxy middleware tramite il sistema di plugin
+- **Plugin Glasshouse** — Configura un proxy middleware tramite il sistema di plugin

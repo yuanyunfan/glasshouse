@@ -8,7 +8,7 @@ La reconstrucción de caché implica facturación adicional de tokens (el precio
 
 ## Clasificación de causas de reconstrucción de caché
 
-cc-viewer compara los cuerpos de dos solicitudes MainAgent consecutivas para determinar con precisión la causa de la reconstrucción de caché:
+Glasshouse compara los cuerpos de dos solicitudes MainAgent consecutivas para determinar con precisión la causa de la reconstrucción de caché:
 
 | reason | Significado | Método de determinación |
 |--------|-------------|------------------------|

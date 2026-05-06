@@ -10,6 +10,9 @@ substantial changes.
 - [02 - Codex HTTP Interceptor](./02-codex-http-interceptor.md) - Capture Codex
   OpenAI Responses API traffic through a local Raven-facing proxy. Status:
   done.
+- [03 - Glasshouse Rename](./03-glasshouse-rename.md) - Rename public branding
+  and publishing metadata from CC Viewer / cc-viewer to Glasshouse while keeping
+  compatibility interfaces stable. Status: done.
 
 ## Status Values
 

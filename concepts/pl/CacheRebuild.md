@@ -8,7 +8,7 @@ Przebudowa cache oznacza dodatkowe koszty tokenów (cena cache creation jest wy�
 
 ## Klasyfikacja przyczyn przebudowy cache
 
-cc-viewer porównuje treści dwóch kolejnych żądań MainAgent, aby precyzyjnie określić przyczynę przebudowy cache:
+Glasshouse porównuje treści dwóch kolejnych żądań MainAgent, aby precyzyjnie określić przyczynę przebudowy cache:
 
 | reason | Znaczenie | Sposób określenia |
 |--------|------|----------|

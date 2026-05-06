@@ -88,7 +88,7 @@ if (isCliMode) {
   import('./pty-manager.js').then(m => {
     _getPtyPidFn = m.getPtyPid;
   }).catch(err => {
-    console.error('[CC Viewer] Failed to load pty-manager for PID tracking:', err.message);
+    console.error('[Glasshouse] Failed to load pty-manager for PID tracking:', err.message);
   });
 }
 
@@ -217,12 +217,12 @@ function startStatsWorker() {
   try {
     statsWorker = new Worker(new URL('./lib/stats-worker.js', import.meta.url));
     statsWorker.on('error', (err) => {
-      console.error('[CC Viewer] Stats worker error:', err.message);
+      console.error('[Glasshouse] Stats worker error:', err.message);
       statsWorker = null;
     });
     statsWorker.on('exit', (code) => {
       if (code !== 0) {
-        console.error('[CC Viewer] Stats worker exited with code', code);
+        console.error('[Glasshouse] Stats worker exited with code', code);
       }
       statsWorker = null;
     });
@@ -231,7 +231,7 @@ function startStatsWorker() {
       statsWorker.postMessage({ type: 'init', logDir: LOG_DIR, projectName: _projectName });
     }
   } catch (err) {
-    console.error('[CC Viewer] Failed to start stats worker:', err.message);
+    console.error('[Glasshouse] Failed to start stats worker:', err.message);
   }
 }
 
@@ -436,7 +436,7 @@ async function handleRequest(req, res) {
   }
 
   // DNS rebinding 防护:即使带了正确 token,Host header 必须落在 allowlist 里。
-  // 默认放行 loopback + 本机所有 LAN IPv4(getAllLocalIps()):cc-viewer 核心场景就是手机扫码访问 LAN URL,
+  // 默认放行 loopback + 本机所有 LAN IPv4(getAllLocalIps()):Glasshouse 核心场景就是手机扫码访问 LAN URL,
   // 要求用户每次手动设 CCV_ALLOWED_HOSTS 不可接受。token 仍是必需(server.js:300-310 ACCESS_TOKEN gate),
   // DNS rebinding 攻击者需精确知道用户 LAN IP 才能利用,门槛降低但不增新攻击面;Vite/Cursor 同行也默认放开 LAN。
   // CCV_ALLOWED_HOSTS 显式设(包括 '*' 关闭防护)时完全沿用用户值,与 1.6.227 行为一致,向后兼容。
@@ -1057,7 +1057,7 @@ async function handleRequest(req, res) {
     return;
   }
 
-  // SSE endpoint — Codex provider reads cc-viewer JSONL entries captured by the local Codex HTTP proxy.
+  // SSE endpoint — Codex provider reads Glasshouse JSONL entries captured by the local Codex HTTP proxy.
   if (url === '/events' && method === 'GET' && (
     parsedUrl.searchParams.get('provider') === 'codex' ||
     parsedUrl.searchParams.get('provider') === 'codex-http'
@@ -3362,7 +3362,7 @@ async function handleRequest(req, res) {
             const year = lsMatch[4];
             startTime = `${year}年${mon}月${day}日 ${time}`;
             const rawCmd = lsMatch[5];
-            // Extract path after lib/ (e.g. node_modules/cc-viewer/cli.js -d → cc-viewer/cli.js -d)
+            // Extract path after lib/ (e.g. node_modules/@yuanyunfan/glasshouse/cli.js -d → glasshouse/cli.js -d)
             const libMatch = rawCmd.match(/lib\/(.+)/);
             command = libMatch ? libMatch[1] : rawCmd;
           }
@@ -3512,13 +3512,13 @@ export async function startViewer() {
     const httpsResult = await runWaterfallHook('httpsOptions', {});
     httpsOptions = (httpsResult.pfx || httpsResult.cert) ? httpsResult : null;
   } catch (err) {
-    console.error('[CC Viewer] httpsOptions hook error:', err.message);
+    console.error('[Glasshouse] httpsOptions hook error:', err.message);
   }
 
   const useHttps = !!httpsOptions;
   const protocol = useHttps ? 'https' : 'http';
   serverProtocol = protocol;
-  if (useHttps) console.error('[CC Viewer] HTTPS mode enabled via plugin hook');
+  if (useHttps) console.error('[Glasshouse] HTTPS mode enabled via plugin hook');
 
   return new Promise((resolve, reject) => {
     function tryListen(port) {
@@ -3542,7 +3542,7 @@ export async function startViewer() {
           try {
             currentServer = createHttpsServer(httpsOptions, handleRequest);
           } catch (err) {
-            console.error('[CC Viewer] HTTPS server creation failed, falling back to HTTP:', err.message);
+            console.error('[Glasshouse] HTTPS server creation failed, falling back to HTTP:', err.message);
             currentServer = createServer(handleRequest);
             serverProtocol = 'http';
           }
@@ -4032,7 +4032,7 @@ async function setupTerminalWebSocket(httpServer) {
       });
     });
   } catch (err) {
-    console.error('[CC Viewer] Failed to setup terminal WebSocket:', err.message);
+    console.error('[Glasshouse] Failed to setup terminal WebSocket:', err.message);
   }
 }
 
@@ -4189,12 +4189,12 @@ if (!isWorkspaceMode) {
               try { client.write(`event: update_major_available\ndata: ${payload}\n\n`); } catch { }
             });
           } else if (result.status === 'upgrading_in_background') {
-            console.error(`[CC Viewer] background upgrade to ${result.remoteVersion} started (active after next launch)`);
+            console.error(`[Glasshouse] background upgrade to ${result.remoteVersion} started (active after next launch)`);
           }
         } catch { /* update check 失败静默 */ }
       }, 30_000);
     }).catch(err => {
-      console.error('Failed to start CC Viewer:', err);
+      console.error('Failed to start Glasshouse:', err);
     });
   });
 }

@@ -4,7 +4,7 @@
 
 Claude ile sohbet ettiğinizde, her API isteği tam konuşma bağlamını (system prompt + araç tanımları + geçmiş mesajlar) gönderir. Anthropic'in prompt caching mekanizması, daha önce hesaplanmış önek içeriğini sunucuda önbelleğe alır; sonraki isteklerde önek aynıysa, önbellek sonuçları doğrudan yeniden kullanılır ve tekrarlanan hesaplamalar atlanır, bu da gecikmeyi ve maliyeti büyük ölçüde azaltır.
 
-cc-viewer'da bu mekanizma "KV-Cache" olarak adlandırılır ve Anthropic API düzeyindeki prompt caching'e karşılık gelir; LLM içindeki transformer dikkat katmanlarının key-value cache'i değildir.
+Glasshouse'da bu mekanizma "KV-Cache" olarak adlandırılır ve Anthropic API düzeyindeki prompt caching'e karşılık gelir; LLM içindeki transformer dikkat katmanlarının key-value cache'i değildir.
 
 ## Önbellek Nasıl Çalışır
 
@@ -22,7 +22,7 @@ Bu önek, TTL penceresi içindeki herhangi bir önceki istekle tamamen aynı old
 
 ## "Mevcut KV-Cache Önbellek İçeriği" Nedir?
 
-cc-viewer'da gösterilen "Mevcut KV-Cache Önbellek İçeriği", en son MainAgent isteğinden çıkarılan ve önbellek sınırının (cache breakpoint) öncesinde yer alan içeriktir. Özellikle şunları içerir:
+Glasshouse'da gösterilen "Mevcut KV-Cache Önbellek İçeriği", en son MainAgent isteğinden çıkarılan ve önbellek sınırının (cache breakpoint) öncesinde yer alan içeriktir. Özellikle şunları içerir:
 
 - **System Prompt**: Claude Code'un sistem talimatları; temel agent talimatları, araç kullanım kuralları, CLAUDE.md proje talimatları, ortam bilgisi vb. dahil
 - **Tools**: Mevcut kullanılabilir araç tanımlarının listesi (Read, Write, Bash, Agent, MCP araçları vb.)

@@ -1,4 +1,4 @@
-# CC-Viewer Configuration Reference
+# Glasshouse Configuration Reference
 
 ## 1. Global Settings Panel (UI)
 
@@ -55,7 +55,7 @@ All UI settings are persisted to `<log_dir>/preferences.json` via the `/api/pref
 
 ## 4. Environment Variables
 
-### CC-Viewer Specific
+### Glasshouse Specific
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -91,12 +91,12 @@ All UI settings are persisted to `<log_dir>/preferences.json` via the `/api/pref
 ccv [options] [claude args...]
 ```
 
-### CC-Viewer Options
+### Glasshouse Options
 
 | Argument | Description |
 |----------|-------------|
 | `-logger` | Install/repair Claude Code hooks |
-| `--uninstall` / `-uninstall` | Remove all CC-Viewer integration |
+| `--uninstall` / `-uninstall` | Remove all Glasshouse integration |
 | `--help` / `-h` / `help` | Show help text |
 | `--version` / `-v` | Show version |
 | `-SDK` / `--sdk` | Use Agent SDK mode |
@@ -118,7 +118,7 @@ ccv [options] [claude args...]
 
 ## 6. Hook Configuration
 
-CC-Viewer auto-registers hooks in `~/.claude/settings.json` under `hooks.PreToolUse`:
+Glasshouse auto-registers hooks in `~/.claude/settings.json` under `hooks.PreToolUse`:
 
 ### 1. AskUserQuestion Bridge
 - **Matcher**: `"AskUserQuestion"`
@@ -132,15 +132,15 @@ CC-Viewer auto-registers hooks in `~/.claude/settings.json` under `hooks.PreTool
 
 ## 7. Shell Integration
 
-CC-Viewer injects a `claude()` function into `~/.zshrc` (or `.bashrc`):
+Glasshouse injects a `claude()` function into `~/.zshrc` (or `.bashrc`):
 
 ```bash
-# >>> CC-Viewer Auto-Inject >>>
+# >>> Glasshouse Auto-Inject >>>
 claude() { ... }
-# <<< CC-Viewer Auto-Inject <<<
+# <<< Glasshouse Auto-Inject <<<
 ```
 
-All `claude` commands are automatically routed through CC-Viewer proxy for log capture and Web UI features.
+All `claude` commands are automatically routed through Glasshouse proxy for log capture and Web UI features.
 
 Uninstall: `ccv --uninstall` or manually delete content between the markers.
 

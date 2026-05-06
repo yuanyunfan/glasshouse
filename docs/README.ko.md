@@ -1,4 +1,4 @@
-# CC-Viewer
+# Glasshouse
 
 Claude Code를 기반으로 직접의 개발 경험을 증류하여 축적한 Vibe Coding 도구입니다:
 
@@ -23,15 +23,15 @@ Claude Code를 기반으로 직접의 개발 경험을 증류하여 축적한 Vi
 #### npm으로 설치
 
 ```bash
-npm install -g cc-viewer --registry=https://registry.npmjs.org
+npm install -g @yuanyunfan/glasshouse --registry=https://registry.npmjs.org
 ```
 
 #### Homebrew로 설치 (macOS / Linux 권장)
 
 ```bash
-brew tap weiesky/cc-viewer
-brew install cc-viewer
-brew upgrade cc-viewer   # 업데이트용 — brew 설치에는 npm install -g를 사용하지 마세요
+brew tap yuanyunfan/glasshouse
+brew install glasshouse
+brew upgrade glasshouse   # 업데이트용 — brew 설치에는 npm install -g를 사용하지 마세요
 ```
 
 ### 실행 방법
@@ -50,7 +50,7 @@ ccv -c --d             # == claude --continue --dangerously-skip-permissions
 
 프로그래밍 모드로 시작하면 웹 페이지가 자동으로 열립니다.
 
-CC-Viewer는 네이티브 데스크톱 앱으로도 제공됩니다: [다운로드 페이지](https://github.com/weiesky/cc-viewer/releases)
+Glasshouse는 네이티브 데스크톱 앱으로도 제공됩니다: [다운로드 페이지](https://github.com/yuanyunfan/glasshouse/releases)
 
 
 ### 로거 모드
@@ -73,19 +73,19 @@ ccv --uninstall
 
 ### 문제 해결
 
-cc-viewer 시작에 문제가 있다면, 다음은 궁극의 문제 해결 방법입니다:
+Glasshouse 시작에 문제가 있다면, 다음은 궁극의 문제 해결 방법입니다:
 
 1단계: 아무 디렉터리에서 Claude Code를 엽니다.
 
 2단계: Claude Code에 다음 지시를 내립니다:
 
 ```
-I have installed the cc-viewer npm package, but after running ccv it still doesn't work properly. Please check cc-viewer's cli.js and findcc.js, and adapt them to the local Claude Code deployment based on the specific environment. Keep the scope of changes as constrained as possible within findcc.js.
+I have installed the Glasshouse npm package, but after running ccv it still doesn't work properly. Please check Glasshouse's cli.js and findcc.js, and adapt them to the local Claude Code deployment based on the specific environment. Keep the scope of changes as constrained as possible within findcc.js.
 ```
 
 Claude Code가 직접 문제를 진단하도록 하는 것이 누군가에게 묻거나 어떤 문서를 읽는 것보다 더 효과적입니다!
 
-위 지시가 완료되면 `findcc.js`가 업데이트됩니다. 프로젝트가 자주 로컬 배포가 필요하거나 포크된 코드가 종종 설치 문제를 해결해야 하는 경우, 이 파일을 유지하면 다음 번에 간단히 복사할 수 있습니다. 현재 Claude Code를 사용하는 많은 프로젝트와 회사들이 Mac이 아닌 서버 측 호스팅 환경에 배포하고 있기 때문에, 작성자는 향후 cc-viewer 소스 코드 업데이트를 더 쉽게 추적할 수 있도록 `findcc.js`를 분리했습니다.
+위 지시가 완료되면 `findcc.js`가 업데이트됩니다. 프로젝트가 자주 로컬 배포가 필요하거나 포크된 코드가 종종 설치 문제를 해결해야 하는 경우, 이 파일을 유지하면 다음 번에 간단히 복사할 수 있습니다. 현재 Claude Code를 사용하는 많은 프로젝트와 회사들이 Mac이 아닌 서버 측 호스팅 환경에 배포하고 있기 때문에, 작성자는 향후 Glasshouse 소스 코드 업데이트를 더 쉽게 추적할 수 있도록 `findcc.js`를 분리했습니다.
 
 
 ### 기타 명령
@@ -156,7 +156,7 @@ QR 코드를 스캔하여 모바일 장치에서 코딩할 수도 있습니다:
 
 ### 로그 관리
 
-왼쪽 상단의 CC-Viewer 드롭다운 메뉴를 통해:
+왼쪽 상단의 Glasshouse 드롭다운 메뉴를 통해:
 
 <img width="1500" height="760" alt="image" src="https://github.com/user-attachments/assets/33295e2b-f2e0-4968-a6f1-6f3d1404454e" />
 
@@ -185,7 +185,7 @@ QR 코드를 스캔하여 모바일 장치에서 코딩할 수도 있습니다:
 
 <img width="600" height="370" alt="image" src="https://github.com/user-attachments/assets/87d332ea-3e34-4957-b442-f9d070211fbf" />
 
-플러그인을 커스터마이징하고, 모든 CC-Viewer 프로세스를 관리할 수 있으며, CC-Viewer는 타사 API로의 핫 스위칭을 지원합니다(예, GLM, Kimi, MiniMax, Qwen, DeepSeek을 사용할 수 있습니다 — 작성자는 현재 시점에서 이들이 모두 꽤 약하다고 생각하지만).
+플러그인을 커스터마이징하고, 모든 Glasshouse 프로세스를 관리할 수 있으며, Glasshouse는 타사 API로의 핫 스위칭을 지원합니다(예, GLM, Kimi, MiniMax, Qwen, DeepSeek을 사용할 수 있습니다 — 작성자는 현재 시점에서 이들이 모두 꽤 약하다고 생각하지만).
 
 ---
 

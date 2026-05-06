@@ -69,7 +69,7 @@ describe('ccv --version', () => {
   it('exits 0 and prints version from package.json', () => {
     const r = runCli(['--version']);
     assert.equal(r.exitCode, 0);
-    assert.ok(r.stdout.includes(`cc-viewer v${PKG.version}`));
+    assert.ok(r.stdout.includes(`glasshouse v${PKG.version}`));
   });
 
   it('-v is an alias', () => {
@@ -481,11 +481,11 @@ describe('ccv -logger: shell hook template invariants', () => {
   });
 
   it('npm-mode hook still repairs missing interceptor marker (pre-2.x path intact)', () => {
-    // The original self-repair (cli.js present but lacks "CC Viewer" marker)
+    // The original self-repair (cli.js present but lacks the viewer marker)
     // must still trigger `ccv -logger`, so legacy users keep auto-reinjecting
     // after every Claude Code upgrade inside the 1.x line.
-    assert.ok(source.includes('grep -q "CC Viewer"'),
-      'npm hook should still probe cli.js for CC Viewer marker');
+    assert.ok(source.includes('grep -Eq "Glasshouse|CC Viewer"'),
+      'npm hook should still probe cli.js for Glasshouse and legacy markers');
   });
 
   it('native-mode hook exists and routes all non-passthrough calls through `ccv run`', () => {
@@ -509,7 +509,7 @@ describe('ccv -logger: shell hook template invariants', () => {
   });
 
   it('Codex HTTP startup output includes authenticated LAN viewer URLs', () => {
-    assert.ok(source.includes('CC Viewer (Codex):'),
+    assert.ok(source.includes('Glasshouse (Codex):'),
       'Codex startup banner should be present');
     assert.ok(source.includes('?provider=codex&token='),
       'Codex startup output should include provider-scoped network URLs with token');

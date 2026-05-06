@@ -1,4 +1,4 @@
-# Contributing to CC-Viewer
+# Contributing to Glasshouse
 
 The author welcomes and encourages PRs from the community. The author also doesn't mind if you distill features from this project into your own applications.
 

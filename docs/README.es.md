@@ -1,4 +1,4 @@
-# CC-Viewer
+# Glasshouse
 
 Un kit de herramientas de Vibe Coding destilado de la propia experiencia de desarrollo, construido sobre Claude Code:
 
@@ -23,15 +23,15 @@ Un kit de herramientas de Vibe Coding destilado de la propia experiencia de desa
 #### Instalación con npm
 
 ```bash
-npm install -g cc-viewer --registry=https://registry.npmjs.org
+npm install -g @yuanyunfan/glasshouse --registry=https://registry.npmjs.org
 ```
 
 #### Instalación con Homebrew (recomendado para macOS / Linux)
 
 ```bash
-brew tap weiesky/cc-viewer
-brew install cc-viewer
-brew upgrade cc-viewer   # para actualizaciones — NO uses npm install -g con instalaciones brew
+brew tap yuanyunfan/glasshouse
+brew install glasshouse
+brew upgrade glasshouse   # para actualizaciones — NO uses npm install -g con instalaciones brew
 ```
 
 ### Lanzamiento
@@ -50,7 +50,7 @@ ccv -c --d             # == claude --continue --dangerously-skip-permissions
 
 Después de iniciar en modo programación, se abrirá automáticamente una página web.
 
-CC-Viewer también se distribuye como aplicación de escritorio nativa: [Página de descarga](https://github.com/weiesky/cc-viewer/releases)
+Glasshouse también se distribuye como aplicación de escritorio nativa: [Página de descarga](https://github.com/yuanyunfan/glasshouse/releases)
 
 
 ### Modo Logger
@@ -73,19 +73,19 @@ ccv --uninstall
 
 ### Solución de problemas
 
-Si encuentra problemas al iniciar cc-viewer, aquí está el enfoque definitivo para la solución de problemas:
+Si encuentra problemas al iniciar Glasshouse, aquí está el enfoque definitivo para la solución de problemas:
 
 Paso 1: Abra Claude Code en cualquier directorio.
 
 Paso 2: Dé a Claude Code la siguiente instrucción:
 
 ```
-I have installed the cc-viewer npm package, but after running ccv it still doesn't work properly. Please check cc-viewer's cli.js and findcc.js, and adapt them to the local Claude Code deployment based on the specific environment. Keep the scope of changes as constrained as possible within findcc.js.
+I have installed the Glasshouse npm package, but after running ccv it still doesn't work properly. Please check Glasshouse's cli.js and findcc.js, and adapt them to the local Claude Code deployment based on the specific environment. Keep the scope of changes as constrained as possible within findcc.js.
 ```
 
 ¡Dejar que Claude Code diagnostique el problema por sí mismo es más efectivo que preguntar a nadie o leer cualquier documentación!
 
-Una vez completada la instrucción anterior, `findcc.js` será actualizado. Si su proyecto requiere frecuentemente despliegue local, o si el código forkeado a menudo necesita resolver problemas de instalación, mantener este archivo le permite simplemente copiarlo la próxima vez. En este momento, muchos proyectos y empresas que usan Claude Code no están desplegando en Mac sino en entornos alojados del lado del servidor, por lo que el autor ha separado `findcc.js` para facilitar el seguimiento de las actualizaciones del código fuente de cc-viewer en el futuro.
+Una vez completada la instrucción anterior, `findcc.js` será actualizado. Si su proyecto requiere frecuentemente despliegue local, o si el código forkeado a menudo necesita resolver problemas de instalación, mantener este archivo le permite simplemente copiarlo la próxima vez. En este momento, muchos proyectos y empresas que usan Claude Code no están desplegando en Mac sino en entornos alojados del lado del servidor, por lo que el autor ha separado `findcc.js` para facilitar el seguimiento de las actualizaciones del código fuente de Glasshouse en el futuro.
 
 
 ### Otros comandos
@@ -156,7 +156,7 @@ Haga clic en el botón "Conversation Mode" en la esquina superior derecha para a
 
 ### Gestión de registros
 
-A través del menú desplegable CC-Viewer en la esquina superior izquierda:
+A través del menú desplegable Glasshouse en la esquina superior izquierda:
 
 <img width="1500" height="760" alt="image" src="https://github.com/user-attachments/assets/33295e2b-f2e0-4968-a6f1-6f3d1404454e" />
 
@@ -185,7 +185,7 @@ Puede cargar imágenes y describir sus necesidades — la comprensión de imáge
 
 <img width="600" height="370" alt="image" src="https://github.com/user-attachments/assets/87d332ea-3e34-4957-b442-f9d070211fbf" />
 
-Puede personalizar plugins, gestionar todos los procesos de CC-Viewer, y CC-Viewer admite el cambio en caliente a APIs de terceros (sí, puede usar GLM, Kimi, MiniMax, Qwen, DeepSeek — aunque el autor los considera a todos bastante débiles en este momento).
+Puede personalizar plugins, gestionar todos los procesos de Glasshouse, y Glasshouse admite el cambio en caliente a APIs de terceros (sí, puede usar GLM, Kimi, MiniMax, Qwen, DeepSeek — aunque el autor los considera a todos bastante débiles en este momento).
 
 ---
 

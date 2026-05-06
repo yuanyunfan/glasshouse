@@ -2,7 +2,7 @@
 
 ## Nasıl çalışır
 
-CC Viewer bir HTTP sunucusu başlatır ve bir **LAN adresi** oluşturur (ör: `http://192.168.1.100:7008`). QR kodu tarayarak aynı WiFi ağı üzerinden telefonunuzdan Claude Code'a erişebilirsiniz.
+Glasshouse bir HTTP sunucusu başlatır ve bir **LAN adresi** oluşturur (ör: `http://192.168.1.100:7008`). QR kodu tarayarak aynı WiFi ağı üzerinden telefonunuzdan Claude Code'a erişebilirsiniz.
 
 ## Neden bağlanamıyorum?
 
@@ -13,13 +13,13 @@ CC Viewer bir HTTP sunucusu başlatır ve bir **LAN adresi** oluşturur (ör: `h
 
 ## Güvenlik uyarısı
 
-> ⚠️ CC Viewer'ın LAN hizmeti aynı ağdaki tüm cihazlara açıktır.
+> ⚠️ Glasshouse'ın LAN hizmeti aynı ağdaki tüm cihazlara açıktır.
 
 - **Herkese açık WiFi**'da dikkatli olun
-- CC Viewer, LAN erişimini korumak için **token kimlik doğrulaması** kullanır
+- Glasshouse, LAN erişimini korumak için **token kimlik doğrulaması** kullanır
 - Güvenilir ağlarda kullanılması önerilir
 
 ## LAN ötesi
 
 - **Tünel araçları** — frp, ngrok, Tailscale vb.
-- **CC Viewer eklentileri** — Eklenti sistemiyle proxy middleware yapılandırın
+- **Glasshouse eklentileri** — Eklenti sistemiyle proxy middleware yapılandırın

@@ -4,7 +4,7 @@
 
 Når du samtaler med Claude, sender hver API-forespørsel den komplette samtalekonteksten (system prompt + verktøydefinisjoner + meldingshistorikk). Anthropics prompt caching-mekanisme hurtigbufrer allerede beregnet prefiksinnhold på serversiden, og hvis prefikset er det samme ved påfølgende forespørsler, gjenbrukes hurtigbufferresultatet direkte, noe som hopper over gjentatte beregninger og reduserer forsinkelse og kostnader betydelig.
 
-I cc-viewer kalles denne mekanismen "KV-Cache", som tilsvarer prompt caching på Anthropic API-nivå — ikke key-value cachen i transformerens oppmerksomhetslag internt i LLM-en.
+I Glasshouse kalles denne mekanismen "KV-Cache", som tilsvarer prompt caching på Anthropic API-nivå — ikke key-value cachen i transformerens oppmerksomhetslag internt i LLM-en.
 
 ## Hvordan hurtigbufferen fungerer
 
@@ -22,7 +22,7 @@ Så lenge dette prefikset er helt identisk med en hvilken som helst forespørsel
 
 ## Hva er "gjeldende KV-Cache hurtigbufferinnhold"?
 
-"Gjeldende KV-Cache hurtigbufferinnhold" som vises i cc-viewer, er innhold hentet fra den siste MainAgent-forespørselen, som befinner seg før hurtigbuffergrensen (cache breakpoint). Det inkluderer spesifikt:
+"Gjeldende KV-Cache hurtigbufferinnhold" som vises i Glasshouse, er innhold hentet fra den siste MainAgent-forespørselen, som befinner seg før hurtigbuffergrensen (cache breakpoint). Det inkluderer spesifikt:
 
 - **System Prompt**: Claude Codes systeminstruksjoner, inkludert kjerne-agentinstruksjoner, retningslinjer for verktøybruk, CLAUDE.md-prosjektinstruksjoner, miljøinformasjon osv.
 - **Tools**: Listen over tilgjengelige verktøydefinisjoner (som Read, Write, Bash, Agent, MCP-verktøy osv.)

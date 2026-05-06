@@ -41,7 +41,7 @@ Descrizione dei campi del corpo della risposta dell'API Claude `/v1/messages`.
 | **ephemeral_5m_input_tokens** | Numero di token per la creazione di cache a breve termine con TTL di 5 minuti |
 | **ephemeral_1h_input_tokens** | Numero di token per la creazione di cache a lungo termine con TTL di 1 ora |
 
-> **Sulla tariffazione della cache**: Il prezzo unitario di `cache_read_input_tokens` è molto inferiore a quello di `input_tokens`, mentre il prezzo unitario di `cache_creation_input_tokens` è leggermente superiore a quello dell'input normale. Pertanto, mantenere un alto tasso di hit della cache nelle conversazioni continuative può ridurre significativamente i costi. Tramite la metrica "tasso di hit" di cc-viewer è possibile monitorare visivamente questa proporzione.
+> **Sulla tariffazione della cache**: Il prezzo unitario di `cache_read_input_tokens` è molto inferiore a quello di `input_tokens`, mentre il prezzo unitario di `cache_creation_input_tokens` è leggermente superiore a quello dell'input normale. Pertanto, mantenere un alto tasso di hit della cache nelle conversazioni continuative può ridurre significativamente i costi. Tramite la metrica "tasso di hit" di Glasshouse è possibile monitorare visivamente questa proporzione.
 
 ## Significato di stop_reason
 

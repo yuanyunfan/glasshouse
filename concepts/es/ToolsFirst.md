@@ -1,6 +1,6 @@
 # ¿Por qué se listan primero los Tools?
 
-En el panel Context de cc-viewer, **los Tools aparecen antes que el System Prompt y los Messages**. Este orden refleja con precisión la **secuencia de prefijo KV-Cache de la API de Anthropic**.
+En el panel Context de Glasshouse, **los Tools aparecen antes que el System Prompt y los Messages**. Este orden refleja con precisión la **secuencia de prefijo KV-Cache de la API de Anthropic**.
 
 ## Secuencia de prefijo KV-Cache
 
@@ -74,4 +74,4 @@ Las herramientas MCP (Model Context Protocol), al igual que las herramientas int
 | Adición/eliminación frecuente de servidores MCP | Cada cambio desencadena una reconstrucción completa del caché; considerar fijar el conjunto de herramientas |
 | Schemas de herramientas sobredimensionados | Reducir descripciones y enums para disminuir el consumo de tokens del prefijo |
 
-En el panel Context de cc-viewer, las herramientas MCP se muestran junto a las herramientas integradas en la zona Tools, ofreciendo una vista clara del tamaño del Schema de cada herramienta y su contribución al prefijo de caché.
+En el panel Context de Glasshouse, las herramientas MCP se muestran junto a las herramientas integradas en la zona Tools, ofreciendo una vista clara del tamaño del Schema de cada herramienta y su contribución al prefijo de caché.

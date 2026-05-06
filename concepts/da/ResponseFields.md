@@ -41,7 +41,7 @@ Feltbeskrivelse for responslegemet i Claude API `/v1/messages`.
 | **ephemeral_5m_input_tokens** | Antal tokens for korttids-cacheoprettelse med 5 minutters TTL |
 | **ephemeral_1h_input_tokens** | Antal tokens for langtids-cacheoprettelse med 1 times TTL |
 
-> **Om cache-fakturering**: Enhedsprisen for `cache_read_input_tokens` er væsentligt lavere end for `input_tokens`, mens enhedsprisen for `cache_creation_input_tokens` er lidt højere end normalt input. Derfor kan en høj cache-hitrate i løbende samtaler reducere omkostningerne markant. Via "hitrate"-metrikken i cc-viewer kan du nemt overvåge dette forhold.
+> **Om cache-fakturering**: Enhedsprisen for `cache_read_input_tokens` er væsentligt lavere end for `input_tokens`, mens enhedsprisen for `cache_creation_input_tokens` er lidt højere end normalt input. Derfor kan en høj cache-hitrate i løbende samtaler reducere omkostningerne markant. Via "hitrate"-metrikken i Glasshouse kan du nemt overvåge dette forhold.
 
 ## Betydning af stop_reason
 

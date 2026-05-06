@@ -2,7 +2,7 @@
 
 ## Que es UltraPlan
 
-UltraPlan es la **implementacion localizada** de cc-viewer del comando nativo `/ultraplan` de Claude Code. Te permite usar las capacidades completas de `/ultraplan` en tu entorno local **sin necesidad de iniciar el servicio remoto oficial de Claude**, guiando a Claude Code para lograr tareas complejas de planificacion e implementacion mediante **colaboracion multi-agente**.
+UltraPlan es la **implementacion localizada** de Glasshouse del comando nativo `/ultraplan` de Claude Code. Te permite usar las capacidades completas de `/ultraplan` en tu entorno local **sin necesidad de iniciar el servicio remoto oficial de Claude**, guiando a Claude Code para lograr tareas complejas de planificacion e implementacion mediante **colaboracion multi-agente**.
 
 En comparacion con el modo Plan regular o Agent Team, UltraPlan puede:
 - Ofrece los roles de **Experto en código** y **Experto en investigación** adaptados a diferentes tipos de tareas

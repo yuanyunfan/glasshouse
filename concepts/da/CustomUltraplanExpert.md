@@ -3,7 +3,7 @@
 ## Hvad gør de to inputfelter
 
 - **Ekspertnavn**: etiketten der vises på rolleknappen i UltraPlan-variantrækken (max 30 tegn). Det er kun et visningsnavn og sendes **aldrig** til Claude Code.
-- **Promptindhold**: din rolleinstruktion. Ved afsendelse pakker cc-viewer det **automatisk** ind i `<system-reminder>...</system-reminder>`-tags med en `[SCOPED INSTRUCTION]`-scope-header. Så **skriv kun selve indholdet** — tilføj ikke `<system-reminder>`-tags selv.
+- **Promptindhold**: din rolleinstruktion. Ved afsendelse pakker Glasshouse det **automatisk** ind i `<system-reminder>...</system-reminder>`-tags med en `[SCOPED INSTRUCTION]`-scope-header. Så **skriv kun selve indholdet** — tilføj ikke `<system-reminder>`-tags selv.
 
 ---
 
@@ -82,7 +82,7 @@ Your final plan must include the following elements:
 
 Dette fortæller Claude Code: **disse instruktioner er kun aktive de næste 1–3 turneringer**, derefter aftager de. Forhindrer "ekspertpersonaen" i at lække ind i ikke-relaterede samtaler bagefter.
 
-**Denne linje genereres af cc-viewer automatisk. Du behøver ikke skrive den.**
+**Denne linje genereres af Glasshouse automatisk. Du behøver ikke skrive den.**
 
 ### 2. Indledende opgavedefinition (**dette er det, du skal omskrive**)
 > Leverage a multi-agent exploration mechanism to formulate an exceptionally detailed implementation plan.
@@ -125,7 +125,7 @@ Den oprindelige skabelon lister 6 elementer i en "implementeringsplan". Din leve
 
 ## Forfattertips (TL;DR)
 
-1. **Behold wrapperen**: `<system-reminder>` + `[SCOPED INSTRUCTION]`-linjen tilføjes af cc-viewer — gentag ikke.
+1. **Behold wrapperen**: `<system-reminder>` + `[SCOPED INSTRUCTION]`-linjen tilføjes af Glasshouse — gentag ikke.
 2. **Omskriv åbningssætningen**: angiv rolle, mål og outputformat på én linje.
 3. **Flex workflowet**: 1–2 trin for lette opgaver, det fulde 5-trin loop kun for komplekse.
 4. **Omskriv Trin 1's underroller**: standardrollerne (akademiske artikler / konkurrenter / demo) er sandsynligvis ikke det, du vil have.

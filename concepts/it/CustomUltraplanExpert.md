@@ -3,7 +3,7 @@
 ## Cosa fanno i due campi di input
 
 - **Nome esperto**: l'etichetta mostrata sul pulsante del ruolo nella riga delle varianti UltraPlan (max 30 caratteri). È solo un nome visualizzato e **non viene mai** inviato a Claude Code.
-- **Corpo del prompt**: la tua istruzione di ruolo. Al momento dell'invio, cc-viewer lo avvolge **automaticamente** in tag `<system-reminder>...</system-reminder>` con un'intestazione di scope `[SCOPED INSTRUCTION]`. Quindi **scrivi solo il corpo** — non aggiungere tu stesso i tag `<system-reminder>`.
+- **Corpo del prompt**: la tua istruzione di ruolo. Al momento dell'invio, Glasshouse lo avvolge **automaticamente** in tag `<system-reminder>...</system-reminder>` con un'intestazione di scope `[SCOPED INSTRUCTION]`. Quindi **scrivi solo il corpo** — non aggiungere tu stesso i tag `<system-reminder>`.
 
 ---
 
@@ -82,7 +82,7 @@ Your final plan must include the following elements:
 
 Questo dice a Claude Code: **queste istruzioni sono attive solo per i prossimi 1–3 turni**, poi svaniscono. Impedisce alla "persona dell'esperto" di trasferirsi in conversazioni non correlate successive.
 
-**Questa riga viene generata automaticamente da cc-viewer. Non è necessario scriverla.**
+**Questa riga viene generata automaticamente da Glasshouse. Non è necessario scriverla.**
 
 ### 2. Definizione del compito iniziale (**questo è ciò che dovresti riscrivere**)
 > Leverage a multi-agent exploration mechanism to formulate an exceptionally detailed implementation plan.
@@ -125,7 +125,7 @@ Il modello originale elenca 6 elementi di un "piano di implementazione". Il tuo 
 
 ## Suggerimenti per la creazione (TL;DR)
 
-1. **Mantieni il wrapper**: la riga `<system-reminder>` + `[SCOPED INSTRUCTION]` viene aggiunta da cc-viewer — non ripeterla.
+1. **Mantieni il wrapper**: la riga `<system-reminder>` + `[SCOPED INSTRUCTION]` viene aggiunta da Glasshouse — non ripeterla.
 2. **Riscrivi la frase di apertura**: dichiara ruolo, obiettivo e formato di output in una sola riga.
 3. **Flessibilizza il workflow**: 1–2 passaggi per attività leggere, l'intero ciclo a 5 passaggi solo per quelle complesse.
 4. **Riscrivi i sotto-ruoli del passaggio 1**: i valori predefiniti (articoli accademici / concorrenti / demo) probabilmente non sono ciò che vuoi.

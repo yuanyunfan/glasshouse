@@ -4,7 +4,7 @@
 
 Gdy rozmawiasz z Claude, każde żądanie API wysyła pełny kontekst konwersacji (system prompt + definicje narzędzi + historia wiadomości). Mechanizm prompt caching Anthropica buforuje na serwerze już obliczoną zawartość prefiksu, a jeśli prefiks jest taki sam przy kolejnych żądaniach, wynik z pamięci podręcznej jest bezpośrednio wykorzystywany ponownie, pomijając powtórne obliczenia i znacząco redukując opóźnienia i koszty.
 
-W cc-viewer mechanizm ten nazywany jest "KV-Cache" i odpowiada prompt cachingowi na poziomie Anthropic API — a nie pamięci podręcznej key-value w warstwach uwagi transformera wewnątrz LLM.
+W Glasshouse mechanizm ten nazywany jest "KV-Cache" i odpowiada prompt cachingowi na poziomie Anthropic API — a nie pamięci podręcznej key-value w warstwach uwagi transformera wewnątrz LLM.
 
 ## Jak działa pamięć podręczna
 
@@ -22,7 +22,7 @@ Dopóki ten prefiks jest całkowicie identyczny z dowolnym żądaniem w oknie TT
 
 ## Czym jest "bieżąca zawartość pamięci podręcznej KV-Cache"?
 
-"Bieżąca zawartość pamięci podręcznej KV-Cache" wyświetlana w cc-viewer to zawartość wyodrębniona z ostatniego żądania MainAgent, znajdująca się przed granicą pamięci podręcznej (cache breakpoint). Obejmuje konkretnie:
+"Bieżąca zawartość pamięci podręcznej KV-Cache" wyświetlana w Glasshouse to zawartość wyodrębniona z ostatniego żądania MainAgent, znajdująca się przed granicą pamięci podręcznej (cache breakpoint). Obejmuje konkretnie:
 
 - **System Prompt**: Instrukcje systemowe Claude Code, w tym podstawowe instrukcje agenta, zasady korzystania z narzędzi, instrukcje projektu CLAUDE.md, informacje o środowisku itp.
 - **Tools**: Lista aktualnie dostępnych definicji narzędzi (takich jak Read, Write, Bash, Agent, narzędzia MCP itp.)

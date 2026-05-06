@@ -8,7 +8,7 @@ La reconstruction du cache implique une facturation supplémentaire de tokens (l
 
 ## Classification des causes de reconstruction du cache
 
-cc-viewer compare les corps de deux requêtes MainAgent consécutives pour déterminer précisément la cause de la reconstruction du cache :
+Glasshouse compare les corps de deux requêtes MainAgent consécutives pour déterminer précisément la cause de la reconstruction du cache :
 
 | reason | Signification | Méthode de détermination |
 |--------|---------------|--------------------------|

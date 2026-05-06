@@ -4,7 +4,7 @@
 
 当你与 Claude 对话时，每次 API 请求都会发送完整的对话上下文（system prompt + 工具定义 + 历史消息）。Anthropic 的 prompt caching 机制会将已经计算过的前缀内容缓存在服务端，后续请求如果前缀一致，则直接复用缓存结果，跳过重复计算，大幅降低延迟和费用。
 
-cc-viewer 中将这一机制称为"KV-Cache"，对应的是 Anthropic API 层面的 prompt caching，而非 LLM 内部 transformer 注意力层的 key-value cache。
+Glasshouse 中将这一机制称为"KV-Cache"，对应的是 Anthropic API 层面的 prompt caching，而非 LLM 内部 transformer 注意力层的 key-value cache。
 
 ## 缓存的工作原理
 
@@ -22,7 +22,7 @@ Tools → System Prompt → Messages（到 cache breakpoint）
 
 ## "当前 KV-Cache 缓存内容"是什么？
 
-cc-viewer 中显示的"当前 KV-Cache 缓存内容"，是从最近一次 MainAgent 请求中提取的、位于缓存边界（cache breakpoint）之前的内容。具体包括：
+Glasshouse 中显示的"当前 KV-Cache 缓存内容"，是从最近一次 MainAgent 请求中提取的、位于缓存边界（cache breakpoint）之前的内容。具体包括：
 
 - **System Prompt**：Claude Code 的系统指令，包含核心 agent 指令、工具使用规范、CLAUDE.md 项目指令、环境信息等
 - **Tools**：当前可用的工具定义列表（如 Read、Write、Bash、Agent、MCP 工具等）

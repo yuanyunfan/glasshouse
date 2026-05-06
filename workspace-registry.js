@@ -83,7 +83,7 @@ export function saveWorkspaces(list) {
       }
     }
   } catch (err) {
-    console.error('[CC Viewer] Failed to save workspaces:', err.message);
+    console.error('[Glasshouse] Failed to save workspaces:', err.message);
     // 尝试清理临时文件
     try { unlinkSync(tmpFile); } catch { }
   }

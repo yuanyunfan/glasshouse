@@ -1,5 +1,5 @@
 /**
- * CC Viewer Electron — Multi-Tab Architecture
+ * Glasshouse Electron — Multi-Tab Architecture
  *
  * BaseWindow with:
  * - tabBarView (36px, tab-bar.html)
@@ -225,7 +225,7 @@ function maybeNotify(tabId, kind, id, payload) {
   notifiedKeys.add(key);
   // 受 _notifyOnlyWhenHidden(用户偏好)控制:开启时窗口聚焦则不通知;关掉后聚焦也通知。
   if (_notifyOnlyWhenHidden && mainWindow && !mainWindow.isDestroyed() && mainWindow.isFocused()) return;
-  const projectName = payload?.projectName || pendingByTab.get(tabId)?.projectName || 'CC Viewer';
+  const projectName = payload?.projectName || pendingByTab.get(tabId)?.projectName || 'Glasshouse';
   // i18n with safe fallback: t() returns the key itself when missing — detect that and substitute defaults.
   const _tr = (key, params, fallback) => {
     try {
@@ -328,7 +328,7 @@ function broadcastTabs() {
 function updateWindowTitle() {
   if (!mainWindow) return;
   const tab = tabs.get(activeTabId);
-  mainWindow.setTitle(tab ? `${tab.projectName} - CC Viewer` : 'CC Viewer');
+  mainWindow.setTitle(tab ? `${tab.projectName} - Glasshouse` : 'Glasshouse');
 }
 
 // --- Layout ---
@@ -849,7 +849,7 @@ if (!gotLock) {
       height: 900,
       minWidth: 800,
       minHeight: 600,
-      title: 'CC Viewer',
+      title: 'Glasshouse',
       titleBarStyle: 'hiddenInset',
       trafficLightPosition: { x: 16, y: 22 },
     });

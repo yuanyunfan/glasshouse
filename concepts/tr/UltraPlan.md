@@ -2,7 +2,7 @@
 
 ## UltraPlan Nedir
 
-UltraPlan, cc-viewer'in Claude Code'un yerel `/ultraplan` komutunun **yerelleştirilmiş uygulamasıdır**. `/ultraplan`'ın tüm yeteneklerini **Claude'un resmi uzak hizmetini başlatmaya gerek kalmadan** yerel ortamınızda kullanmanızı sağlar ve Claude Code'u **çoklu ajan işbirliği** kullanarak karmaşık planlama ve uygulama görevlerini yerine getirmeye yönlendirir.
+UltraPlan, Glasshouse'in Claude Code'un yerel `/ultraplan` komutunun **yerelleştirilmiş uygulamasıdır**. `/ultraplan`'ın tüm yeteneklerini **Claude'un resmi uzak hizmetini başlatmaya gerek kalmadan** yerel ortamınızda kullanmanızı sağlar ve Claude Code'u **çoklu ajan işbirliği** kullanarak karmaşık planlama ve uygulama görevlerini yerine getirmeye yönlendirir.
 
 Normal Plan modu veya Agent Team ile karşılaştırıldığında, UltraPlan şunları yapabilir:
 - Farklı görev türlerine uygun **Kod uzmanı** ve **Araştırma uzmanı** rolleri sunar

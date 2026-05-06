@@ -2,7 +2,7 @@
 
 ## 背景
 
-CC-Viewer 內建了一個由 Anthropic Messages API 驅動的翻譯功能（`POST /api/translate`）。在早期實作中，翻譯請求會重複使用 Claude Code 工作階段中快取的驗證憑證——包括 `x-api-key` 和 `authorization` 標頭。這導致了一個微妙但嚴重的問題：翻譯結果經常回傳無關的內容。
+Glasshouse 內建了一個由 Anthropic Messages API 驅動的翻譯功能（`POST /api/translate`）。在早期實作中，翻譯請求會重複使用 Claude Code 工作階段中快取的驗證憑證——包括 `x-api-key` 和 `authorization` 標頭。這導致了一個微妙但嚴重的問題：翻譯結果經常回傳無關的內容。
 
 ## 根本原因
 
@@ -24,7 +24,7 @@ Anthropic API 支援兩種驗證方式：
 ```
 Claude Code 主要對話 ──(authorization: Bearer sessionToken)──→ Anthropic API
                                                                   ↑
-CC-Viewer 翻譯請求 ──(authorization: Bearer sessionToken)──→ Anthropic API
+Glasshouse 翻譯請求 ──(authorization: Bearer sessionToken)──→ Anthropic API
 ```
 
 由於翻譯請求重複使用了相同的工作階段權杖，Anthropic 伺服器可能會將翻譯請求與 Claude Code 的主要對話上下文產生關聯。這會導致：

@@ -5,7 +5,7 @@
 // (ERR_UNSUPPORTED_ESM_URL_SCHEME). Any `import(join(...))` / `import(resolve(...))`
 // style call must wrap the path in `pathToFileURL(...).href`.
 //
-// cc-viewer historically accumulated 13 such sites across electron/main.js,
+// Glasshouse historically accumulated 13 such sites across electron/main.js,
 // electron/tab-worker.js, and interceptor.js. They're invisible on macOS/Linux,
 // only crash on Windows, and easy to reintroduce. This test scans the source
 // files and fails if a dynamic import-expression uses a non-static argument

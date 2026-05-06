@@ -8,7 +8,7 @@ Cache-gjenoppbygging betyr ekstra token-kostnader (prisen for cache creation er 
 
 ## Klassifisering av årsaker til cache-gjenoppbygging
 
-cc-viewer bestemmer nøyaktig årsaken til cache-gjenoppbygging ved å sammenligne body fra to påfølgende MainAgent-forespørsler:
+Glasshouse bestemmer nøyaktig årsaken til cache-gjenoppbygging ved å sammenligne body fra to påfølgende MainAgent-forespørsler:
 
 | reason | Betydning | Bestemmelsesmetode |
 |--------|-----------|-------------------|

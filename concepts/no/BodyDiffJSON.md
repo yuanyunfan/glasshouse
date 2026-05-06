@@ -29,4 +29,4 @@ Hvis du ser endringer i felt som `system`, `tools` eller `model` i diffen, betyr
 - Body Diff JSON vises i detaljpanelet for MainAgent-forespørselen
 - Klikk på tittelen for å utvide/skjule
 - Støtter JSON- og Text-visningsmodus, samt kopiering med ett klikk
-- I **CC-Viewer → Globale innstillinger** øverst til venstre kan du angi "Utvid Body Diff JSON som standard"
+- I **Glasshouse → Globale innstillinger** øverst til venstre kan du angi "Utvid Body Diff JSON som standard"

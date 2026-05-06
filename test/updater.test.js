@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from '
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { execFileSync } from 'node:child_process';
-import { checkAndUpdate, isAnyCcvBusy, detectHomebrewInstall } from '../lib/updater.js';
+import { checkAndUpdate, isAnyCcvBusy, detectHomebrewInstall, NPM_PACKAGE_NAME } from '../lib/updater.js';
 import { getClaudeConfigDir } from '../findcc.js';
 
 const CACHE_DIR = join(getClaudeConfigDir(), 'cc-viewer');
@@ -374,7 +374,7 @@ describe('checkAndUpdate — fetch', () => {
     assert.equal(result.status, 'upgrading_in_background');
     assert.equal(spawnCalls, 1);
     assert.equal(spawnArgs.cmd, 'npm');
-    assert.deepStrictEqual(spawnArgs.args, ['install', '-g', `cc-viewer@${remote}`, '--no-audit', '--no-fund']);
+    assert.deepStrictEqual(spawnArgs.args, ['install', '-g', `${NPM_PACKAGE_NAME}@${remote}`, '--no-audit', '--no-fund']);
     assert.equal(spawnArgs.opts.detached, true);
     assert.equal(spawnArgs.opts.stdio, 'ignore');
     assert.equal(unrefCalled, true, 'unref must be called on detached child');
@@ -619,7 +619,7 @@ describe('detectHomebrewInstall', () => {
 
   it('returns brew prefix for Apple Silicon path', () => {
     const result = detectHomebrewInstall(
-      '/opt/homebrew/Cellar/cc-viewer/1.6.224/lib/node_modules/cc-viewer/lib',
+      '/opt/homebrew/Cellar/glasshouse/1.6.224/lib/node_modules/@yuanyunfan/glasshouse/lib',
       identityRealpath
     );
     assert.equal(result, '/opt/homebrew');
@@ -627,7 +627,7 @@ describe('detectHomebrewInstall', () => {
 
   it('returns brew prefix for Intel mac path', () => {
     const result = detectHomebrewInstall(
-      '/usr/local/Cellar/cc-viewer/1.6.224/lib/node_modules/cc-viewer/lib',
+      '/usr/local/Cellar/glasshouse/1.6.224/lib/node_modules/@yuanyunfan/glasshouse/lib',
       identityRealpath
     );
     assert.equal(result, '/usr/local');
@@ -635,15 +635,23 @@ describe('detectHomebrewInstall', () => {
 
   it('returns brew prefix for linuxbrew / custom prefix', () => {
     const result = detectHomebrewInstall(
-      '/home/user/.linuxbrew/Cellar/cc-viewer/1.6.224/lib/node_modules/cc-viewer/lib',
+      '/home/user/.linuxbrew/Cellar/glasshouse/1.6.224/lib/node_modules/@yuanyunfan/glasshouse/lib',
       identityRealpath
     );
     assert.equal(result, '/home/user/.linuxbrew');
   });
 
+  it('returns brew prefix for legacy cc-viewer Cellar path', () => {
+    const result = detectHomebrewInstall(
+      '/opt/homebrew/Cellar/cc-viewer/1.6.224/lib/node_modules/cc-viewer/lib',
+      identityRealpath
+    );
+    assert.equal(result, '/opt/homebrew');
+  });
+
   it('returns null for normal npm-global path', () => {
     const result = detectHomebrewInstall(
-      '/Users/sky/.npm-global/lib/node_modules/cc-viewer/lib',
+      '/Users/sky/.npm-global/lib/node_modules/@yuanyunfan/glasshouse/lib',
       identityRealpath
     );
     assert.equal(result, null);
@@ -651,7 +659,7 @@ describe('detectHomebrewInstall', () => {
 
   it('returns null for nvm versioned path', () => {
     const result = detectHomebrewInstall(
-      '/Users/sky/.nvm/versions/node/v20.10.0/lib/node_modules/cc-viewer/lib',
+      '/Users/sky/.nvm/versions/node/v20.10.0/lib/node_modules/@yuanyunfan/glasshouse/lib',
       identityRealpath
     );
     assert.equal(result, null);
@@ -659,13 +667,13 @@ describe('detectHomebrewInstall', () => {
 
   it('returns null for system /usr/local without Cellar', () => {
     const result = detectHomebrewInstall(
-      '/usr/local/lib/node_modules/cc-viewer/lib',
+      '/usr/local/lib/node_modules/@yuanyunfan/glasshouse/lib',
       identityRealpath
     );
     assert.equal(result, null);
   });
 
-  it('returns null for path containing Cellar but not cc-viewer', () => {
+  it('returns null for path containing Cellar but not glasshouse', () => {
     const result = detectHomebrewInstall(
       '/opt/homebrew/Cellar/some-other-pkg/1.0.0/lib',
       identityRealpath
@@ -673,30 +681,30 @@ describe('detectHomebrewInstall', () => {
     assert.equal(result, null);
   });
 
-  it('rejects path where Cellar/cc-viewer is the terminal segment (no version subdir)', () => {
-    // /Cellar/cc-viewer/ 后必须紧跟 <version>/，否则不是合法布局
+  it('rejects path where Cellar/glasshouse is the terminal segment (no version subdir)', () => {
+    // /Cellar/glasshouse/ 后必须紧跟 <version>/，否则不是合法布局
     const result = detectHomebrewInstall(
-      '/opt/homebrew/Cellar/cc-viewer/',
+      '/opt/homebrew/Cellar/glasshouse/',
       identityRealpath
     );
     assert.equal(result, null);
   });
 
-  it('rejects dev clone where path happens to include Cellar/cc-viewer/lib/...', () => {
-    // 防御 dev clone 误判：开发者 clone 到 /Users/x/projects/Cellar/cc-viewer/ 时，
+  it('rejects dev clone where path happens to include Cellar/glasshouse/lib/...', () => {
+    // 防御 dev clone 误判：开发者 clone 到 /Users/x/projects/Cellar/glasshouse/ 时，
     // afterCellar = 'lib/...'，'lib' 不以数字开头 → 不应被当成 brew 安装
     const result = detectHomebrewInstall(
-      '/Users/x/projects/Cellar/cc-viewer/lib',
+      '/Users/x/projects/Cellar/glasshouse/lib',
       identityRealpath
     );
     assert.equal(result, null);
   });
 
-  it('rejects Time Machine backup paths containing Cellar/cc-viewer/<non-version>/', () => {
-    // /Volumes/.../Backups.backupdb/.../opt/homebrew/Cellar/cc-viewer/Backup-2026-01/...
+  it('rejects Time Machine backup paths containing Cellar/glasshouse/<non-version>/', () => {
+    // /Volumes/.../Backups.backupdb/.../opt/homebrew/Cellar/glasshouse/Backup-2026-01/...
     // Backup-2026-01 不以数字开头 → 不误判为 live brew 安装
     const result = detectHomebrewInstall(
-      '/Volumes/TimeMachine/Backups.backupdb/host/opt/homebrew/Cellar/cc-viewer/Backup-2026-01/lib',
+      '/Volumes/TimeMachine/Backups.backupdb/host/opt/homebrew/Cellar/glasshouse/Backup-2026-01/lib',
       identityRealpath
     );
     assert.equal(result, null);
@@ -706,7 +714,7 @@ describe('detectHomebrewInstall', () => {
     // bin shim /opt/homebrew/bin/ccv 是 symlink → Cellar 实体
     const fakeRealpath = (p) =>
       p === '/opt/homebrew/bin/ccv'
-        ? '/opt/homebrew/Cellar/cc-viewer/1.6.224/lib/node_modules/cc-viewer/bin/ccv'
+        ? '/opt/homebrew/Cellar/glasshouse/1.6.224/lib/node_modules/@yuanyunfan/glasshouse/bin/ccv'
         : p;
     const result = detectHomebrewInstall('/opt/homebrew/bin/ccv', fakeRealpath);
     assert.equal(result, '/opt/homebrew');
@@ -716,7 +724,7 @@ describe('detectHomebrewInstall', () => {
     const throwingRealpath = () => { throw new Error('ELOOP'); };
     // 原始路径已含 brew 标记 → 仍能检出
     const result = detectHomebrewInstall(
-      '/opt/homebrew/Cellar/cc-viewer/1.6.224/lib',
+      '/opt/homebrew/Cellar/glasshouse/1.6.224/lib',
       throwingRealpath
     );
     assert.equal(result, '/opt/homebrew');
@@ -768,8 +776,8 @@ describe('checkAndUpdate — brew_managed', () => {
 
   it('major bump on brew install returns brew_managed (brew check wins over major_available)', async () => {
     // 关键反向断言：brew_managed 必须早于 major_available。否则 brew 用户跨大版本会被 i18n
-    // major.message 引导跑 npm i -g cc-viewer@latest，正好触发"双渠道污染"——brew 渠道
-    // 想杜绝的就是这个场景。`brew upgrade cc-viewer` 跨大版本同样能用，文案统一不需特化。
+    // major.message 引导跑 npm i -g @yuanyunfan/glasshouse@latest，正好触发"双渠道污染"——brew 渠道
+    // 想杜绝的就是这个场景。`brew upgrade glasshouse` 跨大版本同样能用，文案统一不需特化。
     mkdirSync(CACHE_DIR, { recursive: true });
     writeFileSync(CACHE_FILE, JSON.stringify({ lastCheck: 0 }));
 

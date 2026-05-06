@@ -8,7 +8,7 @@ Cache-genopbygning medfører ekstra token-omkostninger (prisen for cache creatio
 
 ## Klassificering af årsager til cache-genopbygning
 
-cc-viewer sammenligner body fra to på hinanden følgende MainAgent-requests for præcist at bestemme årsagen til cache-genopbygningen:
+Glasshouse sammenligner body fra to på hinanden følgende MainAgent-requests for præcist at bestemme årsagen til cache-genopbygningen:
 
 | reason | Betydning | Bestemmelsesmetode |
 |--------|------|----------|

@@ -4,7 +4,7 @@
 
 當你與 Claude 對話時，每次 API 請求都會發送完整的對話上下文（system prompt + 工具定義 + 歷史訊息）。Anthropic 的 prompt caching 機制會將已經計算過的前綴內容快取在伺服端，後續請求如果前綴一致，則直接複用快取結果，跳過重複計算，大幅降低延遲和費用。
 
-cc-viewer 中將這一機制稱為「KV-Cache」，對應的是 Anthropic API 層面的 prompt caching，而非 LLM 內部 transformer 注意力層的 key-value cache。
+Glasshouse 中將這一機制稱為「KV-Cache」，對應的是 Anthropic API 層面的 prompt caching，而非 LLM 內部 transformer 注意力層的 key-value cache。
 
 ## 快取的工作原理
 
@@ -22,7 +22,7 @@ Tools → System Prompt → Messages（到 cache breakpoint）
 
 ## 「當前 KV-Cache 快取內容」是什麼？
 
-cc-viewer 中顯示的「當前 KV-Cache 快取內容」，是從最近一次 MainAgent 請求中提取的、位於快取邊界（cache breakpoint）之前的內容。具體包括：
+Glasshouse 中顯示的「當前 KV-Cache 快取內容」，是從最近一次 MainAgent 請求中提取的、位於快取邊界（cache breakpoint）之前的內容。具體包括：
 
 - **System Prompt**：Claude Code 的系統指令，包含核心 agent 指令、工具使用規範、CLAUDE.md 專案指令、環境資訊等
 - **Tools**：當前可用的工具定義列表（如 Read、Write、Bash、Agent、MCP 工具等）

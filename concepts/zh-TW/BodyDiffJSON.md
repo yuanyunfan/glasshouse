@@ -29,4 +29,4 @@ Body Diff JSON 正是為了解決這個問題：它自動對比前後兩個 Main
 - Body Diff JSON 顯示在 MainAgent 請求的詳情面板中
 - 點擊標題可展開/收起
 - 支援 JSON 和 Text 兩種查看模式，以及一鍵複製
-- 在左上角 **CC-Viewer → 全域設定** 中，可以設定「預設展開 Body Diff JSON」
+- 在左上角 **Glasshouse → 全域設定** 中，可以設定「預設展開 Body Diff JSON」

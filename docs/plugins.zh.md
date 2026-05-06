@@ -1,8 +1,8 @@
-# CC-Viewer 插件系统
+# Glasshouse 插件系统
 
 [English](./plugins.md)
 
-CC-Viewer 提供了一套轻量级插件机制，允许在特定生命周期节点注入自定义逻辑。这对企业内部部署尤其有用——例如将二维码的局域网 URL 替换为企业内部代理地址。
+Glasshouse 提供了一套轻量级插件机制，允许在特定生命周期节点注入自定义逻辑。这对企业内部部署尤其有用——例如将二维码的局域网 URL 替换为企业内部代理地址。
 
 ## 快速开始
 
@@ -29,7 +29,7 @@ export default {
 };
 ```
 
-### 第 3 步：重启 cc-viewer
+### 第 3 步：重启 Glasshouse
 
 插件放入目录后重启即生效，**无需 `npm install`**。
 
@@ -96,7 +96,7 @@ export default {
 | `parsedUrl` | `URL` | 完整的 URL 对象 |
 | `handled` | `boolean` | 初始为 `false`；插件写完响应后返回 `{ handled: true }` |
 
-**返回值：** 返回 `{ handled: true }` 表示已处理完成，cc-viewer 将跳过后续路由。
+**返回值：** 返回 `{ handled: true }` 表示已处理完成，Glasshouse 将跳过后续路由。
 
 > **重要：** 只应返回 `{ handled: true }`。不要在返回值中覆写 `req`、`res`、`url`、`method`——waterfall 合并机制会影响后续插件。
 
@@ -223,7 +223,7 @@ hooks: {
     fetch('https://monitor.company.com/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ service: 'cc-viewer', port, host, url }),
+      body: JSON.stringify({ service: 'glasshouse', port, host, url }),
     }).catch(() => {});
   },
 }
@@ -247,7 +247,7 @@ hooks: {
 
 **类型：Parallel（并行通知）**
 
-每当 cc-viewer 检测到新的 JSONL 日志条目时触发。适合用于将日志数据转发到外部 HTTP 服务、数据分析平台或自定义存储。
+每当 Glasshouse 检测到新的 JSONL 日志条目时触发。适合用于将日志数据转发到外部 HTTP 服务、数据分析平台或自定义存储。
 
 **参数说明：**
 
@@ -309,7 +309,7 @@ hooks: {
 
 每个 hook 调用都包裹了 `try/catch`。如果插件抛出异常：
 
-- 错误会输出到 stderr：`[CC Viewer] Plugin "name" hook "hookName" error: message`
+- 错误会输出到 stderr：`[Glasshouse] Plugin "name" hook "hookName" error: message`
 - **不会影响**其他插件和宿主程序的正常运行
 - 对于 waterfall hook，当前值会原样传给下一个插件
 
@@ -359,7 +359,7 @@ export default {
       fetch('https://monitor.company.com/api/notify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ service: 'cc-viewer', port, host }),
+        body: JSON.stringify({ service: 'glasshouse', port, host }),
       }).catch(() => {});
     },
 
@@ -383,7 +383,7 @@ export default {
 
 ## 注意事项
 
-- 插件在服务器启动时加载一次。新增或删除插件文件后需要重启 cc-viewer。
+- 插件在服务器启动时加载一次。新增或删除插件文件后需要重启 Glasshouse。
 - 如果插件目录不存在，加载器静默返回，零性能开销。
 - 插件使用 ESM 格式（`export default`），支持 `.js` 和 `.mjs` 后缀。
 - 插件目录路径：`~/.claude/cc-viewer/plugins/`，企业 IT 可预置此目录。

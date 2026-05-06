@@ -1,6 +1,6 @@
 # なぜToolsが最初に表示されるのか？
 
-cc-viewerのContextパネルでは、**ToolsはSystem PromptとMessagesより前に表示されます**。この順序は、**Anthropic APIのKV-Cacheプレフィックスシーケンス**を正確に反映しています。
+GlasshouseのContextパネルでは、**ToolsはSystem PromptとMessagesより前に表示されます**。この順序は、**Anthropic APIのKV-Cacheプレフィックスシーケンス**を正確に反映しています。
 
 ## KV-Cacheプレフィックスシーケンス
 
@@ -74,4 +74,4 @@ MCP（Model Context Protocol）ツールは、組み込みツールと同様にT
 | MCPサーバーの頻繁な追加/削除 | 変更のたびにキャッシュが全面再構築される；ツールセットの固定を検討 |
 | 過大なTool Schema | descriptionとenumを削減し、プレフィックスのトークン消費を削減 |
 
-cc-viewerのContextパネルでは、MCPツールは組み込みツールと並んでTools領域に表示され、各ツールのSchemaサイズとキャッシュプレフィックスへの寄与を直感的に確認できます。
+GlasshouseのContextパネルでは、MCPツールは組み込みツールと並んでTools領域に表示され、各ツールのSchemaサイズとキャッシュプレフィックスへの寄与を直感的に確認できます。

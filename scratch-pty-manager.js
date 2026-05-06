@@ -125,7 +125,7 @@ export async function spawnScratch(id) {
 
     const shell = process.env.SHELL || '/bin/sh';
     const env = { ...process.env };
-    // 前缀扫描剥离 cc-viewer 主进程的全部协调变量，scratch shell 只继承 cwd + 通用 shell env。
+    // 前缀扫描剥离 Glasshouse 主进程的全部协调变量，scratch shell 只继承 cwd + 通用 shell env。
     // cli.js 会在父进程 set 一批 CCV_*（CCV_CLI_MODE / CCV_PROJECT_DIR / CCV_PROXY_PORT / CCV_SDK_MODE /
     // CCV_WORKSPACE_MODE / CCV_BYPASS_PERMISSIONS / CCV_USER_NAME / CCV_USER_AVATAR 等），用前缀
     // 一次性清掉防遗漏；以后新增 CCV_*/CCVIEWER_* 都自动覆盖，scratch 里跑 ccv 不会反向劫持父级服务。

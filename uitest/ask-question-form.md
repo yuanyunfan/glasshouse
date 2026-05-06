@@ -1,8 +1,8 @@
 # AskUserQuestion UI 测试用例
 
 ## 前置条件
-- cc-viewer 服务运行中
-- 浏览器打开 cc-viewer 页面
+- Glasshouse 服务运行中
+- 浏览器打开 Glasshouse 页面
 - Claude Code CLI 处于活跃会话
 
 ---

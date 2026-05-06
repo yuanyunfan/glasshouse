@@ -1023,7 +1023,7 @@ class TerminalPanel extends React.Component {
       }
       if (this.terminal) this.terminal.focus();
     } catch (err) {
-      console.error('[CC Viewer] Clipboard image upload failed:', err);
+      console.error('[Glasshouse] Clipboard image upload failed:', err);
       message.error(t('ui.terminal.pasteImageFailed'));
     }
   };
@@ -1118,7 +1118,7 @@ class TerminalPanel extends React.Component {
       // refocus terminal after upload (skip on mobile to avoid system keyboard popup)
       if ((!isMobile || isPad) && this.terminal) this.terminal.focus();
     } catch (err) {
-      console.error('[CC Viewer] Upload failed:', err);
+      console.error('[Glasshouse] Upload failed:', err);
     }
     // reset so same file can be re-selected
     e.target.value = '';

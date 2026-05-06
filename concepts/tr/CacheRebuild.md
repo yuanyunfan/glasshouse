@@ -8,7 +8,7 @@ Anthropic'in prompt caching mekanizması, istekteki system → tools → message
 
 ## Önbellek Yeniden Oluşturma Neden Sınıflandırması
 
-cc-viewer, ardışık iki MainAgent isteğinin gövdesini karşılaştırarak önbellek yeniden oluşturma nedenini kesin olarak belirler:
+Glasshouse, ardışık iki MainAgent isteğinin gövdesini karşılaştırarak önbellek yeniden oluşturma nedenini kesin olarak belirler:
 
 | reason | Anlamı | Belirleme Yöntemi |
 |--------|--------|-------------------|

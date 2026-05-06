@@ -2,7 +2,7 @@
 
 ## الخلفية
 
-يتضمن CC-Viewer ميزة ترجمة مدمجة (`POST /api/translate`) تعمل بواسطة Anthropic Messages API. في التنفيذ المبكر، كانت طلبات الترجمة تعيد استخدام بيانات المصادقة المخزنة مؤقتاً من جلسة Claude Code — بما في ذلك رؤوس `x-api-key` و `authorization`. تسبب هذا في مشكلة خفية لكنها خطيرة: كانت نتائج الترجمة تعيد في كثير من الأحيان محتوى غير ذي صلة.
+يتضمن Glasshouse ميزة ترجمة مدمجة (`POST /api/translate`) تعمل بواسطة Anthropic Messages API. في التنفيذ المبكر، كانت طلبات الترجمة تعيد استخدام بيانات المصادقة المخزنة مؤقتاً من جلسة Claude Code — بما في ذلك رؤوس `x-api-key` و `authorization`. تسبب هذا في مشكلة خفية لكنها خطيرة: كانت نتائج الترجمة تعيد في كثير من الأحيان محتوى غير ذي صلة.
 
 ## السبب الجذري
 
@@ -24,7 +24,7 @@
 ```
 المحادثة الرئيسية لـ Claude Code ──(authorization: Bearer sessionToken)──→ Anthropic API
                                                                               ↑
-طلب ترجمة CC-Viewer ──(authorization: Bearer sessionToken)──→ Anthropic API
+طلب ترجمة Glasshouse ──(authorization: Bearer sessionToken)──→ Anthropic API
 ```
 
 نظراً لأن طلبات الترجمة أعادت استخدام نفس رمز الجلسة، فقد يربط خادم Anthropic طلبات الترجمة بسياق المحادثة الرئيسية لـ Claude Code. يؤدي هذا إلى:

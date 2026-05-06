@@ -1,6 +1,6 @@
 # Project
 
-`cc-viewer` is a Node.js + React viewer for Claude Code request logs. It also
+`Glasshouse` is a Node.js + React viewer for Claude Code request logs. It also
 exposes local server APIs, SSE streams, and Electron/native runtime surfaces.
 
 ## Architecture

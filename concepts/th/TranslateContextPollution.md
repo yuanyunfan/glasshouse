@@ -2,7 +2,7 @@
 
 ## ความเป็นมา
 
-CC-Viewer มีฟีเจอร์แปลภาษาในตัว (`POST /api/translate`) ที่ขับเคลื่อนโดย Anthropic Messages API ในการพัฒนาช่วงแรก คำขอแปลภาษาใช้ข้อมูลรับรองตัวตนที่แคชไว้จากเซสชัน Claude Code ซ้ำ — รวมถึงทั้ง header `x-api-key` และ `authorization` สิ่งนี้ทำให้เกิดปัญหาที่แนบเนียนแต่ร้ายแรง: ผลลัพธ์การแปลมักส่งคืนเนื้อหาที่ไม่เกี่ยวข้อง
+Glasshouse มีฟีเจอร์แปลภาษาในตัว (`POST /api/translate`) ที่ขับเคลื่อนโดย Anthropic Messages API ในการพัฒนาช่วงแรก คำขอแปลภาษาใช้ข้อมูลรับรองตัวตนที่แคชไว้จากเซสชัน Claude Code ซ้ำ — รวมถึงทั้ง header `x-api-key` และ `authorization` สิ่งนี้ทำให้เกิดปัญหาที่แนบเนียนแต่ร้ายแรง: ผลลัพธ์การแปลมักส่งคืนเนื้อหาที่ไม่เกี่ยวข้อง
 
 ## สาเหตุหลัก
 
@@ -24,7 +24,7 @@ Anthropic API รองรับสองวิธีการรับรอง
 ```
 การสนทนาหลักของ Claude Code ──(authorization: Bearer sessionToken)──→ Anthropic API
                                                                           ↑
-คำขอแปลภาษาของ CC-Viewer ──(authorization: Bearer sessionToken)──→ Anthropic API
+คำขอแปลภาษาของ Glasshouse ──(authorization: Bearer sessionToken)──→ Anthropic API
 ```
 
 เนื่องจากคำขอแปลภาษาใช้ session token เดียวกันซ้ำ เซิร์ฟเวอร์ Anthropic อาจเชื่อมโยงคำขอแปลภาษาเข้ากับบริบทการสนทนาหลักของ Claude Code ส่งผลให้:

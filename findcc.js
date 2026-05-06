@@ -1,5 +1,5 @@
 import { resolve, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { existsSync, realpathSync } from 'node:fs';
 import { homedir, tmpdir, arch } from 'node:os';
 import { execSync, spawnSync } from 'node:child_process';
@@ -79,8 +79,9 @@ const NATIVE_CANDIDATES = [
 // 用于 which/command -v 查找的命令名
 export const BINARY_NAME = 'claude';
 
-// 注入到 cli.js 的 import 语句（相对路径，基于 cli.js 所在位置）
-export const INJECT_IMPORT = "import '../../cc-viewer/interceptor.js';";
+// 注入到 Claude Code cli.js 的 import 语句。使用当前包目录的 file URL，避免依赖
+// npm 包名路径；这让 scoped package、Homebrew 和本地开发路径都能指向同一个入口。
+export const INJECT_IMPORT = `import '${pathToFileURL(resolve(__dirname, 'interceptor.js')).href}';`;
 
 // ============ 导出函数 ============
 

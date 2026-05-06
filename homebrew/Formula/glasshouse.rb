@@ -1,10 +1,10 @@
 require "language/node"
 
-class CcViewer < Formula
-  desc "Vibe Coding toolkit for Claude Code with Web Viewer + Logger"
-  homepage "https://github.com/weiesky/cc-viewer"
+class Glasshouse < Formula
+  desc "Request viewer for Claude Code and Codex"
+  homepage "https://github.com/yuanyunfan/glasshouse"
   # NOTE: url + sha256 自动由 .github/workflows/bump-homebrew.yml 维护，发版后会跨 repo PR 更新
-  url "https://registry.npmjs.org/cc-viewer/-/cc-viewer-1.6.224.tgz"
+  url "https://registry.npmjs.org/@yuanyunfan/glasshouse/-/glasshouse-1.6.236.tgz"
   sha256 "0000000000000000000000000000000000000000000000000000000000000000"
   license "MIT"
 
@@ -22,7 +22,7 @@ class CcViewer < Formula
     (bin/"ccv").write <<~SH
       #!/bin/sh
       exec "#{Formula["node"].opt_bin}/node" \\
-        "#{libexec}/lib/node_modules/cc-viewer/cli.js" "$@"
+        "#{libexec}/lib/node_modules/@yuanyunfan/glasshouse/cli.js" "$@"
     SH
     (bin/"ccv").chmod 0755
   end

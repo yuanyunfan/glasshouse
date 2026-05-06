@@ -481,7 +481,7 @@ class AppBase extends React.Component {
       .catch(() => { });
 
     // 获取 GitHub star 数
-    fetch('https://api.github.com/repos/weiesky/cc-viewer')
+    fetch('https://api.github.com/repos/yuanyunfan/glasshouse')
       .then(res => res.json())
       .then(data => { if (data.stargazers_count != null) this.setState({ githubStars: data.stargazers_count }); })
       .catch(() => { });
@@ -991,7 +991,7 @@ class AppBase extends React.Component {
             this._loadingCountTimer = null;
           }
           this._rebuildRequestIndex([]);
-          if (data.projectName) document.title = `${data.projectName} - CC Viewer`;
+          if (data.projectName) document.title = `${data.projectName} - Glasshouse`;
           this.setState({
             workspaceMode: false,
             projectName: data.projectName || '',

@@ -41,7 +41,7 @@ Claude API `/v1/messages` 응답 본문의 필드 설명.
 | **ephemeral_5m_input_tokens** | TTL 5분의 단기 캐시 생성 토큰 수 |
 | **ephemeral_1h_input_tokens** | TTL 1시간의 장기 캐시 생성 토큰 수 |
 
-> **캐시 과금에 대하여**: `cache_read_input_tokens`의 단가는 `input_tokens`보다 훨씬 낮고, `cache_creation_input_tokens`의 단가는 일반 입력보다 약간 높습니다. 따라서 지속적인 대화에서 높은 캐시 적중률을 유지하면 비용을 크게 절감할 수 있습니다. cc-viewer의 "적중률" 지표를 통해 이 비율을 직관적으로 모니터링할 수 있습니다.
+> **캐시 과금에 대하여**: `cache_read_input_tokens`의 단가는 `input_tokens`보다 훨씬 낮고, `cache_creation_input_tokens`의 단가는 일반 입력보다 약간 높습니다. 따라서 지속적인 대화에서 높은 캐시 적중률을 유지하면 비용을 크게 절감할 수 있습니다. Glasshouse의 "적중률" 지표를 통해 이 비율을 직관적으로 모니터링할 수 있습니다.
 
 ## stop_reason 의미
 

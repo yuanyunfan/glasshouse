@@ -2,7 +2,7 @@
 
 ## 什么是 UltraPlan
 
-UltraPlan 是 cc-viewer 对 Claude Code 原生 `/ultraplan` 命令的**本地化实现**。它让你无需启动 Claude 官方的远程服务，即可在本地环境中使用 `/ultraplan` 的完整能力，引导 Claude Code 以**多代理协作**的方式完成复杂的规划和实现任务。
+UltraPlan 是 Glasshouse 对 Claude Code 原生 `/ultraplan` 命令的**本地化实现**。它让你无需启动 Claude 官方的远程服务，即可在本地环境中使用 `/ultraplan` 的完整能力，引导 Claude Code 以**多代理协作**的方式完成复杂的规划和实现任务。
 
 与普通的 Plan 模式或 Agent Team 相比，UltraPlan 能够：
 - 提供**代码专家**和**调研专家**两种角色，针对不同任务类型

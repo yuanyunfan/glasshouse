@@ -63,7 +63,7 @@ export function startProxy() {
     const server = createServer(async (req, res) => {
       const originalBaseUrl = getOriginalBaseUrl();
 
-      // Use the patched fetch (which logs to cc-viewer)
+      // Use the patched fetch (which logs to Glasshouse)
       try {
         // Convert incoming headers
         const headers = { ...req.headers };
@@ -80,7 +80,7 @@ export function startProxy() {
           headers: headers,
         };
 
-        // 标记此请求为 CC-Viewer 代理转发的 Claude API 请求
+        // 标记此请求为 Glasshouse 代理转发的 Claude API 请求
         // 拦截器识别到此 Header 会强制记录，忽略 URL 匹配规则
         fetchOptions.headers['x-cc-viewer-trace'] = 'true';
 
@@ -109,7 +109,7 @@ export function startProxy() {
           try {
             const errorText = await response.text();
             if (process.env.CCV_DEBUG) {
-              console.error(`[CC-Viewer Proxy] ${extractApiErrorMessage(response.status, errorText)}`);
+              console.error(`[Glasshouse Proxy] ${extractApiErrorMessage(response.status, errorText)}`);
             }
 
             res.writeHead(response.status, responseHeaders);
@@ -118,7 +118,7 @@ export function startProxy() {
           } catch (err) {
             // 读取 body 失败，回退到流式处理
             if (process.env.CCV_DEBUG) {
-              console.error('[CC-Viewer Proxy] Failed to read error body:', err);
+              console.error('[Glasshouse Proxy] Failed to read error body:', err);
             }
           }
         }
@@ -134,7 +134,7 @@ export function startProxy() {
           // pipeline handles stream errors; without this, unhandled 'error' events crash the process.
           pipeline(nodeStream, res, (err) => {
             if (err && process.env.CCV_DEBUG) {
-              console.error('[CC-Viewer Proxy] Stream pipeline error:', err.message);
+              console.error('[Glasshouse Proxy] Stream pipeline error:', err.message);
             }
           });
         } else {
@@ -143,7 +143,7 @@ export function startProxy() {
       } catch (err) {
         // Log proxy errors only when debugging
         if (process.env.CCV_DEBUG) {
-          console.error('[CC-Viewer Proxy] Error:', err);
+          console.error('[Glasshouse Proxy] Error:', err);
         }
 
         res.statusCode = 502;
