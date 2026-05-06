@@ -30,6 +30,12 @@ describe('codex-http-adapter', () => {
         }],
         input: [
           { role: 'user', content: [{ type: 'input_text', text: 'Hello' }] },
+          { type: 'reasoning', encrypted_content: 'request-ciphertext' },
+          {
+            type: 'web_search_call',
+            status: 'completed',
+            action: { type: 'search', query: 'SPY 1 month performance', queries: ['SPY 1 month performance'] },
+          },
           { type: 'function_call_output', call_id: 'call_1', output: 'ok' },
         ],
       },
@@ -38,6 +44,11 @@ describe('codex-http-adapter', () => {
         model: 'gpt-5.4',
         output: [
           { type: 'reasoning', encrypted_content: 'ciphertext' },
+          {
+            type: 'web_search_call',
+            status: 'completed',
+            action: { type: 'open_page', url: 'https://example.com/market' },
+          },
           { type: 'message', role: 'assistant', content: [{ type: 'output_text', text: 'Done' }] },
           { type: 'function_call', call_id: 'call_2', name: 'exec_command', arguments: '{"cmd":"pwd"}' },
         ],
@@ -59,9 +70,13 @@ describe('codex-http-adapter', () => {
     assert.equal(entry.body.tools[0].input_schema.properties.cmd.type, 'string');
     assert.match(JSON.stringify(entry.body.contextMessages), /Hello/);
     assert.match(JSON.stringify(entry.body.contextMessages), /ok/);
+    assert.match(JSON.stringify(entry.body.contextMessages), /web_search/);
     assert.match(JSON.stringify(entry.body.messages), /Done/);
     assert.match(JSON.stringify(entry.body.messages), /tool_use/);
+    assert.match(JSON.stringify(entry.body.messages), /web_open_page/);
+    assert.match(JSON.stringify(entry.body.messages), /https:\/\/example.com\/market/);
     assert.doesNotMatch(JSON.stringify(entry.body.messages), /ciphertext/);
+    assert.doesNotMatch(JSON.stringify(entry.body.contextMessages), /request-ciphertext/);
     assert.equal(entry.response.body.usage.input_tokens, 75);
     assert.equal(entry.response.body.usage.cache_read_input_tokens, 25);
     assert.equal(entry.response.body.usage.reasoning_output_tokens, 4);

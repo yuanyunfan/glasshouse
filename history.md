@@ -6,6 +6,7 @@
 - feat(codex-http): add `ccv run -- codex` Raven-facing Responses API interceptor with `provider=codex` viewer mode
 - feat(codex-http): extend the shell hook so direct `codex` agent launches print Glasshouse URLs and route through the Codex HTTP interceptor
 - refactor(codex): remove the old `~/.codex/sessions/**/*.jsonl` session reader and make HTTP interception the default Codex provider path
+- fix(codex): render Responses API built-in tool calls such as `web_search_call` / `open_page` in the Context tab instead of dropping them
 - fix(codex): surface persisted Codex base/developer prompts, context-only user messages, and tool_search tool definitions in the Context tab
 - fix(codex): keep encrypted-only reasoning in raw events instead of rendering `[Encrypted reasoning content]` as a thinking block
 - perf(chatview): viewReqProps 9 处 spread → 显式 prop（消除 messages.map 内对象创建热点）

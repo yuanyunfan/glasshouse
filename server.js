@@ -51,7 +51,7 @@ import { countLogEntries, streamRawEntriesAsync, readPagedEntries } from './lib/
 import { awaitDrainOrClose } from './lib/sse-backpressure.js';
 import { enrichRawIfNeeded } from './lib/enrich-plan-input.js';
 import { buildTeamStatusResponse } from './lib/team-runtime.js';
-import { buildCodexContextWindow } from './lib/codex-http-adapter.js';
+import { buildCodexContextWindow, buildCodexHttpEntry } from './lib/codex-http-adapter.js';
 
 
 // 动态获取 getPrefsFile()（LOG_DIR 可能在运行时被 setLogDir 修改）
@@ -290,8 +290,32 @@ function _isCodexEntry(entry) {
 }
 
 function _normalizeCodexEntry(entry) {
-  if (!entry || entry.provider !== 'codex-http') return entry;
-  return { ...entry, provider: 'codex' };
+  if (!entry) return entry;
+  const normalized = entry.provider === 'codex-http' ? { ...entry, provider: 'codex' } : entry;
+  const rawRequestBody = normalized._codexRawRequest?.body;
+  const responseBody = normalized.response?.body;
+  const output = Array.isArray(responseBody?.output) ? responseBody.output : null;
+  if (!rawRequestBody || !output || normalized.body?.metadata?.transport !== 'http-interceptor') {
+    return normalized;
+  }
+  return buildCodexHttpEntry({
+    url: normalized.url,
+    method: normalized.method,
+    timestamp: normalized.timestamp,
+    status: normalized.response?.status,
+    requestHeaders: normalized._codexRawRequest?.headers,
+    responseHeaders: normalized.response?.headers,
+    requestBody: rawRequestBody,
+    responseBody: {
+      id: responseBody.id,
+      model: responseBody.model,
+      output,
+      usage: responseBody.usage?.codex || responseBody.usage,
+      error: responseBody.error,
+    },
+    responseEvents: normalized._codexRawResponseEvents,
+    upstreamBaseUrl: normalized.body?.metadata?.upstreamBaseUrl,
+  });
 }
 
 async function _readCodexLogEntries() {

@@ -31,14 +31,15 @@ async function appendCodexHttpFixture(overrides = {}) {
     requestBody: {
       model: 'gpt-5.4',
       instructions: 'Codex HTTP system prompt',
-      input: [{ role: 'user', content: [{ type: 'input_text', text: overrides.prompt || 'Codex HTTP prompt' }] }],
+      input: overrides.input || [{ role: 'user', content: [{ type: 'input_text', text: overrides.prompt || 'Codex HTTP prompt' }] }],
     },
     responseBody: {
       model: 'gpt-5.4',
-      output: [{ type: 'message', role: 'assistant', content: [{ type: 'output_text', text: overrides.answer || 'Codex HTTP answer' }] }],
+      output: overrides.output || [{ type: 'message', role: 'assistant', content: [{ type: 'output_text', text: overrides.answer || 'Codex HTTP answer' }] }],
       usage: { input_tokens: 20, output_tokens: 5, total_tokens: 25 },
     },
   });
+  if (overrides.mutateEntry) overrides.mutateEntry(entry);
   appendFileSync(interceptor.LOG_FILE, JSON.stringify(entry) + '\n---\n');
   return { entry, logFile: interceptor.LOG_FILE };
 }
@@ -243,6 +244,41 @@ describe('server API endpoints', { concurrency: false }, () => {
     assert.equal(data[0].body.metadata.transport, 'http-interceptor');
     assert.match(JSON.stringify(data[0].body.contextMessages), /Codex HTTP prompt/);
     assert.match(JSON.stringify(data[0].response.body.content), /Codex HTTP answer/);
+  });
+
+  it('GET /api/requests?provider=codex rebuilds persisted built-in tool calls from raw output', async () => {
+    await appendCodexHttpFixture({
+      input: [
+        { role: 'user', content: [{ type: 'input_text', text: 'Market prompt' }] },
+        { type: 'reasoning', encrypted_content: 'request-ciphertext' },
+        {
+          type: 'web_search_call',
+          status: 'completed',
+          action: { type: 'search', query: 'SPY 1 month performance' },
+        },
+      ],
+      output: [
+        {
+          type: 'web_search_call',
+          status: 'completed',
+          action: { type: 'open_page', url: 'https://example.com/markets' },
+        },
+        { type: 'message', role: 'assistant', content: [{ type: 'output_text', text: 'Market answer' }] },
+      ],
+      mutateEntry(entry) {
+        entry.response.body.content = [{ type: 'text', text: 'Market answer' }];
+        entry.body.contextMessages = [{ role: 'user', content: [{ type: 'text', text: 'Market prompt' }] }];
+      },
+    });
+    const res = await httpRequest(port, '/api/requests?provider=codex');
+    assert.equal(res.status, 200);
+    const data = res.json();
+    const entry = data.find(item => JSON.stringify(item).includes('Market answer'));
+    assert.ok(entry);
+    assert.match(JSON.stringify(entry.body.contextMessages), /web_search/);
+    assert.doesNotMatch(JSON.stringify(entry.body.contextMessages), /request-ciphertext/);
+    assert.match(JSON.stringify(entry.response.body.content), /web_open_page/);
+    assert.match(JSON.stringify(entry.response.body.content), /https:\/\/example.com\/markets/);
   });
 
   it('GET /events?provider=codex streams load and live captured entries', async () => {
