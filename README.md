@@ -151,7 +151,7 @@ If Codex is configured to use a Raven OpenAI-compatible provider, run it through
 ccv run -- codex
 ```
 
-After installing or updating the shell hook with `ccv -logger`, running `codex` directly also starts the Codex HTTP interceptor for agent commands and prints the matching Local/Network/Proxy/Upstream Glasshouse URLs. Codex management commands such as `login`, `logout`, `mcp`, `plugin`, `update`, and `--help` pass through unchanged.
+After installing or updating the shell hook with `ccv -logger`, running `codex` directly also starts the Codex HTTP interceptor for agent commands and prints the matching Local/Network/Proxy/Upstream Glasshouse URLs. Codex mode prints the viewer URLs but does not open a browser automatically; set `CCV_CODEX_OPEN_BROWSER=1` to opt into the old auto-open behavior. Codex management commands such as `login`, `logout`, `mcp`, `plugin`, `update`, and `--help` pass through unchanged.
 
 CC-Viewer starts a local Codex HTTP proxy, temporarily overrides the spawned Codex process with `-c model_providers.<provider>.base_url=http://127.0.0.1:<port>/v1`, and forwards traffic to the original Raven base URL, usually `http://localhost:7024/v1`. This mode does not edit `~/.codex/config.toml`.
 

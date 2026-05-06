@@ -363,7 +363,6 @@ async function runCodexProxyCommand(cmd, cmdArgs, noOpen = false) {
     env.CCV_CODEX_PROXY_MODE = '1';
 
     const viewerUrl = `${protocol}://127.0.0.1:${port}?provider=codex`;
-    if (!noOpen) openViewerUrl(viewerUrl);
     console.log('CC Viewer (Codex):');
     console.log(`  ➜ Local:   ${viewerUrl}`);
     const _lanIps = serverMod.getAllLocalIps();
@@ -373,6 +372,9 @@ async function runCodexProxyCommand(cmd, cmdArgs, noOpen = false) {
     }
     console.log(`  ➜ Proxy:   ${localBaseUrl}`);
     console.log(`  ➜ Upstream: ${codexConfig.baseUrl}`);
+
+    const shouldOpenViewer = !noOpen && process.env.CCV_CODEX_OPEN_BROWSER === '1';
+    if (shouldOpenViewer) openViewerUrl(viewerUrl);
 
     const child = spawn(cmd, finalArgs, { stdio: 'inherit', env, cwd: workingDir });
     const cleanup = async (code = 0) => {

@@ -31,7 +31,8 @@ and response bodies for visualization only.
 
 1. Support `ccv run -- codex ...` without mutating `~/.codex/config.toml`.
    After `ccv -logger`, the shell hook also wraps direct `codex` agent
-   invocations through the same path.
+   invocations through the same path. Codex mode prints the Glasshouse URLs but
+   does not open a browser unless `CCV_CODEX_OPEN_BROWSER=1` is set.
 2. Read the active Codex provider config, defaulting to the `raven` provider
    when present.
 3. Override only the spawned Codex process via

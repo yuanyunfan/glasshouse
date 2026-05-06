@@ -515,6 +515,13 @@ describe('ccv -logger: shell hook template invariants', () => {
       'Codex startup output should include provider-scoped network URLs with token');
   });
 
+  it('Codex HTTP mode does not open the browser unless explicitly enabled', () => {
+    assert.ok(source.includes("process.env.CCV_CODEX_OPEN_BROWSER === '1'"),
+      'Codex browser auto-open should require an explicit opt-in env var');
+    assert.ok(source.includes('const shouldOpenViewer = !noOpen && process.env.CCV_CODEX_OPEN_BROWSER ==='),
+      '--no-open should still override the Codex browser opt-in');
+  });
+
   it('logger mode selection no longer depends on realpath(node_modules) heuristic', () => {
     // The old `prefersNative` detection loop has been removed; mode is decided
     // purely by cli.js presence. Guard against regressions that reintroduce

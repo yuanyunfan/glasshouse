@@ -145,7 +145,7 @@ ccv -h
 ccv run -- codex
 ```
 
-安装或更新 shell hook 后（`ccv -logger`），直接运行 `codex` 也会对 agent 类命令启动 Codex HTTP interceptor，并打印对应的 Local/Network/Proxy/Upstream Glasshouse URL。`login`、`logout`、`mcp`、`plugin`、`update`、`--help` 等 Codex 管理命令会原样透传。
+安装或更新 shell hook 后（`ccv -logger`），直接运行 `codex` 也会对 agent 类命令启动 Codex HTTP interceptor，并打印对应的 Local/Network/Proxy/Upstream Glasshouse URL。Codex 模式默认只打印 viewer URL，不会自动打开浏览器；如果需要旧的自动打开行为，可以设置 `CCV_CODEX_OPEN_BROWSER=1`。`login`、`logout`、`mcp`、`plugin`、`update`、`--help` 等 Codex 管理命令会原样透传。
 
 CC-Viewer 会启动本地 Codex HTTP proxy，并只对当前 Codex 子进程追加 `-c model_providers.<provider>.base_url=http://127.0.0.1:<port>/v1` 覆盖，把请求继续转发到原始 Raven base URL，通常是 `http://localhost:7024/v1`。这个模式不会修改 `~/.codex/config.toml`。
 
