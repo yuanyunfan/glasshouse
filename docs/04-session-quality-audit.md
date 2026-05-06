@@ -2,7 +2,9 @@
 
 ## Status
 
-Design
+In progress - MVP implemented for deterministic rule checks, persisted audit
+storage, API creation/reuse, browser `AI Insight`, and a dynamic dashboard.
+Fresh Codex reviewer process execution remains a follow-up slice.
 
 ## Background
 
@@ -479,20 +481,62 @@ exact excerpt to decide a finding.
 
 ## Implementation Slices
 
-- C0: this design document.
+- C0: this design document. Done.
 - C1: evidence extraction helpers and unit tests for Claude and Codex normalized
-  entries.
+  entries. MVP done in `lib/session-audit.js`.
 - C2: deterministic rule engine with fixtures for hard gates and project
-  invariants.
+  invariants. MVP done for failed tool results, destructive commands,
+  secret-like content, unsupported completion claims, large outputs, and high
+  token pressure.
 - C3: audit job API and persistent store, including source revision hashing,
   dedupe, attempts, `POST /api/session-audits`,
-  `GET /api/session-audits/:auditId`, and audit progress events.
+  `GET /api/session-audits/:auditId`, and audit progress events. MVP done with
+  `<LOG_DIR>/audits` JSON storage and one-shot SSE status events.
 - C4: Codex reviewer runner with prompt fixtures, process isolation, redaction
-  checks, timeout handling, and result parsing.
+  checks, timeout handling, and result parsing. Not implemented yet; MVP records
+  reviewer status as `not_configured`.
 - C5: browser `AI Insight` button and dynamic session-quality-audit dashboard
   with persisted report loading, progress streaming, findings, scores, evidence
-  links, rerun, retry, and outdated-source handling.
+  links, rerun, retry, and outdated-source handling. MVP done for button,
+  dashboard route, persisted loading, findings, scores, diagnostics, and rerun;
+  explicit outdated-source banner remains follow-up.
 - C6: documentation for running audits and interpreting results.
+
+## MVP Runtime Notes
+
+The first implementation intentionally keeps the reviewer layer safe and
+deterministic until a process runner is configured. Clicking `AI Insight` now:
+
+1. Posts the selected trusted source to `POST /api/session-audits`.
+2. Builds a compact redacted evidence bundle from server-resolved entries.
+3. Runs deterministic rules synchronously.
+4. Persists `metadata.json`, `evidence-bundle.json`, `rule-findings.json`,
+   `reviewer-output.json`, and `report.json` under `<LOG_DIR>/audits`.
+5. Opens `/session-quality-audit/:auditId`.
+
+Repeated clicks with the same `sourceRevision` and `auditConfigHash` reuse the
+existing audit. `Rerun Insight` sets `force: true` and creates a retained new
+attempt. If the source log grows, `sourceRevision` changes and a new audit is
+created rather than silently reusing the previous report.
+
+The browser does not send arbitrary filesystem paths. Local historical audits
+only accept `source.type = "local-log"` and a log-list relative file that the
+server validates with the existing trusted `LOG_DIR` path checks. Browser-loaded
+ad hoc files are not auditable in the MVP because they are not backed by a
+server-trusted session key.
+
+The LLM reviewer section is persisted as:
+
+```json
+{
+  "status": "not_configured",
+  "reviewer": "fresh-codex-process"
+}
+```
+
+This makes the dashboard honest about which layer produced each result while
+leaving C4 free to add a fresh Codex process runner behind the same report
+schema.
 
 ## Verification Plan
 

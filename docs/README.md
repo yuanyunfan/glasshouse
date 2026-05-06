@@ -15,7 +15,7 @@ substantial changes.
   compatibility interfaces stable. Status: done.
 - [04 - Session Quality Audit](./04-session-quality-audit.md) - Define the
   browser `AI Insight` flow that runs deterministic checks plus a fresh Codex
-  LLM review, then opens a quality dashboard. Status: design.
+  LLM review, then opens a quality dashboard. Status: in-progress.
 - [05 - Agent Compare Benchmark](./05-agent-compare-benchmark.md) - Define an
   experimental Codex vs Claude Code calibration mode with isolated workspaces,
   shared verification, per-run audits, and a personal agent-fit profile. Status:

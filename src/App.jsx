@@ -28,6 +28,7 @@ class App extends AppBase {
       terminalVisible: true,
       currentTab: 'context',
       pendingCacheHighlight: null,
+      aiInsightLoading: false,
     });
     this.appHeaderRef = React.createRef();
     this._getTokenStatsContent = () => this.appHeaderRef.current?.renderTokenStats?.() ?? null;
@@ -150,6 +151,34 @@ class App extends AppBase {
   };
 
   handleCacheHighlightDone = () => { this.setState({ pendingCacheHighlight: null }); };
+
+  handleRunAiInsight = async () => {
+    if (this.state.aiInsightLoading) return;
+    if (this._isLocalLog && (!this._localLogFile || !this._localLogFile.includes('/'))) {
+      message.warning(t('ui.aiInsightNeedsPersistedLog'));
+      return;
+    }
+    const body = { provider: this.state.provider };
+    if (this._isLocalLog) {
+      body.source = { type: 'local-log', file: this._localLogFile };
+    }
+    this.setState({ aiInsightLoading: true });
+    try {
+      const res = await fetch(apiUrl('/api/session-audits'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || t('ui.aiInsightFailed'));
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+      window.location.href = `/session-quality-audit/${encodeURIComponent(data.auditId)}${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+    } catch (err) {
+      message.error(err.message || t('ui.aiInsightFailed'));
+      this.setState({ aiInsightLoading: false });
+    }
+  };
 
   handleNavigateCacheMsg = (msgIdx) => {
     const filteredRequests = this.state.showAll ? this.state.requests : filterRelevantRequests(this.state.requests);
@@ -389,6 +418,9 @@ class App extends AppBase {
               activeProxyId={this.state.activeProxyId}
               defaultConfig={this.state.defaultConfig}
               onProxyProfileChange={this.handleProxyProfileChange}
+              onRunAiInsight={this.handleRunAiInsight}
+              aiInsightLoading={this.state.aiInsightLoading}
+              aiInsightDisabled={filteredRequests.length === 0}
             />
           </Layout.Header>
           {!isCodexProvider && this.state.claudeMissing && (

@@ -19,7 +19,11 @@ const onLoadError = (err) => {
 
 // SettingsProvider 必须在 App/Mobile 之外:AppBase 通过 contextType 消费,要求它本身在 Provider 子树里。
 // constructor 内 fire fetch 让 AppBase.componentDidMount 时 _prefsReady Promise 已可用。
-if (isMobile) {
+if (window.location.pathname.startsWith('/session-quality-audit/')) {
+  import('./components/SessionAuditDashboard').then(({ default: SessionAuditDashboard }) => {
+    root.render(<SessionAuditDashboard />);
+  }).catch(onLoadError);
+} else if (isMobile) {
   import('./Mobile').then(({ default: Mobile }) => {
     root.render(<SettingsProvider><Mobile /></SettingsProvider>);
   }).catch(onLoadError);

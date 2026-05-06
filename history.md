@@ -11,6 +11,7 @@
 - fix(codex): render Responses API built-in tool calls such as `web_search_call` / `open_page` in the Context tab instead of dropping them
 - fix(codex): surface persisted Codex base/developer prompts, context-only user messages, and tool_search tool definitions in the Context tab
 - fix(codex): keep encrypted-only reasoning in raw events instead of rendering `[Encrypted reasoning content]` as a thinking block
+- feat(audit): add browser `AI Insight` session-quality audit MVP with persisted JSON audit store, deterministic rule findings, idempotent rerun behavior, and a dynamic `/session-quality-audit/:auditId` dashboard
 - perf(chatview): viewReqProps 9 处 spread → 显式 prop（消除 messages.map 内对象创建热点）
 - refactor(contexts): SettingsProvider class → 函数组件 + useMemo value（消除 contextType 订阅链路虚假重渲）
 - refactor(appheader): 抽离 LiveTagPopover + inline style 提常量 + CSS 变量化（hover 血条 popover 性能修复）

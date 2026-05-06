@@ -218,6 +218,8 @@ class AppHeader extends React.Component {
       nextProps.approvalGlobal !== this.props.approvalGlobal ||
       nextProps.approvalDismissedIds !== this.props.approvalDismissedIds ||
       nextProps.approvalOwnPending !== this.props.approvalOwnPending ||
+      nextProps.aiInsightLoading !== this.props.aiInsightLoading ||
+      nextProps.aiInsightDisabled !== this.props.aiInsightDisabled ||
       nextState !== this.state
     );
   }
@@ -1168,7 +1170,7 @@ class AppHeader extends React.Component {
   }
 
   render() {
-    const { requestCount, requests = [], viewMode, cacheType, provider = 'claude', onProviderChange, onToggleViewMode, onImportLocalLogs, onLangChange, isLocalLog, localLogFile, projectName, collapseToolResults, onCollapseToolResultsChange, expandThinking, onExpandThinkingChange, showFullToolContent, onShowFullToolContentChange, expandDiff, onExpandDiffChange, filterIrrelevant, onFilterIrrelevantChange, logDir, onLogDirChange, updateInfo, onDismissUpdate, cliMode, terminalVisible, onToggleTerminal, onReturnToWorkspaces, contextWindow, contextBarOptimistic, serverCachedContent, resumeAutoChoice, onResumeAutoChoiceToggle, onResumeAutoChoiceChange, themeColor, onThemeColorChange, autoApproveSeconds, onAutoApproveChange } = this.props;
+    const { requestCount, requests = [], viewMode, cacheType, provider = 'claude', onProviderChange, onToggleViewMode, onImportLocalLogs, onLangChange, isLocalLog, localLogFile, projectName, collapseToolResults, onCollapseToolResultsChange, expandThinking, onExpandThinkingChange, showFullToolContent, onShowFullToolContentChange, expandDiff, onExpandDiffChange, filterIrrelevant, onFilterIrrelevantChange, logDir, onLogDirChange, updateInfo, onDismissUpdate, cliMode, terminalVisible, onToggleTerminal, onReturnToWorkspaces, contextWindow, contextBarOptimistic, serverCachedContent, resumeAutoChoice, onResumeAutoChoiceToggle, onResumeAutoChoiceChange, themeColor, onThemeColorChange, autoApproveSeconds, onAutoApproveChange, onRunAiInsight, aiInsightLoading, aiInsightDisabled } = this.props;
     const { countdownText } = this.state;
 
     const menuItems = [
@@ -1496,6 +1498,17 @@ class AppHeader extends React.Component {
               onClick={onToggleTerminal}
             >
               {t('ui.terminal')}
+            </Button>
+          )}
+          {onRunAiInsight && (
+            <Button
+              className={styles.compactBtn}
+              icon={<DashboardOutlined />}
+              loading={aiInsightLoading}
+              disabled={aiInsightDisabled}
+              onClick={onRunAiInsight}
+            >
+              {t('ui.aiInsight')}
             </Button>
           )}
           <Button

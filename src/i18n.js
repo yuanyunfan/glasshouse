@@ -8136,6 +8136,206 @@ const i18nData = {
     "zh": "类型",
     "en": "Kind",
     "zh-TW": "類型"
+  },
+  "ui.aiInsight": {
+    "zh": "AI Insight",
+    "en": "AI Insight",
+    "zh-TW": "AI Insight"
+  },
+  "ui.aiInsightFailed": {
+    "zh": "AI Insight 生成失败",
+    "en": "Failed to generate AI Insight",
+    "zh-TW": "AI Insight 產生失敗"
+  },
+  "ui.aiInsightNeedsPersistedLog": {
+    "zh": "AI Insight 需要当前 live session，或从 Glasshouse 日志列表打开的持久化日志。",
+    "en": "AI Insight requires the current live session or a persisted log opened from the Glasshouse log list.",
+    "zh-TW": "AI Insight 需要目前 live session，或從 Glasshouse 日誌列表開啟的持久化日誌。"
+  },
+  "ui.audit.title": {
+    "zh": "Session Quality Audit",
+    "en": "Session Quality Audit",
+    "zh-TW": "Session Quality Audit"
+  },
+  "ui.audit.loadingTitle": {
+    "zh": "正在加载审计报告",
+    "en": "Loading audit report",
+    "zh-TW": "正在載入審計報告"
+  },
+  "ui.audit.createdAt": {
+    "zh": "创建于",
+    "en": "Created",
+    "zh-TW": "建立於"
+  },
+  "ui.audit.backToViewer": {
+    "zh": "返回 Viewer",
+    "en": "Back to Viewer",
+    "zh-TW": "返回 Viewer"
+  },
+  "ui.audit.rerun": {
+    "zh": "Rerun Insight",
+    "en": "Rerun Insight",
+    "zh-TW": "Rerun Insight"
+  },
+  "ui.audit.loading": {
+    "zh": "正在读取审计结果...",
+    "en": "Loading audit result...",
+    "zh-TW": "正在讀取審計結果..."
+  },
+  "ui.audit.errorMissingId": {
+    "zh": "缺少 audit id",
+    "en": "Missing audit id",
+    "zh-TW": "缺少 audit id"
+  },
+  "ui.audit.errorLoad": {
+    "zh": "审计报告加载失败",
+    "en": "Failed to load audit report",
+    "zh-TW": "審計報告載入失敗"
+  },
+  "ui.audit.errorRerun": {
+    "zh": "重新生成 AI Insight 失败",
+    "en": "Failed to rerun AI Insight",
+    "zh-TW": "重新產生 AI Insight 失敗"
+  },
+  "ui.audit.status.pass": {
+    "zh": "Pass",
+    "en": "Pass",
+    "zh-TW": "Pass"
+  },
+  "ui.audit.status.needsAttention": {
+    "zh": "Needs Attention",
+    "en": "Needs Attention",
+    "zh-TW": "Needs Attention"
+  },
+  "ui.audit.status.fail": {
+    "zh": "Fail",
+    "en": "Fail",
+    "zh-TW": "Fail"
+  },
+  "ui.audit.summaryUnavailable": {
+    "zh": "暂无摘要",
+    "en": "Summary unavailable",
+    "zh-TW": "暫無摘要"
+  },
+  "ui.audit.summaryText": {
+    "zh": "报告把确定性规则发现和 LLM 评审分开展示；MVP 中 LLM 评审未配置时不会启动外部 reviewer。",
+    "en": "The report separates deterministic rule findings from LLM review; the MVP does not start an external reviewer when it is not configured.",
+    "zh-TW": "報告會分開展示確定性規則發現與 LLM 評審；MVP 中 LLM 評審未配置時不會啟動外部 reviewer。"
+  },
+  "ui.audit.metricRequests": {
+    "zh": "Requests",
+    "en": "Requests",
+    "zh-TW": "Requests"
+  },
+  "ui.audit.metricToolCalls": {
+    "zh": "Tool calls",
+    "en": "Tool calls",
+    "zh-TW": "Tool calls"
+  },
+  "ui.audit.metricFailedTools": {
+    "zh": "Failed tools",
+    "en": "Failed tools",
+    "zh-TW": "Failed tools"
+  },
+  "ui.audit.metricTokens": {
+    "zh": "Tokens",
+    "en": "Tokens",
+    "zh-TW": "Tokens"
+  },
+  "ui.audit.ruleFindings": {
+    "zh": "确定性规则发现",
+    "en": "Deterministic Rule Findings",
+    "zh-TW": "確定性規則發現"
+  },
+  "ui.audit.ruleFindingsDesc": {
+    "zh": "可复现、可测试的规则检查结果，保留证据引用。",
+    "en": "Reproducible rule checks with evidence references.",
+    "zh-TW": "可重現、可測試的規則檢查結果，保留證據引用。"
+  },
+  "ui.audit.categoryScores": {
+    "zh": "Category Scores",
+    "en": "Category Scores",
+    "zh-TW": "Category Scores"
+  },
+  "ui.audit.categoryScoresDesc": {
+    "zh": "规则可判断的维度直接打分；语义维度等待 LLM reviewer。",
+    "en": "Rule-backed dimensions are scored directly; semantic dimensions wait for an LLM reviewer.",
+    "zh-TW": "規則可判斷的維度直接打分；語義維度等待 LLM reviewer。"
+  },
+  "ui.audit.llmReview": {
+    "zh": "LLM 评审结果",
+    "en": "LLM Review",
+    "zh-TW": "LLM 評審結果"
+  },
+  "ui.audit.llmReviewDesc": {
+    "zh": "用于任务对齐、技术判断和沟通质量等语义评审。",
+    "en": "Semantic review for task alignment, technical judgment, and communication quality.",
+    "zh-TW": "用於任務對齊、技術判斷和溝通品質等語義評審。"
+  },
+  "ui.audit.llmNotConfigured": {
+    "zh": "当前未配置 fresh Codex reviewer runner。",
+    "en": "Fresh Codex reviewer runner is not configured.",
+    "zh-TW": "目前未配置 fresh Codex reviewer runner。"
+  },
+  "ui.audit.diagnostics": {
+    "zh": "诊断信息",
+    "en": "Diagnostics",
+    "zh-TW": "診斷資訊"
+  },
+  "ui.audit.hardGate": {
+    "zh": "Hard gate",
+    "en": "Hard gate",
+    "zh-TW": "Hard gate"
+  },
+  "ui.audit.noFindings": {
+    "zh": "没有发现需要展示的规则问题。",
+    "en": "No rule findings to display.",
+    "zh-TW": "沒有需要展示的規則問題。"
+  },
+  "ui.audit.scoreReviewerRequired": {
+    "zh": "需要 LLM reviewer",
+    "en": "Reviewer required",
+    "zh-TW": "需要 LLM reviewer"
+  },
+  "ui.audit.score.taskAlignment": {
+    "zh": "Task alignment",
+    "en": "Task alignment",
+    "zh-TW": "Task alignment"
+  },
+  "ui.audit.score.toolUse": {
+    "zh": "Tool use",
+    "en": "Tool use",
+    "zh-TW": "Tool use"
+  },
+  "ui.audit.score.technicalCorrectness": {
+    "zh": "Technical correctness",
+    "en": "Technical correctness",
+    "zh-TW": "Technical correctness"
+  },
+  "ui.audit.score.verificationQuality": {
+    "zh": "Verification quality",
+    "en": "Verification quality",
+    "zh-TW": "Verification quality"
+  },
+  "ui.audit.score.safetyAndPermissions": {
+    "zh": "Safety and permissions",
+    "en": "Safety and permissions",
+    "zh-TW": "Safety and permissions"
+  },
+  "ui.audit.score.communicationQuality": {
+    "zh": "Communication quality",
+    "en": "Communication quality",
+    "zh-TW": "Communication quality"
+  },
+  "ui.audit.score.contextEfficiency": {
+    "zh": "Context efficiency",
+    "en": "Context efficiency",
+    "zh-TW": "Context efficiency"
+  },
+  "ui.audit.score.projectRuleCompliance": {
+    "zh": "Project-rule compliance",
+    "en": "Project-rule compliance",
+    "zh-TW": "Project-rule compliance"
   }
 };
 

@@ -46,12 +46,13 @@ import { getGitDiffs, countUntrackedLines } from './lib/git-diff.js';
 import { CONTEXT_WINDOW_FILE, readModelContextSize, buildContextWindowEvent, getContextSizeForModel } from './lib/context-watcher.js';
 import { watchLogFile, startWatching, getWatchedFiles, sendEventToClients, sendToClients } from './lib/log-watcher.js';
 import { isMainAgentEntry, extractCachedContent } from './lib/kv-cache-analyzer.js';
-import { listLocalLogs, deleteLogFiles, mergeLogFiles } from './lib/log-management.js';
+import { listLocalLogs, deleteLogFiles, mergeLogFiles, readLocalLog, validateLogPath } from './lib/log-management.js';
 import { countLogEntries, streamRawEntriesAsync, readPagedEntries } from './lib/log-stream.js';
 import { awaitDrainOrClose } from './lib/sse-backpressure.js';
 import { enrichRawIfNeeded } from './lib/enrich-plan-input.js';
 import { buildTeamStatusResponse } from './lib/team-runtime.js';
 import { buildCodexContextWindow, buildCodexHttpEntry } from './lib/codex-http-adapter.js';
+import { createAuditFromEntries, getAudit } from './lib/session-audit.js';
 
 
 // 动态获取 getPrefsFile()（LOG_DIR 可能在运行时被 setLogDir 修改）
@@ -270,6 +271,43 @@ function _sendJson(res, status, data) {
   res.end(JSON.stringify(data));
 }
 
+function _readJsonBody(req, limit = MAX_POST_BODY) {
+  return new Promise((resolve, reject) => {
+    let body = '';
+    let done = false;
+    const fail = (err) => {
+      if (done) return;
+      done = true;
+      reject(err);
+    };
+    req.on('data', chunk => {
+      body += chunk;
+      if (body.length > limit) {
+        const err = new Error('Request body too large');
+        err.code = 'BODY_TOO_LARGE';
+        fail(err);
+        req.destroy();
+      }
+    });
+    req.on('end', () => {
+      if (done) return;
+      done = true;
+      if (!body.trim()) {
+        resolve({});
+        return;
+      }
+      try {
+        resolve(JSON.parse(body));
+      } catch {
+        const err = new Error('Invalid JSON');
+        err.code = 'INVALID_JSON';
+        reject(err);
+      }
+    });
+    req.on('error', fail);
+  });
+}
+
 function _latestCodexContextWindow(entries) {
   if (!Array.isArray(entries)) return null;
   for (let i = entries.length - 1; i >= 0; i--) {
@@ -323,6 +361,15 @@ async function _readCodexLogEntries() {
   await streamRawEntriesAsync(LOG_FILE, (raw) => {
     const entry = _parseLogEntry(enrichRawIfNeeded(raw));
     if (_isCodexEntry(entry)) entries.push(_normalizeCodexEntry(entry));
+  });
+  return entries;
+}
+
+async function _readClaudeLogEntries() {
+  const entries = [];
+  await streamRawEntriesAsync(LOG_FILE, (raw) => {
+    const entry = _parseLogEntry(enrichRawIfNeeded(raw));
+    if (entry) entries.push(entry);
   });
   return entries;
 }
@@ -1293,6 +1340,101 @@ async function handleRequest(req, res) {
     });
     res.write(']');
     res.end();
+    return;
+  }
+
+  if (url === '/api/session-audits' && method === 'POST') {
+    try {
+      const body = await _readJsonBody(req);
+      const requestedProvider = body.provider === 'codex' || body.provider === 'codex-http' ? 'codex' : 'claude';
+      const force = body.force === true;
+      let entries = [];
+      let sourceProvider = requestedProvider;
+      let sourceSessionKey = '';
+      let sourceLabel = '';
+      let sourceMeta = {};
+
+      if (body.source?.type === 'local-log') {
+        const file = body.source.file;
+        if (!file || typeof file !== 'string' || file.includes('..') || !file.endsWith('.jsonl')) {
+          _sendJson(res, 400, { error: 'Invalid local log file' });
+          return;
+        }
+        const realPath = validateLogPath(LOG_DIR, file);
+        entries = readLocalLog(LOG_DIR, file);
+        const hasCodexEntry = entries.some(entry => entry?.provider === 'codex' || entry?.body?.metadata?.provider === 'codex');
+        sourceProvider = hasCodexEntry ? 'codex' : requestedProvider;
+        sourceSessionKey = `local-log:${file}`;
+        sourceLabel = file;
+        sourceMeta = { type: 'local-log', filePath: realPath };
+      } else if (body.source?.type) {
+        _sendJson(res, 400, { error: 'Unsupported audit source type' });
+        return;
+      } else if (requestedProvider === 'codex') {
+        entries = await _readCodexLogEntries();
+        sourceSessionKey = `live:codex:${_projectName || 'current'}`;
+        sourceLabel = _projectName ? `Codex · ${_projectName}` : 'Codex live session';
+        sourceMeta = { type: 'live-session', filePath: LOG_FILE || null };
+      } else {
+        entries = await _readClaudeLogEntries();
+        sourceSessionKey = `live:claude:${_projectName || 'current'}`;
+        sourceLabel = _projectName ? `Claude · ${_projectName}` : 'Claude live session';
+        sourceMeta = { type: 'live-session', filePath: LOG_FILE || null };
+      }
+
+      const result = createAuditFromEntries({
+        logDir: LOG_DIR,
+        sourceProvider,
+        sourceSessionKey,
+        sourceLabel,
+        entries,
+        force,
+        sourceMeta,
+      });
+      _sendJson(res, 200, {
+        auditId: result.auditId,
+        reused: result.reused,
+        status: result.audit?.metadata?.status || 'complete',
+        dashboardUrl: `/session-quality-audit/${result.auditId}`,
+      });
+    } catch (err) {
+      const status = err.code === 'INVALID_JSON' ? 400
+        : err.code === 'BODY_TOO_LARGE' ? 413
+          : err.code === 'NOT_FOUND' ? 404
+            : err.code === 'ACCESS_DENIED' ? 403
+              : 500;
+      _sendJson(res, status, { error: err.message || 'Failed to create session audit' });
+    }
+    return;
+  }
+
+  const auditRoute = url.match(/^\/api\/session-audits\/([^/]+)(?:\/(events))?$/);
+  if (auditRoute && method === 'GET') {
+    const auditId = decodeURIComponent(auditRoute[1]);
+    const isEvents = auditRoute[2] === 'events';
+    try {
+      const audit = getAudit(LOG_DIR, auditId);
+      if (isEvents) {
+        res.writeHead(200, {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+        });
+        res.write(`event: status\ndata: ${JSON.stringify({ auditId, status: audit.metadata?.status || 'unknown', audit })}\n\n`);
+        res.end();
+      } else {
+        _sendJson(res, 200, { auditId, ...audit });
+      }
+    } catch (err) {
+      const status = err.code === 'NOT_FOUND' ? 404 : err.code === 'INVALID_AUDIT_ID' ? 400 : 500;
+      if (isEvents) {
+        res.writeHead(status, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' });
+        res.write(`event: error\ndata: ${JSON.stringify({ error: err.message })}\n\n`);
+        res.end();
+      } else {
+        _sendJson(res, status, { error: err.message || 'Failed to read session audit' });
+      }
+    }
     return;
   }
 
