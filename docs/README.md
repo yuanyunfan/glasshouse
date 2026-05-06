@@ -13,9 +13,9 @@ substantial changes.
 - [03 - Glasshouse Rename](./03-glasshouse-rename.md) - Rename public branding
   and publishing metadata from CC Viewer / cc-viewer to Glasshouse while keeping
   compatibility interfaces stable. Status: done.
-- [04 - Session Quality Audit](./04-session-quality-audit.md) - Define a
-  two-layer session quality model with deterministic rule checks and LLM review.
-  Status: design.
+- [04 - Session Quality Audit](./04-session-quality-audit.md) - Define the
+  browser `AI Insight` flow that runs deterministic checks plus a fresh Codex
+  LLM review, then opens a quality dashboard. Status: design.
 
 ## Status Values
 

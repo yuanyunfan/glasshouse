@@ -30,6 +30,10 @@ evidence.
    Codex, uploaded, or imported logs.
 6. Support Claude and Codex sessions through provider-normalized evidence, while
    preserving provider-specific raw details for drill-down.
+7. Expose the feature from the browser as an `AI Insight` button on the current
+   session.
+8. Start a fresh Codex reviewer process for the LLM-review layer, then navigate
+   the browser to a session-quality-audit dashboard for progress and results.
 
 ## Non-goals
 
@@ -86,6 +90,84 @@ must cite evidence IDs instead of making unsupported claims.
 The final report should keep these layers separate. A hard rule failure should
 not be hidden by a positive LLM summary, and a subjective LLM concern should not
 be presented as a deterministic fact.
+
+## User Flow
+
+The primary product flow starts in the existing browser viewer:
+
+```text
+User opens a Claude/Codex session in Glasshouse
+-> clicks AI Insight
+-> browser POSTs an audit request for the selected session
+-> server creates an audit job and extracts a compact evidence bundle
+-> rule engine runs deterministic checks
+-> server starts a fresh Codex reviewer process with the bundle and review prompt
+-> browser navigates to the session-quality-audit dashboard
+-> dashboard streams job progress, rule findings, reviewer output, and final report
+```
+
+`AI Insight` should be a review action, not a chat message injected into the
+audited session. The audited session remains read-only and unchanged.
+
+The dashboard should support these states:
+
+- `queued`: the audit job exists, but extraction or review has not started.
+- `extracting`: Glasshouse is building the evidence bundle.
+- `rule-checking`: deterministic checks are running.
+- `reviewing`: a fresh Codex reviewer process is analyzing the bundle.
+- `complete`: the merged report is available.
+- `failed`: extraction, rule checks, process launch, or reviewer parsing failed.
+
+If a session has already been audited with the same source-log revision and
+audit configuration, the browser may navigate to the existing dashboard instead
+of starting a duplicate job. The UI should still provide an explicit rerun
+action when the user wants a fresh Codex review.
+
+## Runtime Architecture
+
+The audit runtime should be job-based:
+
+```text
+React AI Insight button
+-> POST /api/session-audits
+-> audit job store
+-> evidence extractor
+-> rule engine
+-> Codex reviewer runner
+-> GET /api/session-audits/:auditId
+-> SSE /api/session-audits/:auditId/events
+-> React session-quality-audit dashboard
+```
+
+The `POST /api/session-audits` request should identify the selected provider and
+trusted session key, not a browser-supplied filesystem path. The server resolves
+the source entries from the same trusted roots and loaded session abstractions
+used by the viewer.
+
+The Codex reviewer runner should launch a new Codex process with an explicit
+review prompt and a local evidence-bundle path or stdin payload. The process
+should be isolated from the active audited session:
+
+- The reviewer must not append messages to the audited Claude/Codex log.
+- Reviewer traffic should not be merged into the audited session timeline.
+- If Glasshouse captures reviewer traffic for debugging, those entries must be
+  tagged with audit metadata such as `auditId` and `role: "reviewer"` and must be
+  excluded from the source evidence bundle by default.
+- The reviewer must receive redacted, compact evidence by default. Raw payloads
+  are included only when needed for a specific finding.
+- The spawned process should inherit only the environment required to run Codex.
+  Secrets and auth headers from captured sessions must not be passed through the
+  evidence bundle.
+
+The dashboard should be the canonical result surface. It should show:
+
+- Overall status and hard-gate failures.
+- Category scores and reviewer summary.
+- Rule findings and LLM findings as separate sections.
+- Job progress, start time, end time, source provider, and source session label.
+- Evidence links back to request indexes, messages, tool calls, tool results, and
+  token/context-window summaries.
+- Reviewer raw output and parse errors behind an expandable diagnostic section.
 
 ## Layer 1: Rule Checks
 
@@ -268,11 +350,12 @@ exact excerpt to decide a finding.
   entries.
 - C2: deterministic rule engine with fixtures for hard gates and project
   invariants.
-- C3: local API endpoint that returns an audit bundle and rule findings for a
-  selected session.
-- C4: optional LLM reviewer command/API integration with prompt fixtures and
-  redaction checks.
-- C5: UI surface for report status, findings, scores, and evidence links.
+- C3: audit job API and store, including `POST /api/session-audits`,
+  `GET /api/session-audits/:auditId`, and audit progress events.
+- C4: Codex reviewer runner with prompt fixtures, process isolation, redaction
+  checks, timeout handling, and result parsing.
+- C5: browser `AI Insight` button and session-quality-audit dashboard with
+  progress, findings, scores, and evidence links.
 - C6: documentation for running audits and interpreting results.
 
 ## Verification Plan
@@ -294,5 +377,9 @@ LLM-review verification:
 End-to-end verification:
 
 - API test for generating an audit bundle from loaded entries.
+- API test for creating an audit job from a selected trusted session key.
+- Runner test with a fake Codex command that emits a valid reviewer report.
+- Browser check that clicking `AI Insight` starts or reuses an audit job and
+  navigates to the session-quality-audit dashboard.
 - Browser check for evidence links when the UI is implemented.
 - `npm test` and `npm run build` before shipping runtime changes.
