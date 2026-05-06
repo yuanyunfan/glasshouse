@@ -3,6 +3,11 @@
 ## 1.6.236 (2026-05-05)
 
 - feat(codex): add read-only Codex session JSONL viewer with trusted session APIs, SSE live tail, provider/session UI switch, and raw/chat rendering
+- feat(codex-http): add `ccv run -- codex` Raven-facing Responses API interceptor with `provider=codex` viewer mode
+- feat(codex-http): extend the shell hook so direct `codex` agent launches print Glasshouse URLs and route through the Codex HTTP interceptor
+- refactor(codex): remove the old `~/.codex/sessions/**/*.jsonl` session reader and make HTTP interception the default Codex provider path
+- fix(codex): surface persisted Codex base/developer prompts, context-only user messages, and tool_search tool definitions in the Context tab
+- fix(codex): keep encrypted-only reasoning in raw events instead of rendering `[Encrypted reasoning content]` as a thinking block
 - perf(chatview): viewReqProps 9 处 spread → 显式 prop（消除 messages.map 内对象创建热点）
 - refactor(contexts): SettingsProvider class → 函数组件 + useMemo value（消除 contextType 订阅链路虚假重渲）
 - refactor(appheader): 抽离 LiveTagPopover + inline style 提常量 + CSS 变量化（hover 血条 popover 性能修复）

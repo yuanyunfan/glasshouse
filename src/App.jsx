@@ -343,12 +343,6 @@ class App extends AppBase {
               cacheType={this.state.cacheType}
               provider={this.state.provider}
               onProviderChange={this.handleProviderChange}
-              codexSessions={this.state.codexSessions}
-              codexSessionsLoading={this.state.codexSessionsLoading}
-              codexSessionsError={this.state.codexSessionsError}
-              selectedCodexSessionId={this.state.selectedCodexSessionId}
-              onCodexSessionChange={this.handleCodexSessionChange}
-              onCodexSessionsRefresh={this.handleCodexSessionsRefresh}
               onToggleViewMode={this.handleToggleViewMode}
               onLangChange={this.handleLangChange}
               onImportLocalLogs={this.handleImportLocalLogs}
@@ -412,14 +406,12 @@ class App extends AppBase {
                 isCodexProvider ? (
                 <div className={styles.guideContainer}>
                   <div className={styles.guideContent}>
-                    <h2 className={styles.guideTitle}>{t('ui.codexMode')}</h2>
+                    <h2 className={styles.guideTitle}>{t('ui.providerCodex')}</h2>
                     <div className={styles.guideStep}>
                       <div className={styles.guideStepNum}>1</div>
                       <div className={styles.guideStepBody}>
                         <p className={styles.guideText}>
-                          {this.state.codexSessionsLoading
-                            ? t('ui.codexSessionLoading')
-                            : (this.state.codexSessionsError || t('ui.codexNoSessionSelected'))}
+                          {t('ui.codexHttpWaiting')}
                         </p>
                       </div>
                     </div>

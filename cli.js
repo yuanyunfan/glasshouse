@@ -78,6 +78,30 @@ function buildShellHook(isNative) {
     '--help', '-h',
   ];
 
+  const codexPassthroughCommands = [
+    // Codex management/local commands that should not start the HTTP interceptor.
+    'login',
+    'logout',
+    'mcp',
+    'plugin',
+    'mcp-server',
+    'app-server',
+    'app',
+    'completion',
+    'update',
+    'sandbox',
+    'debug',
+    'apply',
+    'features',
+    'help',
+    'exec-server',
+  ];
+
+  const codexPassthroughFlags = [
+    '--version', '-V', '-v',
+    '--help', '-h',
+  ];
+
   if (isNative) {
     return `${SHELL_HOOK_START}
 claude() {
@@ -99,6 +123,27 @@ claude() {
       ;;
   esac
   ccv run -- claude --ccv-internal "$@"
+}
+
+codex() {
+  # Avoid recursion if ccv invokes codex
+  if [ "$1" = "--ccv-internal" ]; then
+    shift
+    command codex "$@"
+    return
+  fi
+  # Pass through local/management commands directly without HTTP interception
+  case "$1" in
+    ${codexPassthroughCommands.join('|')})
+      command codex "$@"
+      return
+      ;;
+    ${codexPassthroughFlags.join('|')})
+      command codex "$@"
+      return
+      ;;
+  esac
+  ccv run -- codex --ccv-internal "$@"
 }
 ${SHELL_HOOK_END}`;
   }
@@ -141,6 +186,27 @@ claude() {
     ccv -logger 2>/dev/null
   fi
   command claude "$@"
+}
+
+codex() {
+  # Avoid recursion if ccv invokes codex
+  if [ "$1" = "--ccv-internal" ]; then
+    shift
+    command codex "$@"
+    return
+  fi
+  # Pass through local/management commands directly without HTTP interception
+  case "$1" in
+    ${codexPassthroughCommands.join('|')})
+      command codex "$@"
+      return
+      ;;
+    ${codexPassthroughFlags.join('|')})
+      command codex "$@"
+      return
+      ;;
+  esac
+  ccv run -- codex --ccv-internal "$@"
 }
 ${SHELL_HOOK_END}`;
 }
@@ -221,8 +287,123 @@ function removeCliJsInjection() {
   }
 }
 
-async function runProxyCommand(args) {
+function parseRunArgs(args) {
+  let cmdStartIndex = 1;
+  if (args[1] === '--') {
+    cmdStartIndex = 2;
+  }
+  const cmd = args[cmdStartIndex];
+  const cmdArgs = args.slice(cmdStartIndex + 1);
+  if (cmdArgs[0] === '--ccv-internal') {
+    cmdArgs.shift();
+  }
+  return { cmd, cmdArgs };
+}
+
+function isCodexCommand(cmd) {
+  return cmd === 'codex' || /[\\/]codex(\.exe)?$/.test(cmd || '');
+}
+
+async function waitForViewerPort(serverMod) {
+  return new Promise(resolve => {
+    const check = () => {
+      const port = serverMod.getPort();
+      if (port) resolve(port);
+      else setTimeout(check, 100);
+    };
+    setTimeout(check, 200);
+  });
+}
+
+function openViewerUrl(url) {
   try {
+    const cmd = process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'start' : 'xdg-open';
+    import('node:child_process').then(({ execSync }) => {
+      try { execSync(`${cmd} ${url}`, { stdio: 'ignore', timeout: 5000 }); } catch {}
+    }).catch(() => {});
+  } catch {}
+}
+
+async function runCodexProxyCommand(cmd, cmdArgs, noOpen = false) {
+  let codexProxy = null;
+  let serverMod = null;
+  try {
+    const workingDir = process.cwd();
+    process.env.CCV_CLI_MODE = '1';
+    process.env.CCV_PROJECT_DIR = workingDir;
+    process.env.CCV_PROXY_MODE = '1';
+    process.env.CCV_CODEX_PROXY_MODE = '1';
+
+    const { readCodexProviderConfig } = await import('./lib/codex-config.js');
+    const codexConfig = readCodexProviderConfig();
+    if (!codexConfig.baseUrl) {
+      throw new Error(`Codex provider "${codexConfig.provider}" does not define model_providers.${codexConfig.provider}.base_url`);
+    }
+    if (codexConfig.wireApi && codexConfig.wireApi !== 'responses') {
+      console.error(`[CC Viewer] Codex provider "${codexConfig.provider}" uses wire_api="${codexConfig.wireApi}"; Codex HTTP interceptor currently captures /v1/responses first.`);
+    }
+
+    serverMod = await import('./server.js');
+    await waitForViewerPort(serverMod);
+    const port = serverMod.getPort();
+    const protocol = serverMod.getProtocol();
+
+    const interceptorMod = await import('./interceptor.js');
+    const { startCodexHttpProxy } = await import('./lib/codex-http-proxy.js');
+    codexProxy = await startCodexHttpProxy({
+      upstreamBaseUrl: codexConfig.baseUrl,
+      logFile: interceptorMod.LOG_FILE,
+    });
+
+    const localBaseUrl = `${codexProxy.url}/v1`;
+    const overrideArg = `model_providers.${codexConfig.provider}.base_url=${localBaseUrl}`;
+    const finalArgs = ['-c', overrideArg, ...cmdArgs];
+    const env = { ...process.env };
+    delete env.ANTHROPIC_BASE_URL;
+    env.CCV_CODEX_PROXY_MODE = '1';
+
+    const viewerUrl = `${protocol}://127.0.0.1:${port}?provider=codex`;
+    if (!noOpen) openViewerUrl(viewerUrl);
+    console.log('CC Viewer (Codex):');
+    console.log(`  ➜ Local:   ${viewerUrl}`);
+    const _lanIps = serverMod.getAllLocalIps();
+    const _token = serverMod.getAccessToken();
+    for (const _ip of _lanIps) {
+      console.log(`  ➜ Network: ${protocol}://${_ip}:${port}?provider=codex&token=${encodeURIComponent(_token)}`);
+    }
+    console.log(`  ➜ Proxy:   ${localBaseUrl}`);
+    console.log(`  ➜ Upstream: ${codexConfig.baseUrl}`);
+
+    const child = spawn(cmd, finalArgs, { stdio: 'inherit', env, cwd: workingDir });
+    const cleanup = async (code = 0) => {
+      try { if (codexProxy) await codexProxy.close(); } catch {}
+      try { if (serverMod) await serverMod.stopViewer(); } catch {}
+      process.exit(code ?? 0);
+    };
+    child.on('exit', cleanup);
+    child.on('error', async (err) => {
+      console.error('Failed to start Codex command:', err.message);
+      await cleanup(1);
+    });
+  } catch (err) {
+    try { if (codexProxy) await codexProxy.close(); } catch {}
+    try { if (serverMod) await serverMod.stopViewer(); } catch {}
+    console.error('Codex proxy error:', err.message || err);
+    process.exit(1);
+  }
+}
+
+async function runProxyCommand(args, noOpen = false) {
+  try {
+    const { cmd, cmdArgs } = parseRunArgs(args);
+    if (!cmd) {
+      console.error('No command provided to run.');
+      process.exit(1);
+    }
+    if (isCodexCommand(cmd)) {
+      return runCodexProxyCommand(cmd, cmdArgs, noOpen);
+    }
+
     // Dynamic import to avoid side effects when just installing
     const { startProxy } = await import('./proxy.js');
     const proxyPort = await startProxy();
@@ -232,17 +413,8 @@ async function runProxyCommand(args) {
     // args[0] is 'run'.
     // If args[1] is '--', then command starts at args[2].
 
-    let cmdStartIndex = 1;
-    if (args[1] === '--') {
-      cmdStartIndex = 2;
-    }
-
-    let cmd = args[cmdStartIndex];
-    if (!cmd) {
-      console.error('No command provided to run.');
-      process.exit(1);
-    }
-    let cmdArgs = args.slice(cmdStartIndex + 1);
+    let claudeCmd = cmd;
+    let claudeCmdArgs = cmdArgs;
 
     // If cmd is 'claude' and next arg is '--ccv-internal', remove it
     // and we must use 'command claude' to avoid infinite recursion of the shell function?
@@ -253,16 +425,12 @@ async function runProxyCommand(args) {
     // The issue might be that ccv itself is running in a way that PATH is weird?
 
     // Wait, the shell hook adds '--ccv-internal'. We should strip it before spawning.
-    if (cmdArgs[0] === '--ccv-internal') {
-      cmdArgs.shift();
-    }
-
     const env = { ...process.env };
     // Determine the path to the native 'claude' executable
-    if (cmd === 'claude') {
+    if (claudeCmd === 'claude') {
       const nativePath = resolveNativePath();
       if (nativePath) {
-        cmd = nativePath;
+        claudeCmd = nativePath;
       }
     }
     env.ANTHROPIC_BASE_URL = `http://127.0.0.1:${proxyPort}`;
@@ -280,16 +448,16 @@ async function runProxyCommand(args) {
     // 若 claude 不识别该 flag（老版本/fork）会 unknown option 崩溃——由 pty-manager.js::spawnClaude 的
     // onExit reactive retry 兜底；cli.js 这条路径是一次性子进程，没有 respawn 机会，用户需手动重试。
     // 可通过环境变量 CCV_SKIP_THINKING_DISPLAY=1 强制跳过。
-    const isClaudeCmd = cmd === 'claude' || /[\\/]claude(\.exe)?$/.test(cmd);
+    const isClaudeCmd = claudeCmd === 'claude' || /[\\/]claude(\.exe)?$/.test(claudeCmd);
     if (isClaudeCmd && process.env.CCV_SKIP_THINKING_DISPLAY !== '1') {
       const { withDefaultThinkingDisplay } = await import('./pty-manager.js');
-      cmdArgs = withDefaultThinkingDisplay(cmdArgs);
+      claudeCmdArgs = withDefaultThinkingDisplay(claudeCmdArgs);
     }
 
-    cmdArgs.unshift(settingsJson);
-    cmdArgs.unshift('--settings');
+    claudeCmdArgs.unshift(settingsJson);
+    claudeCmdArgs.unshift('--settings');
 
-    const child = spawn(cmd, cmdArgs, { stdio: 'inherit', env });
+    const child = spawn(claudeCmd, claudeCmdArgs, { stdio: 'inherit', env });
 
     child.on('exit', (code) => {
       process.exit(code);
@@ -757,7 +925,7 @@ if (isLogger) {
 }
 
 if (args[0] === 'run') {
-  runProxyCommand(args);
+  runProxyCommand(args, noOpen);
 } else if (args.includes('-SDK') || args.includes('--sdk')) {
   // SDK 模式（显式 -SDK 切换）
   const claudeArgs = args.filter(a => a !== '-SDK' && a !== '--sdk')

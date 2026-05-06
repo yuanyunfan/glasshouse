@@ -72,6 +72,10 @@ export function createEntrySlimmer(isMainAgentFn) {
           for (let j = startIdx; j < pCount; j++) idxArr.push(j);
 
           prev._messageCount = pCount;
+          if (Array.isArray(prev.body.contextMessages) && prev.body.contextMessages.length > 0) {
+            prev._contextMessageCount = prev.body.contextMessages.length;
+            prev.body.contextMessages = [];
+          }
           prev._messagesIndex = idxArr;
           prev._slimmed = true;
           prev.body.messages = [];
@@ -154,6 +158,12 @@ export function restoreSlimmedEntry(entry, requests) {
   const fullEntry = requests[entry._fullEntryIndex];
   if (!fullEntry?.body?.messages) return entry;
   if (fullEntry.body.messages.length < entry._messageCount) return entry;
+  const restoredContextMessages = (() => {
+    if (!entry._contextMessageCount) return entry.body?.contextMessages;
+    if (!Array.isArray(fullEntry.body.contextMessages)) return entry.body?.contextMessages;
+    if (fullEntry.body.contextMessages.length < entry._contextMessageCount) return entry.body?.contextMessages;
+    return fullEntry.body.contextMessages.slice(0, entry._contextMessageCount);
+  })();
   return {
     ...entry,
     _slimmed: false,
@@ -161,6 +171,7 @@ export function restoreSlimmedEntry(entry, requests) {
     body: {
       ...entry.body,
       messages: fullEntry.body.messages.slice(0, entry._messageCount),
+      ...(restoredContextMessages ? { contextMessages: restoredContextMessages } : {}),
       system: fullEntry.body.system,
     }
   };
@@ -228,6 +239,10 @@ export function createIncrementalSlimmer(isMainAgentFn) {
         const orig = requests[prevMainIdx];
         if (orig.body?.messages?.length > 0) {
           const cloned = { ...orig, body: { ...orig.body }, _messageCount: orig.body.messages.length, _slimmed: true, _fullEntryIndex: currentIdx };
+          if (Array.isArray(orig.body.contextMessages) && orig.body.contextMessages.length > 0) {
+            cloned._contextMessageCount = orig.body.contextMessages.length;
+            cloned.body.contextMessages = [];
+          }
           cloned.body.messages = [];
           requests[prevMainIdx] = cloned;
           sessionSlimmedIndices.add(prevMainIdx);

@@ -51,8 +51,7 @@ import { countLogEntries, streamRawEntriesAsync, readPagedEntries } from './lib/
 import { awaitDrainOrClose } from './lib/sse-backpressure.js';
 import { enrichRawIfNeeded } from './lib/enrich-plan-input.js';
 import { buildTeamStatusResponse } from './lib/team-runtime.js';
-import { listCodexSessions, readCodexSession, createCodexSessionTail } from './lib/codex-session-reader.js';
-import { buildCodexContextWindow } from './lib/codex-entry-adapter.js';
+import { buildCodexContextWindow } from './lib/codex-http-adapter.js';
 
 
 // 动态获取 getPrefsFile()（LOG_DIR 可能在运行时被 setLogDir 修改）
@@ -281,6 +280,82 @@ function _latestCodexContextWindow(entries) {
   return null;
 }
 
+function _parseLogEntry(raw) {
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+function _isCodexEntry(entry) {
+  return entry?.provider === 'codex-http' ||
+    (entry?.provider === 'codex' && entry?.body?.metadata?.transport === 'http-interceptor');
+}
+
+function _normalizeCodexEntry(entry) {
+  if (!entry || entry.provider !== 'codex-http') return entry;
+  return { ...entry, provider: 'codex' };
+}
+
+async function _readCodexLogEntries() {
+  const entries = [];
+  await streamRawEntriesAsync(LOG_FILE, (raw) => {
+    const entry = _parseLogEntry(enrichRawIfNeeded(raw));
+    if (_isCodexEntry(entry)) entries.push(_normalizeCodexEntry(entry));
+  });
+  return entries;
+}
+
+function _createCodexLogTail(onEntry) {
+  const logFile = LOG_FILE;
+  if (!logFile) return () => {};
+  let offset = 0;
+  let pending = '';
+  try {
+    if (existsSync(logFile)) offset = statSync(logFile).size;
+  } catch {}
+
+  const consumeRaw = (raw) => {
+    const entry = _parseLogEntry(enrichRawIfNeeded(raw));
+    if (_isCodexEntry(entry)) onEntry(_normalizeCodexEntry(entry));
+  };
+
+  const watcher = () => {
+    let currentSize = 0;
+    try { currentSize = statSync(logFile).size; } catch { return; }
+    if (currentSize < offset) {
+      offset = currentSize;
+      pending = '';
+      return;
+    }
+    if (currentSize <= offset) return;
+    const bytesToRead = currentSize - offset;
+    const buf = Buffer.alloc(bytesToRead);
+    const fd = openSync(logFile, 'r');
+    try {
+      readSync(fd, buf, 0, bytesToRead, offset);
+    } finally {
+      closeSync(fd);
+    }
+    offset = currentSize;
+    const chunk = pending + buf.toString('utf-8');
+    const parts = chunk.split('\n---\n');
+    pending = parts.pop() || '';
+    for (const part of parts) {
+      if (part.trim()) consumeRaw(part.trim());
+    }
+    if (pending.trim()) {
+      try {
+        JSON.parse(pending);
+        consumeRaw(pending.trim());
+        pending = '';
+      } catch {}
+    }
+  };
+
+  try { watchFile(logFile, { interval: 500 }, watcher); } catch {}
+  return () => {
+    try { unwatchFile(logFile, watcher); } catch {}
+  };
+}
+
 function getLocalIp() {
   const nets = networkInterfaces();
   for (const name of Object.keys(nets)) {
@@ -375,19 +450,6 @@ async function handleRequest(req, res) {
     if (!res.headersSent) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Plugin error' }));
-    }
-    return;
-  }
-
-  if (url === '/api/codex/sessions' && method === 'GET') {
-    try {
-      const result = listCodexSessions();
-      _sendJson(res, 200, {
-        codexHome: result.codexHome,
-        sessions: result.sessions,
-      });
-    } catch (err) {
-      _sendJson(res, 500, { error: err.message || 'Failed to list Codex sessions' });
     }
     return;
   }
@@ -971,23 +1033,11 @@ async function handleRequest(req, res) {
     return;
   }
 
-  // SSE endpoint — Codex provider reads trusted session JSONL files by id.
-  if (url === '/events' && method === 'GET' && parsedUrl.searchParams.get('provider') === 'codex') {
-    const sessionId = parsedUrl.searchParams.get('session');
-    if (!sessionId) {
-      _sendJson(res, 400, { error: 'missing "session" parameter' });
-      return;
-    }
-
-    let loaded;
-    try {
-      loaded = readCodexSession(sessionId, { slim: true });
-    } catch (err) {
-      const status = err.code === 'CODEX_SESSION_NOT_FOUND' ? 404 : 500;
-      _sendJson(res, status, { error: err.message || 'Failed to read Codex session' });
-      return;
-    }
-
+  // SSE endpoint — Codex provider reads cc-viewer JSONL entries captured by the local Codex HTTP proxy.
+  if (url === '/events' && method === 'GET' && (
+    parsedUrl.searchParams.get('provider') === 'codex' ||
+    parsedUrl.searchParams.get('provider') === 'codex-http'
+  )) {
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
@@ -999,31 +1049,30 @@ async function handleRequest(req, res) {
     }, 30000);
 
     let cleanupTail = null;
-    const removeCodexClient = () => {
+    const cleanup = () => {
       clearInterval(pingTimer);
       if (cleanupTail) {
         try { cleanupTail(); } catch {}
         cleanupTail = null;
       }
     };
-    req.on('close', removeCodexClient);
-    res.on('close', removeCodexClient);
-    res.on('error', removeCodexClient);
+    req.on('close', cleanup);
+    res.on('close', cleanup);
+    res.on('error', cleanup);
 
     try {
-      const entries = loaded.entries || [];
+      const entries = await _readCodexLogEntries();
       res.write(`event: load_start\ndata: ${JSON.stringify({ total: entries.length, incremental: false })}\n\n`);
       for (const entry of entries) {
         if (res.destroyed || !res.writable) break;
-        const payload = `event: load_chunk\ndata: [${JSON.stringify(entry)}]\n\n`;
-        const drained = res.write(payload);
+        const drained = res.write(`event: load_chunk\ndata: [${JSON.stringify(entry)}]\n\n`);
         if (!drained) await awaitDrainOrClose(res, SSE_BACKPRESSURE_TIMEOUT_MS);
       }
       res.write('event: load_end\ndata: {}\n\n');
       const cw = _latestCodexContextWindow(entries);
       if (cw) res.write(`event: context_window\ndata: ${JSON.stringify(cw)}\n\n`);
 
-      cleanupTail = createCodexSessionTail(sessionId, (entry) => {
+      cleanupTail = _createCodexLogTail((entry) => {
         if (res.destroyed || !res.writable) return;
         try {
           res.write(`data: ${JSON.stringify(entry)}\n\n`);
@@ -1033,7 +1082,7 @@ async function handleRequest(req, res) {
       });
     } catch (err) {
       try { res.write(`event: error\ndata: ${JSON.stringify({ error: err.message })}\n\n`); } catch {}
-      removeCodexClient();
+      cleanup();
       try { res.end(); } catch {}
     }
     return;
@@ -1196,18 +1245,15 @@ async function handleRequest(req, res) {
 
   // API endpoint
   if (url === '/api/requests' && method === 'GET') {
-    if (parsedUrl.searchParams.get('provider') === 'codex') {
-      const sessionId = parsedUrl.searchParams.get('session');
-      if (!sessionId) {
-        _sendJson(res, 400, { error: 'missing "session" parameter' });
-        return;
-      }
+    if (
+      parsedUrl.searchParams.get('provider') === 'codex' ||
+      parsedUrl.searchParams.get('provider') === 'codex-http'
+    ) {
       try {
-        const result = readCodexSession(sessionId, { slim: true });
-        _sendJson(res, 200, result.entries);
+        const entries = await _readCodexLogEntries();
+        _sendJson(res, 200, entries);
       } catch (err) {
-        const status = err.code === 'CODEX_SESSION_NOT_FOUND' ? 404 : 500;
-        _sendJson(res, status, { error: err.message || 'Failed to read Codex session' });
+        _sendJson(res, 500, { error: err.message || 'Failed to read Codex entries' });
       }
       return;
     }

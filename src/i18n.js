@@ -8117,45 +8117,15 @@ const i18nData = {
     "en": "Codex",
     "zh-TW": "Codex"
   },
+  "ui.codexHttpWaiting": {
+    "zh": "等待通过 codex 或 ccv run -- codex 捕获的 Codex 请求。",
+    "en": "Waiting for Codex requests captured through codex or ccv run -- codex.",
+    "zh-TW": "等待透過 codex 或 ccv run -- codex 捕獲的 Codex 請求。"
+  },
   "ui.codexMode": {
     "zh": "Codex Viewer",
     "en": "Codex Viewer",
     "zh-TW": "Codex Viewer"
-  },
-  "ui.codexSession": {
-    "zh": "Codex 会话",
-    "en": "Codex session",
-    "zh-TW": "Codex 會話"
-  },
-  "ui.codexSessionPlaceholder": {
-    "zh": "选择 Codex 会话",
-    "en": "Select a Codex session",
-    "zh-TW": "選擇 Codex 會話"
-  },
-  "ui.codexSessionLoading": {
-    "zh": "正在加载 Codex 会话...",
-    "en": "Loading Codex sessions...",
-    "zh-TW": "正在載入 Codex 會話..."
-  },
-  "ui.codexNoSessions": {
-    "zh": "没有找到 Codex session JSONL",
-    "en": "No Codex session JSONL files found",
-    "zh-TW": "沒有找到 Codex session JSONL"
-  },
-  "ui.codexLoadFailed": {
-    "zh": "加载 Codex 会话失败",
-    "en": "Failed to load Codex sessions",
-    "zh-TW": "載入 Codex 會話失敗"
-  },
-  "ui.codexNoSessionSelected": {
-    "zh": "请选择一个 Codex 会话。",
-    "en": "Select a Codex session.",
-    "zh-TW": "請選擇一個 Codex 會話。"
-  },
-  "ui.codexRefreshSessions": {
-    "zh": "刷新 Codex 会话",
-    "en": "Refresh Codex sessions",
-    "zh-TW": "重新整理 Codex 會話"
   },
   "ui.codexRawEvents": {
     "zh": "Codex 原始事件",

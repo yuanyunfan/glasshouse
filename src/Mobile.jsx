@@ -510,7 +510,7 @@ class Mobile extends AppBase {
             </button>
             {mobileIsCodex ? (
               <span className={styles.mobileCLIStatusLabel}>
-                {t('ui.providerCodex')}{this.state.selectedCodexSessionId ? `: ${this.state.selectedCodexSessionId.slice(0, 8)}` : ''}
+                {t('ui.providerCodex')}
               </span>
             ) : !mobileIsLocalLog ? (() => {
               // 移动端（含 iPad）：渲染与 PC 一致的上下文血条。contextPercent 已在 render 顶部计算。

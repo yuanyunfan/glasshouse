@@ -128,19 +128,6 @@
   width: 112px;
 }
 
-.codexSessionSelect {
-  width: min(34vw, 360px);
-}
-
-.codexRefreshBtn {
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* Cache countdown */
 .countdownStrong {
   font-variant-numeric: tabular-nums;

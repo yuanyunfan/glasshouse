@@ -55,8 +55,8 @@ class RequestList extends React.Component {
   };
 
   renderTypeTag(req, reqType, subType) {
-    if (req.provider === 'codex') {
-      const kind = req.codexKind || 'Meta';
+    if (req.provider === 'codex' && req.codexKind) {
+      const kind = req.codexKind;
       const colorClass = kind === 'User' || kind === 'Assistant'
         ? styles.tagMainAgent
         : kind === 'Usage' || kind === 'Meta'

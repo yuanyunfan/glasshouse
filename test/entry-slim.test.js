@@ -258,6 +258,26 @@ describe('restoreSlimmedEntry', () => {
     assert.notEqual(restored, slimmed, 'should return new object');
   });
 
+  it('should restore contextMessages when present on a slimmed entry', () => {
+    const full = makeMainAgent(20);
+    full.body.contextMessages = Array.from({ length: 8 }, (_, i) => ({ role: 'user', content: `ctx-${i}` }));
+    const slimmed = {
+      ...makeMainAgent(10),
+      _slimmed: true,
+      _messageCount: 10,
+      _contextMessageCount: 3,
+      _fullEntryIndex: 1,
+    };
+    slimmed.body.messages = [];
+    slimmed.body.contextMessages = [];
+    const requests = [slimmed, full];
+
+    const restored = restoreSlimmedEntry(slimmed, requests);
+    assert.equal(restored.body.messages.length, 10);
+    assert.equal(restored.body.contextMessages.length, 3);
+    assert.deepEqual(restored.body.contextMessages.map(m => m.content), ['ctx-0', 'ctx-1', 'ctx-2']);
+  });
+
   it('should return original entry when fullEntry has fewer messages than _messageCount', () => {
     const full = makeMainAgent(5); // only 5 messages, but slimmed expects 10
     const slimmed = {

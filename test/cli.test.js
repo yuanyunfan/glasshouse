@@ -497,6 +497,24 @@ describe('ccv -logger: shell hook template invariants', () => {
       `expected ≥2 occurrences of 'ccv run -- claude --ccv-internal' (native hook + npm self-heal), got ${matches.length}`);
   });
 
+  it('shell hook wraps Codex agent calls through the Codex HTTP interceptor and keeps management commands passthrough', () => {
+    assert.ok(source.includes('codex() {'),
+      'shell hook should define a codex wrapper');
+    assert.ok(source.includes('ccv run -- codex --ccv-internal'),
+      'codex wrapper should route agent calls through the Codex HTTP interceptor');
+    assert.ok(source.includes('login') && source.includes('logout') && source.includes('mcp'),
+      'codex wrapper should keep auth/config commands as passthrough');
+    assert.ok(source.includes('command codex "$@"'),
+      'codex wrapper should preserve a direct passthrough path');
+  });
+
+  it('Codex HTTP startup output includes authenticated LAN viewer URLs', () => {
+    assert.ok(source.includes('CC Viewer (Codex):'),
+      'Codex startup banner should be present');
+    assert.ok(source.includes('?provider=codex&token='),
+      'Codex startup output should include provider-scoped network URLs with token');
+  });
+
   it('logger mode selection no longer depends on realpath(node_modules) heuristic', () => {
     // The old `prefersNative` detection loop has been removed; mode is decided
     // purely by cli.js presence. Guard against regressions that reintroduce

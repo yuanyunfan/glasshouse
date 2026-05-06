@@ -1,9 +1,10 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { request } from 'node:http';
-import { mkdtempSync, rmSync, writeFileSync, mkdirSync, existsSync, cpSync, appendFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, appendFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { buildCodexHttpEntry } from '../lib/codex-http-adapter.js';
 
 // 创建临时目录模拟 LOG_DIR
 const tmpDir = mkdtempSync(join(tmpdir(), 'ccv-server-test-'));
@@ -20,14 +21,31 @@ writeFileSync(fakeLogFile, JSON.stringify({
   status: 200,
 }) + '\n---\n');
 
-const fakeCodexHome = join(tmpDir, 'codex');
-cpSync(join(process.cwd(), 'test/fixtures/codex-session'), fakeCodexHome, { recursive: true });
-const fakeCodexSessionId = '11111111-2222-3333-4444-555555555555';
+async function appendCodexHttpFixture(overrides = {}) {
+  const interceptor = await import('../interceptor.js');
+  interceptor.initForWorkspace(join(tmpDir, 'codex-http-workspace'), { forceNew: true });
+  const entry = buildCodexHttpEntry({
+    url: '/v1/responses',
+    status: 200,
+    upstreamBaseUrl: 'http://localhost:7024/v1',
+    requestBody: {
+      model: 'gpt-5.4',
+      instructions: 'Codex HTTP system prompt',
+      input: [{ role: 'user', content: [{ type: 'input_text', text: overrides.prompt || 'Codex HTTP prompt' }] }],
+    },
+    responseBody: {
+      model: 'gpt-5.4',
+      output: [{ type: 'message', role: 'assistant', content: [{ type: 'output_text', text: overrides.answer || 'Codex HTTP answer' }] }],
+      usage: { input_tokens: 20, output_tokens: 5, total_tokens: 25 },
+    },
+  });
+  appendFileSync(interceptor.LOG_FILE, JSON.stringify(entry) + '\n---\n');
+  return { entry, logFile: interceptor.LOG_FILE };
+}
 
 // 设置环境变量，阻止自动启动和副作用
 process.env.CCV_WORKSPACE_MODE = '1';
 process.env.CCV_CLI_MODE = '0';
-process.env.CODEX_HOME = fakeCodexHome;
 
 /** 用 node:http 发请求（避免被 interceptor patch 的 fetch 干扰） */
 function httpRequest(port, path, { method = 'GET', body = null } = {}) {
@@ -214,56 +232,44 @@ describe('server API endpoints', { concurrency: false }, () => {
   });
 
   // --- Codex provider API ---
-  it('GET /api/codex/sessions lists trusted Codex sessions', async () => {
-    const res = await httpRequest(port, '/api/codex/sessions');
-    assert.equal(res.status, 200);
-    const data = res.json();
-    assert.equal(data.codexHome, fakeCodexHome);
-    assert.equal(data.sessions.length, 1);
-    assert.equal(data.sessions[0].id, fakeCodexSessionId);
-  });
-
-  it('GET /api/requests?provider=codex returns adapted entries', async () => {
-    const res = await httpRequest(port, `/api/requests?provider=codex&session=${fakeCodexSessionId}`);
+  it('GET /api/requests?provider=codex returns captured HTTP entries', async () => {
+    await appendCodexHttpFixture();
+    const res = await httpRequest(port, '/api/requests?provider=codex');
     assert.equal(res.status, 200);
     const data = res.json();
     assert.ok(Array.isArray(data));
+    assert.equal(data.length, 1);
     assert.equal(data[0].provider, 'codex');
-    assert.ok(data.some(entry => entry.codexKind === 'Command'));
-    assert.equal(data.at(-1).response.body.usage.total_tokens, 1250);
+    assert.equal(data[0].body.metadata.transport, 'http-interceptor');
+    assert.match(JSON.stringify(data[0].body.contextMessages), /Codex HTTP prompt/);
+    assert.match(JSON.stringify(data[0].response.body.content), /Codex HTTP answer/);
   });
 
-  it('GET /api/requests?provider=codex rejects unknown sessions', async () => {
-    const res = await httpRequest(port, '/api/requests?provider=codex&session=../../etc/passwd');
-    assert.equal(res.status, 404);
-    assert.match(res.json().error, /not found/i);
-  });
-
-  it('GET /events?provider=codex streams load events', async () => {
-    const res = await readSseUntil(port, `/events?provider=codex&session=${fakeCodexSessionId}`, 'event: load_end');
-    assert.equal(res.status, 200);
-    assert.equal(res.headers['content-type'], 'text/event-stream');
-    assert.match(res.body, /event: load_start/);
-    assert.match(res.body, /event: load_chunk/);
-    assert.match(res.body, /event: load_end/);
-    assert.match(res.body, /"provider":"codex"/);
-  });
-
-  it('GET /events?provider=codex streams appended JSONL lines', async () => {
-    const sessionPath = join(fakeCodexHome, 'sessions/2026/05/05/rollout-2026-05-05T10-00-00-11111111-2222-3333-4444-555555555555.jsonl');
-    const liveEvent = {
-      timestamp: '2026-05-05T10:00:20.000Z',
-      type: 'event_msg',
-      payload: { type: 'user_message', message: 'Live tail message' },
-    };
+  it('GET /events?provider=codex streams load and live captured entries', async () => {
+    const { logFile } = await appendCodexHttpFixture({ prompt: 'Initial HTTP prompt', answer: 'Initial HTTP answer' });
+    const liveEntry = buildCodexHttpEntry({
+      url: '/v1/responses',
+      status: 200,
+      upstreamBaseUrl: 'http://localhost:7024/v1',
+      requestBody: {
+        model: 'gpt-5.4',
+        input: [{ role: 'user', content: [{ type: 'input_text', text: 'Live HTTP prompt' }] }],
+      },
+      responseBody: {
+        model: 'gpt-5.4',
+        output: [{ type: 'message', role: 'assistant', content: [{ type: 'output_text', text: 'Live HTTP answer' }] }],
+      },
+    });
     const res = await readSseUntilAfterLoad(
       port,
-      `/events?provider=codex&session=${fakeCodexSessionId}`,
-      'Live tail message',
-      () => setTimeout(() => appendFileSync(sessionPath, JSON.stringify(liveEvent) + '\n'), 50)
+      '/events?provider=codex',
+      'Live HTTP answer',
+      () => setTimeout(() => appendFileSync(logFile, JSON.stringify(liveEntry) + '\n---\n'), 50)
     );
     assert.equal(res.status, 200);
-    assert.match(res.body, /Live tail message/);
+    assert.match(res.body, /event: load_start/);
+    assert.match(res.body, /Initial HTTP answer/);
+    assert.match(res.body, /Live HTTP answer/);
   });
 
   // --- GET /api/user-profile ---

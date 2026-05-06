@@ -137,13 +137,22 @@ ccv -h
 * 每个请求内联显示 Token 用量统计（输入/输出 Token、缓存创建/读取、命中率）
 * 兼容 Claude Code Router（CCR）及其他代理场景 — 通过 API 路径模式兜底匹配请求
 
-### Codex Viewer（只读）
+### Codex HTTP 捕获（Raven）
 
-在顶部栏的数据源选择器中从 Claude 切换到 Codex。CC-Viewer 会扫描 `CODEX_HOME` 或 `~/.codex` 下的 `sessions/**/*.jsonl`，列出可信会话，并把选中的 Codex session 渲染到 Raw 和对话模式中。
+如果 Codex 配置为使用 Raven 这类 OpenAI 兼容 provider，可以通过 CC-Viewer 启动：
 
-* 只读：不会启动 Codex、不会包装 Codex TUI、不会拦截上游 API，也不会解密加密 reasoning 内容
-* 直达 URL：打开 viewer 时使用 `?provider=codex`，也可以追加 `&session=<session-id>`
-* 实时更新：选中的 Codex JSONL 文件追加完整新行后，会通过现有 SSE 路径增量显示
+```bash
+ccv run -- codex
+```
+
+安装或更新 shell hook 后（`ccv -logger`），直接运行 `codex` 也会对 agent 类命令启动 Codex HTTP interceptor，并打印对应的 Local/Network/Proxy/Upstream Glasshouse URL。`login`、`logout`、`mcp`、`plugin`、`update`、`--help` 等 Codex 管理命令会原样透传。
+
+CC-Viewer 会启动本地 Codex HTTP proxy，并只对当前 Codex 子进程追加 `-c model_providers.<provider>.base_url=http://127.0.0.1:<port>/v1` 覆盖，把请求继续转发到原始 Raven base URL，通常是 `http://localhost:7024/v1`。这个模式不会修改 `~/.codex/config.toml`。
+
+* Viewer URL：使用 `?provider=codex` 打开，或在数据源选择器中选择 `Codex`
+* 捕获 OpenAI Responses API `/v1/responses` request 以及 JSON/SSE response
+* 写入 viewer 日志前会过滤 auth/API key headers
+* 旧的 `~/.codex/sessions/**/*.jsonl` reader 已移除；Codex 现在默认使用 HTTP interceptor 路径
 
 ### 对话模式
 

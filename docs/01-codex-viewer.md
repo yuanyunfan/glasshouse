@@ -2,7 +2,8 @@
 
 ## Status
 
-Done
+Superseded by [02 - Codex HTTP Interceptor](./02-codex-http-interceptor.md).
+The session JSONL reader described here has been removed from the runtime.
 
 ## Background
 
@@ -74,6 +75,30 @@ session and emits pseudo entries. Each pseudo entry preserves
 `provider: "codex"` and `_codexRawEvents` so raw details remain available even
 after normalization.
 
+Codex session JSONL is not a one-to-one Claude API request log. Prompt and tool
+metadata must be reconstructed from the events Codex does persist:
+
+- `session_meta.payload.base_instructions.text` becomes the primary system
+  prompt block.
+- `response_item.message` events with `role: "developer"` or `role: "system"`
+  are appended to the system prompt blocks.
+- `response_item.message` events with `role: "user"` are stored as
+  `body.contextMessages` for the Context tab. They are not inserted into
+  `body.messages`, because some of these messages are hidden runtime context
+  such as AGENTS/environment payloads and should not pollute the chat view.
+- `response_item.tool_search_output.payload.tools` is flattened into
+  Claude-like `body.tools[]` definitions with names, descriptions, and input
+  schemas.
+
+If Codex does not persist an upfront tool definition in the session JSONL, the
+viewer can only show the tool call name plus the raw event. It must not invent
+tool prompts that are not present in the source log.
+
+Codex reasoning events that contain only `encrypted_content` are preserved in
+the raw-event tab but are not rendered as `thinking` blocks. The viewer cannot
+decrypt those payloads, and showing a fake placeholder in the conversation
+misrepresents the context.
+
 ## Request Flow
 
 ```text
@@ -118,8 +143,9 @@ interface CodexPseudoEntry {
   body: {
     model: string;
     system: Array<{ type: "text"; text: string }>;
-    tools: Array<{ name: string }>;
+    tools: Array<{ name: string; description?: string; input_schema?: unknown }>;
     messages: Array<{ role: "user" | "assistant"; content: unknown }>;
+    contextMessages?: Array<{ role: "user" | "assistant"; content: unknown }>;
   };
   response: {
     status: 200;

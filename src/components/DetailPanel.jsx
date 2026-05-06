@@ -209,8 +209,10 @@ class DetailPanel extends React.Component {
 
   renderCodexSummary(request) {
     if (request?.provider !== 'codex') return null;
-    const session = request._codexSession || {};
-    const rawEvents = Array.isArray(request._codexRawEvents) ? request._codexRawEvents : [];
+    const metadata = request.body?.metadata || {};
+    const rawEvents = Array.isArray(request._codexRawResponseEvents)
+      ? request._codexRawResponseEvents
+      : (Array.isArray(request._codexRawEvents) ? request._codexRawEvents : []);
     const rawTypes = rawEvents
       .map(event => event?.payload?.type || event?.type)
       .filter(Boolean)
@@ -219,17 +221,16 @@ class DetailPanel extends React.Component {
       <div className={styles.codexSummary}>
         <div className={styles.codexSummaryHeader}>
           <Tag color="blue">{t('ui.providerCodex')}</Tag>
-          <Tag>{request.codexKind || t('ui.codexKind')}</Tag>
-          {session.id && <Text code className={styles.codexSessionId}>{session.id}</Text>}
+          <Tag>{metadata.transport || request.codexKind || t('ui.codexKind')}</Tag>
         </div>
         <div className={styles.codexSummaryGrid}>
           <div>
-            <Text type="secondary">{t('ui.codexSession')}</Text>
-            <div className={styles.codexSummaryValue}>{session.threadName || session.filename || session.id || '-'}</div>
+            <Text type="secondary">transport</Text>
+            <div className={styles.codexSummaryValue}>{metadata.transport || '-'}</div>
           </div>
           <div>
-            <Text type="secondary">cwd</Text>
-            <div className={styles.codexSummaryValue}>{session.cwd || request.body?.metadata?.cwd || '-'}</div>
+            <Text type="secondary">upstream</Text>
+            <div className={styles.codexSummaryValue}>{metadata.upstreamBaseUrl || '-'}</div>
           </div>
           <div>
             <Text type="secondary">model</Text>
@@ -792,12 +793,16 @@ class DetailPanel extends React.Component {
     ];
 
     if (request.provider === 'codex') {
+      const rawCodexData = request._codexRawEvents || {
+        request: request._codexRawRequest || null,
+        responseEvents: request._codexRawResponseEvents || [],
+      };
       tabItems.unshift({
         key: 'codex-raw',
         label: t('ui.codexRawEvents'),
         children: (
           <div className={styles.tabContent}>
-            <JsonViewer data={request._codexRawEvents || []} defaultExpand="all" />
+            <JsonViewer data={rawCodexData} defaultExpand="all" />
           </div>
         ),
       });

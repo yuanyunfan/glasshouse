@@ -24,11 +24,11 @@ export const MAX_SESSIONS = (isMobile && !isPad) ? 30 : 100;
 export const OPTIMISTIC_CLEAR_PERCENT = 5;
 
 function getInitialProviderState() {
-  if (typeof window === 'undefined') return { provider: 'claude', codexSessionId: '' };
+  if (typeof window === 'undefined') return { provider: 'claude' };
   const params = new URLSearchParams(window.location.search);
+  const providerParam = params.get('provider');
   return {
-    provider: params.get('provider') === 'codex' ? 'codex' : 'claude',
-    codexSessionId: params.get('session') || '',
+    provider: providerParam === 'codex' || providerParam === 'codex-http' ? 'codex' : 'claude',
   };
 }
 
@@ -61,11 +61,6 @@ class AppBase extends React.Component {
       cacheType,
       mainAgentSessions: [], // [{ messages, response }]
       provider: initialProvider.provider,
-      codexSessions: [],
-      codexSessionsLoading: false,
-      codexSessionsError: '',
-      codexHome: '',
-      selectedCodexSessionId: initialProvider.codexSessionId,
       importModalVisible: false,
       localLogs: {},       // { projectName: [{file, timestamp, size}] }
       localLogsLoading: false,
@@ -148,7 +143,6 @@ class AppBase extends React.Component {
     // 增量维护的 KV-Cache 缓存内容（稳定引用，不受 inProgress 闪烁影响）
     this._lastKvCacheContent = null;
     this._sseSlimmer = null; this._sseReconstructor = null;
-    this._codexSessionsSeq = 0;
   }
 
   /** 批量剪枝 entries：清空旧 MainAgent 的 body.messages，保留最后一条完整 */
@@ -189,14 +183,13 @@ class AppBase extends React.Component {
     return this.state.provider === 'codex';
   }
 
-  _setProviderUrl(provider, sessionId) {
+  _setProviderUrl(provider) {
     if (typeof window === 'undefined' || !window.history?.replaceState) return;
     const nextUrl = new URL(window.location.href);
     if (provider === 'codex') {
       nextUrl.searchParams.set('provider', 'codex');
       nextUrl.searchParams.delete('logfile');
-      if (sessionId) nextUrl.searchParams.set('session', sessionId);
-      else nextUrl.searchParams.delete('session');
+      nextUrl.searchParams.delete('session');
     } else {
       nextUrl.searchParams.delete('provider');
       nextUrl.searchParams.delete('session');
@@ -507,8 +500,9 @@ class AppBase extends React.Component {
       .catch(() => { });
 
     // 检查是否是通过 ?logfile= 打开的历史日志
-    if (isCodexInitial) {
-      this.loadCodexSessions(this.state.selectedCodexSessionId);
+    if (this._isCodexProvider()) {
+      this._setProviderUrl('codex');
+      this.initSSE();
     } else if (logfile) {
       this.loadLocalLogFile(logfile);
     } else {
@@ -700,46 +694,8 @@ class AppBase extends React.Component {
     this._loadingMore = false;
   }
 
-  loadCodexSessions = async (preferredSessionId = this.state.selectedCodexSessionId, options = {}) => {
-    const seq = ++this._codexSessionsSeq;
-    this.setState({ codexSessionsLoading: true, codexSessionsError: '' });
-    try {
-      const res = await fetch(apiUrl('/api/codex/sessions'));
-      const data = await res.json();
-      if (seq !== this._codexSessionsSeq) return;
-      if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
-
-      const sessions = Array.isArray(data.sessions) ? data.sessions : [];
-      const selected = sessions.some(s => s.id === preferredSessionId)
-        ? preferredSessionId
-        : (sessions[0]?.id || '');
-      const error = sessions.length === 0 ? t('ui.codexNoSessions') : '';
-
-      this.setState({
-        codexHome: data.codexHome || '',
-        codexSessions: sessions,
-        codexSessionsLoading: false,
-        codexSessionsError: error,
-        selectedCodexSessionId: selected,
-        ...(selected ? {} : this._resetViewerEntries()),
-      }, () => {
-        if (!this._isCodexProvider()) return;
-        this._setProviderUrl('codex', selected);
-        if (!selected && this.eventSource) { this.eventSource.close(); this.eventSource = null; }
-        if (selected && (options.force || !this.eventSource)) this.initSSE();
-      });
-    } catch (err) {
-      if (seq !== this._codexSessionsSeq) return;
-      this.setState({
-        codexSessionsLoading: false,
-        codexSessionsError: err.message || t('ui.codexLoadFailed'),
-        ...this._resetViewerEntries(),
-      });
-    }
-  };
-
   handleProviderChange = (provider) => {
-    const nextProvider = provider === 'codex' ? 'codex' : 'claude';
+    const nextProvider = provider === 'codex' || provider === 'codex-http' ? 'codex' : 'claude';
     if (nextProvider === this.state.provider) return;
 
     if (this.eventSource) { this.eventSource.close(); this.eventSource = null; }
@@ -755,36 +711,19 @@ class AppBase extends React.Component {
         sdkMode: false,
         ...this._resetViewerEntries({ fileLoading: true }),
       }, () => {
-        this._setProviderUrl('codex', this.state.selectedCodexSessionId);
-        this.loadCodexSessions(this.state.selectedCodexSessionId, { force: true });
+        this._setProviderUrl('codex');
+        this.initSSE();
       });
       return;
     }
 
     this.setState({
       provider: 'claude',
-      codexSessionsError: '',
       ...this._resetViewerEntries({ fileLoading: true }),
     }, () => {
       this._setProviderUrl('claude');
       this.initSSE();
     });
-  };
-
-  handleCodexSessionChange = (sessionId) => {
-    if (!sessionId || sessionId === this.state.selectedCodexSessionId) return;
-    if (this.eventSource) { this.eventSource.close(); this.eventSource = null; }
-    this.setState({
-      selectedCodexSessionId: sessionId,
-      ...this._resetViewerEntries({ fileLoading: true }),
-    }, () => {
-      this._setProviderUrl('codex', sessionId);
-      this.initSSE();
-    });
-  };
-
-  handleCodexSessionsRefresh = () => {
-    this.loadCodexSessions(this.state.selectedCodexSessionId, { force: true });
   };
 
   initSSE() {
@@ -794,13 +733,8 @@ class AppBase extends React.Component {
       let hasCache = false;
       const isCodex = this._isCodexProvider();
       if (this.eventSource) { this.eventSource.close(); this.eventSource = null; }
-      if (isCodex) {
-        const sessionId = this.state.selectedCodexSessionId;
-        if (!sessionId) {
-          this.setState({ fileLoading: false, fileLoadingCount: 0 });
-          return;
-        }
-        url = `/events?provider=codex&session=${encodeURIComponent(sessionId)}`;
+      if (this._isCodexProvider()) {
+        url = '/events?provider=codex';
       } else if (isMobile) {
         const meta = getCacheMeta();
         if (meta && meta.lastTs && meta.count > 0) {

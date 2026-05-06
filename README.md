@@ -143,13 +143,22 @@ Fulfill your imagination of mobile programming. There's also a plugin mechanism 
 - Each request displays inline Token usage statistics (input/output tokens, cache creation/read, hit rate)
 - Compatible with Claude Code Router (CCR) and other proxy scenarios — falls back to API path pattern matching
 
-### Codex Viewer (Read-only)
+### Codex HTTP Capture (Raven)
 
-Use the provider selector in the top bar to switch from Claude to Codex. CC-Viewer scans `CODEX_HOME` or `~/.codex` for `sessions/**/*.jsonl`, lists trusted sessions, and renders the selected session in both Raw and Conversation modes.
+If Codex is configured to use a Raven OpenAI-compatible provider, run it through CC-Viewer:
 
-- Read-only: it does not launch Codex, wrap the Codex TUI, intercept upstream API calls, or decrypt encrypted reasoning content
-- Direct URL: open the viewer with `?provider=codex`, optionally adding `&session=<session-id>`
-- Live updates: when the selected Codex JSONL file gets new complete lines, the viewer streams them through the existing SSE path
+```bash
+ccv run -- codex
+```
+
+After installing or updating the shell hook with `ccv -logger`, running `codex` directly also starts the Codex HTTP interceptor for agent commands and prints the matching Local/Network/Proxy/Upstream Glasshouse URLs. Codex management commands such as `login`, `logout`, `mcp`, `plugin`, `update`, and `--help` pass through unchanged.
+
+CC-Viewer starts a local Codex HTTP proxy, temporarily overrides the spawned Codex process with `-c model_providers.<provider>.base_url=http://127.0.0.1:<port>/v1`, and forwards traffic to the original Raven base URL, usually `http://localhost:7024/v1`. This mode does not edit `~/.codex/config.toml`.
+
+- Viewer URL: open with `?provider=codex`, or select `Codex` in the provider selector
+- Captures OpenAI Responses API `/v1/responses` requests and JSON/SSE responses
+- Sanitizes auth/API-key headers before writing viewer logs
+- The old `~/.codex/sessions/**/*.jsonl` reader has been removed; Codex now uses the HTTP interceptor path by default
 
 ### Conversation Mode
 

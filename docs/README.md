@@ -5,8 +5,11 @@ substantial changes.
 
 ## Active RFCs
 
-- [01 - Codex Viewer](./01-codex-viewer.md) - Add an offline and live viewer for
-  Codex session JSONL files. Status: done.
+- [01 - Codex Viewer](./01-codex-viewer.md) - Historical offline/live viewer for
+  Codex session JSONL files. Status: superseded by 02.
+- [02 - Codex HTTP Interceptor](./02-codex-http-interceptor.md) - Capture Codex
+  OpenAI Responses API traffic through a local Raven-facing proxy. Status:
+  done.
 
 ## Status Values
 

@@ -407,19 +407,21 @@ function AccordionSection({ sectionKey, title, items, historyItems = [], onSelec
 export default function ContextTab({ body, response }) {
   const [selectedItem, setSelectedItem] = useState(null);
   const sidebarRef = useRef(null);
+  const contextMessages = Array.isArray(body?.contextMessages) ? body.contextMessages : body?.messages;
 
   // Compute turns from messages; override last turn's assistant blocks with actual response.
   const turns = useMemo(() => {
-    if (!Array.isArray(body?.messages)) return [];
-    const allTurns = groupMessagesIntoTurns(body.messages);
+    if (!Array.isArray(contextMessages)) return [];
+    const allTurns = groupMessagesIntoTurns(contextMessages);
     if (allTurns.length === 0) return allTurns;
     const last = allTurns[allTurns.length - 1];
-    const responseBlocks = response?.content ? parseContentBlocks(response.content) : null;
+    const useResponseOverride = body?.metadata?.transport === 'http-interceptor' || body?.metadata?.provider !== 'codex';
+    const responseBlocks = useResponseOverride && response?.content ? parseContentBlocks(response.content) : null;
     return [
       ...allTurns.slice(0, -1),
       { ...last, assistantBlocks: responseBlocks ?? last.assistantBlocks },
     ];
-  }, [body, response]);
+  }, [contextMessages, response, body?.metadata?.provider]);
 
   // Auto-select last turn whenever body or response changes.
   useEffect(() => {
