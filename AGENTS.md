@@ -28,7 +28,6 @@ exposes local server APIs, SSE streams, and Electron/native runtime surfaces.
 - Store and compare timestamps as UTC/ISO strings; localize only at display
   boundaries.
 - Do not do unrelated refactors while implementing feature slices.
-- Do not auto-commit, push, or publish. Ask the user first.
 - Do not increment the package version except as part of an explicit publish
   flow.
 
