@@ -169,6 +169,140 @@ The dashboard should be the canonical result surface. It should show:
   token/context-window summaries.
 - Reviewer raw output and parse errors behind an expandable diagnostic section.
 
+## Persistence and Dashboard Lifecycle
+
+The production dashboard should be dynamic, not a static HTML artifact. The
+static dashboard prototype in `docs/session-quality-audit-dashboard.html` is
+only a design preview. Runtime UI should use a route such as:
+
+```text
+/session-quality-audit/:auditId
+```
+
+The page should load persisted audit state with
+`GET /api/session-audits/:auditId` and subscribe to
+`SSE /api/session-audits/:auditId/events` while the job is running.
+
+Audit data should be persisted. It should not be an in-memory one-shot result,
+because users need to reopen reports, avoid duplicate reviewer runs, compare
+reruns, and inspect historical findings after a session changes.
+
+Recommended storage layers:
+
+- **Audit job metadata**: `auditId`, source provider, source session key, source
+  revision, audit config hash, status, timestamps, reviewer model/process
+  metadata, attempt number, and error details.
+- **Audit result**: overall status, hard gates, category scores, deterministic
+  rule findings, LLM reviewer findings, summary, recommendations, diagnostics,
+  parse errors, and reviewer raw-output metadata.
+- **Evidence bundle and refs**: compact redacted evidence, evidence bundle hash,
+  request indexes, message indexes, tool-call IDs, short excerpts, and excerpt
+  hashes. Full raw session copies should not be persisted by default.
+
+For MVP, a local JSON audit store is enough:
+
+```text
+<LOG_DIR>/audits/
+  audit-index.json
+  audit_<id>/
+    metadata.json
+    evidence-bundle.json
+    rule-findings.json
+    reviewer-output.json
+    report.json
+```
+
+Longer term, SQLite is a better fit for listing audits, querying attempts,
+updating job state, cleaning old reports, and joining evidence references to
+dashboard views.
+
+Each audit should record a source revision and an audit config hash:
+
+```text
+sourceRevision = hash(
+  sourceProvider,
+  sourceSessionKey,
+  entryCount,
+  lastEntryTimestamp,
+  logSize,
+  lastEntryDedupKey
+)
+
+auditConfigHash = hash(
+  ruleEngineVersion,
+  reviewerPromptVersion,
+  reviewerModel,
+  redactionPolicyVersion,
+  reportSchemaVersion
+)
+
+dedupeKey = hash(sourceProvider, sourceSessionKey, sourceRevision, auditConfigHash)
+```
+
+`sourceRevision` must change when the source session grows or its log content is
+rewritten. `auditConfigHash` must change when rule behavior, reviewer prompt,
+model choice, redaction, or report schema changes.
+
+Evidence links should resolve raw details on demand from trusted source logs.
+The persisted report should contain enough short excerpts to be useful offline,
+but it should not become a second full copy of Claude or Codex logs.
+
+## Repeated AI Insight Click Behavior
+
+Clicking `AI Insight` should be idempotent for the same source revision and
+audit configuration:
+
+```text
+click AI Insight
+-> compute dedupeKey
+-> find existing audit for dedupeKey
+-> if complete: open existing dashboard
+-> if queued/extracting/rule-checking/reviewing: open running dashboard
+-> if failed: open failed dashboard with Retry action
+-> if missing: create a new audit job
+```
+
+If a user clicks `AI Insight` multiple times while an audit is running, the
+server should not launch multiple Codex reviewer processes. All browser tabs
+should attach to the same audit job and subscribe to the same progress stream.
+
+If the source session has changed since the previous audit, the previous report
+must not be silently reused as the current result. For example:
+
+```text
+After query #3:
+sourceRevision = rev_3
+auditId = audit_A
+scope = #1..#3
+
+After ten more user queries:
+sourceRevision = rev_13
+AI Insight click creates audit_B
+scope = #1..#13
+```
+
+The old dashboard should remain available and be marked as outdated, for
+example: `Source session has 10 newer turns`. The current click should either
+create the new full-session audit directly or show a choice:
+
+```text
+Open previous report / Run new insight for current session
+```
+
+MVP behavior should use full-session audits. A later version can add delta
+audits:
+
+- **Full-session audit**: audit from the beginning of the session through the
+  current latest request. This is the default and easiest result to interpret.
+- **Delta audit**: audit only turns added after the previous audit, such as
+  `#4..#13`. This reduces cost for long sessions, but the dashboard must still
+  explain how the delta findings relate to the full timeline.
+
+Explicit `Rerun Insight` should always create a new attempt, even when
+`sourceRevision` and `auditConfigHash` are unchanged. Attempts should be
+retained under the same source session so users can compare reviewer drift or
+prompt/model changes.
+
 ## Layer 1: Rule Checks
 
 Rule checks should produce structured findings:
@@ -350,12 +484,14 @@ exact excerpt to decide a finding.
   entries.
 - C2: deterministic rule engine with fixtures for hard gates and project
   invariants.
-- C3: audit job API and store, including `POST /api/session-audits`,
+- C3: audit job API and persistent store, including source revision hashing,
+  dedupe, attempts, `POST /api/session-audits`,
   `GET /api/session-audits/:auditId`, and audit progress events.
 - C4: Codex reviewer runner with prompt fixtures, process isolation, redaction
   checks, timeout handling, and result parsing.
-- C5: browser `AI Insight` button and session-quality-audit dashboard with
-  progress, findings, scores, and evidence links.
+- C5: browser `AI Insight` button and dynamic session-quality-audit dashboard
+  with persisted report loading, progress streaming, findings, scores, evidence
+  links, rerun, retry, and outdated-source handling.
 - C6: documentation for running audits and interpreting results.
 
 ## Verification Plan
@@ -378,8 +514,15 @@ End-to-end verification:
 
 - API test for generating an audit bundle from loaded entries.
 - API test for creating an audit job from a selected trusted session key.
+- API test that repeated clicks for the same `dedupeKey` reuse the existing
+  complete or running audit.
+- API test that source session growth changes `sourceRevision` and creates a new
+  audit attempt instead of reusing the old report.
+- API test that explicit `Rerun Insight` creates a new attempt for the same
+  source revision.
 - Runner test with a fake Codex command that emits a valid reviewer report.
 - Browser check that clicking `AI Insight` starts or reuses an audit job and
   navigates to the session-quality-audit dashboard.
+- Browser check that an outdated audit shows the source-changed banner.
 - Browser check for evidence links when the UI is implemented.
 - `npm test` and `npm run build` before shipping runtime changes.
