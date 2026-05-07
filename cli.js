@@ -383,7 +383,7 @@ async function runCodexProxyCommand(cmd, cmdArgs, noOpen = false) {
     const { startCodexHttpProxy } = await import('./lib/codex-http-proxy.js');
     codexProxy = await startCodexHttpProxy({
       upstreamBaseUrl: codexConfig.baseUrl,
-      logFile: interceptorMod.LOG_FILE,
+      getLogFile: () => interceptorMod.LOG_FILE,
     });
 
     const localBaseUrl = `${codexProxy.url}/v1`;

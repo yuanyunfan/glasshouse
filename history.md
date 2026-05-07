@@ -6,6 +6,7 @@
 - feat(codex): add read-only Codex session JSONL viewer with trusted session APIs, SSE live tail, provider/session UI switch, and raw/chat rendering
 - feat(codex-http): add `ccv run -- codex` Raven-facing Responses API interceptor with `provider=codex` viewer mode
 - feat(codex-http): extend the shell hook so direct `codex` agent launches print Glasshouse URLs and route through the Codex HTTP interceptor
+- fix(codex-http): write captured Codex entries to the live log file after resume/new-log resolution so the viewer does not open empty while requests are in flight
 - refactor(codex): remove the old `~/.codex/sessions/**/*.jsonl` session reader and make HTTP interception the default Codex provider path
 - fix(codex): stop automatically opening the browser for Codex HTTP sessions; terminal output still prints the viewer URLs
 - fix(codex): render Responses API built-in tool calls such as `web_search_call` / `open_page` in the Context tab instead of dropping them

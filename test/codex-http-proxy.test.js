@@ -1,6 +1,9 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import http, { request } from 'node:http';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { startCodexHttpProxy, buildUpstreamUrl } from '../lib/codex-http-proxy.js';
 
 function startFakeRaven(handler) {
@@ -133,6 +136,44 @@ describe('codex-http-proxy', () => {
     } finally {
       await proxy.close();
       await upstream.close();
+    }
+  });
+
+  it('writes captured entries to the current log file at response completion', async () => {
+    const tmp = mkdtempSync(join(tmpdir(), 'glasshouse-codex-proxy-'));
+    const staleLog = join(tmp, 'stale.jsonl');
+    const activeLog = join(tmp, 'active.jsonl');
+    let currentLog = staleLog;
+
+    const upstream = await startFakeRaven((req, res) => {
+      res.writeHead(200, { 'content-type': 'application/json' });
+      currentLog = activeLog;
+      res.end(JSON.stringify({
+        id: 'resp_dynamic_log',
+        model: 'gpt-5.4',
+        output: [{ type: 'message', role: 'assistant', content: [{ type: 'output_text', text: 'dynamic log ok' }] }],
+      }));
+    });
+    const proxy = await startCodexHttpProxy({
+      upstreamBaseUrl: upstream.baseUrl,
+      getLogFile: () => currentLog,
+    });
+    try {
+      const res = await postJson(proxy.port, '/v1/responses', {
+        model: 'gpt-5.4',
+        input: 'Hello',
+      });
+
+      assert.equal(res.status, 200);
+      assert.equal(existsSync(staleLog), false);
+      assert.equal(existsSync(activeLog), true);
+      const raw = readFileSync(activeLog, 'utf-8');
+      assert.match(raw, /"provider":"codex"/);
+      assert.match(raw, /dynamic log ok/);
+    } finally {
+      await proxy.close();
+      await upstream.close();
+      rmSync(tmp, { recursive: true, force: true });
     }
   });
 });
